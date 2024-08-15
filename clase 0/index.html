@@ -1,0 +1,91 @@
+<!-- DOCUMENTACION -->
+<!-- https://www.youtube.com/watch?v=bBB-dMgeisk -->
+<!-- https://www.youtube.com/watch?v=NVdH2Sys0ZI -->
+<html>
+
+<head>
+    <script>
+        let unaVariable = 2
+        let unArray = [4, 5, 6, 7, 7]
+        let unaVariableBooleana = false
+        //los objetos tienen sintaxis de json. JSON es JS Object Notation
+        let objeto = { prop1: "bla", prop2: 3 }
+        //FUNCIONES
+        let unaFuncion = function () {
+            console.log(this)
+        }
+        let otraFuncion = () => {
+            console.log(this)
+        }
+        //const no se pueden cambiar, variables definidas como let, si
+        const otroObjeto = {
+            funcion: () => {
+                console.log(this)
+            }
+        }
+        //Javascript no es tipado
+        let arrayDeCualquierCosa = ["sd", { propiedad: 6 }, 8, [0, 1]]
+
+        if (unaVariableBooleana) {
+            //algo
+        }
+
+
+        for (let i = 0; i < 10; i++) {
+            //algo muchas veces
+        }
+
+
+        //clases en js:
+        class Pepino {
+            constructor() {
+                console.log("objeto pepino creado")
+            }
+            quienSoy() {
+                console.log(this)
+                return this
+            }
+        }
+
+        let unaInstanciaDePepino = new Pepino()
+
+
+        /////////////// 
+        let gameLoopAndando = false
+        let numeroDeFrame = false
+        function arrancarTimer() {
+            gameLoopAndando = !gameLoopAndando
+            let boton = document.querySelector("#botonArrancar")
+            if (gameLoopAndando) {
+                boton.innerHTML = "frenar"
+                gameLoop()
+            } else {
+                boton.innerHTML = "arrancar"
+            }
+        }
+
+        function gameLoop() {
+            if (!gameLoopAndando) return
+            console.log(numeroDeFrame)
+
+            numeroDeFrame++
+            document.querySelector("#botonArrancar").style.top = (Math.sin(numeroDeFrame/100) * 100) + "px"
+            requestAnimationFrame(gameLoop)
+        }
+
+
+
+    </script>
+</head>
+
+<body>
+    <button onclick="unaFuncion()">
+        unaFuncion()
+    </button>
+
+    <button onclick="arrancarTimer()" id="botonArrancar" style="position:relative;top:0px;">
+        arrancar timer
+    </button>
+</body>
+
+</html>

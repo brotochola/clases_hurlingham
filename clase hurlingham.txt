@@ -1,0 +1,55 @@
+- pixi js
+- tiles
+- tabla de distancias precalculada
+- juegos de 0 jugadores: game of life, particulas q hacen cosas
+- boids, flowfield
+- finite state machine
+- path finding
+- fisica 2d con matterjs, box2d
+- optimizacion (no calcular cosas de mas)
+- mov de camara (mover todo el mundo pal costado)
+- mouse y teclado, manejar algo del juego
+
+https://developer.mozilla.org/en-US/docs/Games/Techniques
+
+
+
+
+CLASES:
+
+objetivo: hacer un juego de matar zombies, moviendo al protagnoista con el teclado y mouse.
+los zombies usan boids
+
+0 - js, chrome, github
+1 - pixi y levantar imagenes
+    funcion gameloop
+2 - entidades en posiciones y movimientos
+
+3 - mover a un personaje con el teclado y mouse, path finding al hacer click, touches en celu
+4 - movimiento de camara suave con lerp
+5 - NPC, boids
+    https://www.youtube.com/watch?v=6dJlhv3hfQ0
+    
+6 - finite state machine
+
+7 - grid y tiles (quadtrees)
+    precalcular istancias para no tener q ahcer el teorema de pitagoras todo el tiempo
+    https://www.youtube.com/watch?v=eED4bSkYCB8
+    mencionar game of life:
+    https://www.youtube.com/watch?v=FWSR_7kZuYg
+    game of life mas flashero:
+    https://www.youtube.com/watch?v=6kiBYjvyojQ
+    particles life
+    https://www.youtube.com/watch?v=p4YirERTVF0&t=25s
+    dual grid system:
+    https://www.youtube.com/watch?v=jEWFSv3ivTg
+
+
+8 - colisiones y motor de fisica 2d
+
+9 - graficos segun estado
+
+10 - optimizacion
+11 - cordova, electron, github pages, itch.io
+
+

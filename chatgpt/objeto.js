@@ -1,9 +1,10 @@
 // Clase base Objeto
 class Objeto {
-  constructor(x, y, velocidadMax, tamaño = 25, grid, app) {
+  constructor(x, y, velocidadMax, tamaño = 25, juego) {
     this.id = generarID();
-    this.grid = grid;
-    this.app = app;
+    this.grid = juego.grid;
+    this.app = juego.app;
+    this.juego = juego;
     this.sprite = new PIXI.Sprite();
     this.sprite.x = x;
     this.sprite.y = y;
@@ -18,7 +19,68 @@ class Objeto {
     this.sprite.anchor.set(0.5); // Pivote en el centro
   }
 
-  actualizar() {
+  getObjetosEnMiCelda() {
+    this.miCelda = this.grid.getCellPX(this.sprite.x, this.sprite.y);
+    return this.miCelda.objetosAca;
+  }
+
+  borrar() {
+    this.juego.app.stage.removeChild(this.sprite);
+    if (this instanceof Zombie) {
+      this.juego.zombies = this.juego.zombies.filter((k) => k != this);
+    } else if (this instanceof Bala) {
+      this.juego.balas = this.juego.balas.filter((k) => k != this);
+    }
+
+    this.grid.remove(this);
+  }
+
+  obtenerVecinos() {
+    const vecinos = [];
+    const cellSize = this.grid.cellSize;
+    const xIndex = Math.floor(this.sprite.x / cellSize);
+    const yIndex = Math.floor(this.sprite.y / cellSize);
+
+    // Revisar celdas adyacentes
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        const cell = this.grid.getCell(xIndex + i, yIndex + j);
+        if (cell) {
+          cell.objetosAca.forEach((zombie) => {
+            if (zombie !== this) {
+              vecinos.push(zombie);
+            }
+          });
+        }
+      }
+    }
+    return vecinos;
+  }
+  normalizarVelocidad() {
+    if (this.velocidad.x == 0 && this.velocidad.y == 0) {
+      return;
+    }
+
+    let magnitud = calculoDeDistanciaRapido(
+      0,
+      0,
+      this.velocidad.x,
+      this.velocidad.y
+    );
+
+    if (magnitud == 0) return;
+
+    this.velocidad.x /= magnitud;
+    this.velocidad.y /= magnitud;
+
+    this.velocidad.x *= this.velocidadMax;
+    this.velocidad.y *= this.velocidadMax;
+    if (isNaN(this.velocidad.x)) debugger;
+  }
+
+  update() {
+    this.normalizarVelocidad();
+
     this.sprite.x += this.velocidad.x;
     this.sprite.y += this.velocidad.y;
     this.actualizarRotacion();

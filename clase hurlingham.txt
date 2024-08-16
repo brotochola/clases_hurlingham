@@ -9,6 +9,7 @@
 - optimizacion (no calcular cosas de mas)
 - mov de camara (mover todo el mundo pal costado)
 - mouse y teclado, manejar algo del juego
+- perlin noise
 
 https://developer.mozilla.org/en-US/docs/Games/Techniques
 
@@ -21,18 +22,51 @@ objetivo: hacer un juego de matar zombies, moviendo al protagnoista con el tecla
 los zombies usan boids
 
 0 - js, chrome, github
+
+    Porqué js, la web, cantidad de usuarios, lo facil q es, etc, Node, el NPM
+    Todo es codigo abierto en la web, mostrar algun juego random
+    Chrome, la consola, el ojito, emulador de dispositivos, sources, debugger, ir paso por paso
+
+
 1 - pixi y levantar imagenes
-    funcion gameloop
+    Pixi,
+    WebGL,
+    funcion gameloop,
+    contenedores,
+    cargar imagenes,
+    spritesheets
+
+
+
 2 - entidades en posiciones y movimientos
 
-3 - mover a un personaje con el teclado y mouse, path finding al hacer click, touches en celu
-4 - movimiento de camara suave con lerp
-5 - NPC, boids
-    https://www.youtube.com/watch?v=6dJlhv3hfQ0
-    
-6 - finite state machine
+    Clase entidades,
+    Clase para personajes, protagonista, arboles,
+    Posicion, velocidad, aceleracion (y fuerza), Newton
+    Vectores
+    update y render    
 
-7 - grid y tiles (quadtrees)
+3 - mover a un personaje con el teclado y mouse, touches en celu
+    Eventos en JS
+    Meter la data del teclado y del mouse en la clase Juego
+    Asignar velocidad al protagonista
+
+4 - movimiento de camara suave con lerp
+
+5 - NPC, Boids
+    Zombies persiguen al protagonista
+    Otros personajes se escapan de los zombies
+    Otros personajes persiguen al protagonista 
+    Alineacion
+    Separacion
+    Cohesion
+    Los personajes q perseguian al protagonista le hacen boids
+
+
+    https://www.youtube.com/watch?v=6dJlhv3hfQ0
+
+
+6 - grid y tiles (quadtrees)
     precalcular istancias para no tener q ahcer el teorema de pitagoras todo el tiempo
     https://www.youtube.com/watch?v=eED4bSkYCB8
     mencionar game of life:
@@ -44,6 +78,9 @@ los zombies usan boids
     dual grid system:
     https://www.youtube.com/watch?v=jEWFSv3ivTg
 
+
+    
+7 - finite state machine
 
 8 - colisiones y motor de fisica 2d
 

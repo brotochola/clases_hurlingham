@@ -64,3 +64,7 @@ function generarID(longitud = 8) {
   }
   return id;
 }
+
+function lerp(start, end, alpha) {
+  return start + (end - start) * alpha;
+}

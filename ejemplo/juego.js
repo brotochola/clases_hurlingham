@@ -9,34 +9,44 @@ class Juego {
       backgroundColor: 0x1099bb,
     });
     document.body.appendChild(this.app.view);
-
+    this.gridActualizacionIntervalo = 10; // Cada 10 frames
+    this.contadorDeFrames = 0;
     this.grid = new Grid(50, this.app); // Tamaño de celda 50
     this.zombies = [];
     this.balas = [];
 
     this.keyboard = {};
 
-    this.app.stage.sortableChildren =true
+    this.app.stage.sortableChildren = true;
 
+    this.ponerFondo();
     this.ponerProtagonista();
 
     this.ponerZombies(500);
 
     this.ponerListeners();
 
-    this.gridActualizacionIntervalo = 10; // Cada 10 frames
-    this.contadorDeFrames = 0;
     setTimeout(() => {
       this.app.ticker.add(this.actualizar.bind(this));
-
       window.__PIXI_APP__ = this.app;
     }, 100);
   }
+  ponerFondo() {
+    // Crear un patrón a partir de una imagen
+    PIXI.Texture.fromURL("./img/bg.png").then((patternTexture) => {
+      // Crear un sprite con la textura del patrón
+      this.backgroundSprite = new PIXI.TilingSprite(patternTexture, 5000, 5000);
+      // this.backgroundSprite.tileScale.set(0.5);
+      
 
+      // Añadir el sprite al stage
+      this.app.stage.addChild(this.backgroundSprite);
+    });
+  }
   ponerProtagonista() {
     this.player = new Player(
       window.innerWidth / 2,
-      window.innerHeight *0.9,
+      window.innerHeight * 0.9,
       this
     );
   }
@@ -46,8 +56,13 @@ class Juego {
     for (let i = 0; i < cant; i++) {
       //LA VELOCIDAD SE USA PARA LA VELOCIDAD MAXIMA CON LA Q SE MUEVE EL ZOMBIE
       //Y TAMBIEN PARA LA VELOCIDAD DE REPRODUCCION DE UN SPRITE
-      let velocidad=Math.random()*0.2+0.5
-      const zombie = new Zombie(Math.random() * 800, Math.random() * 600, velocidad,this); // Pasar la grid a los zombies
+      let velocidad = Math.random() * 0.2 + 0.5;
+      const zombie = new Zombie(
+        Math.random() * 800,
+        Math.random() * 600,
+        velocidad,
+        this
+      ); // Pasar la grid a los zombies
       this.zombies.push(zombie);
       this.grid.add(zombie);
     }
@@ -105,6 +120,30 @@ class Juego {
     this.balas.forEach((bala) => {
       bala.update();
     });
+
+    this.moverCamara();
+  }
+
+  moverCamara() {
+    let lerpFactor=0.07
+  // Obtener la posición del protagonista
+  const playerX = this.player.container.x;
+  const playerY = this.player.container.y;
+
+  // Calcular la posición objetivo del stage para centrar al protagonista
+  const halfScreenWidth = this.app.screen.width / 2;
+  const halfScreenHeight = this.app.screen.height / 2;
+
+  const targetX = halfScreenWidth - playerX;
+  const targetY = halfScreenHeight - playerY;
+
+  // Aplicar el límite de 0,0
+  const clampedX = Math.min(targetX, 0);
+  const clampedY = Math.min(targetY, 0);
+
+  // Aplicar Lerp para suavizar el movimiento de la cámara
+  this.app.stage.position.x = lerp(this.app.stage.position.x, clampedX, lerpFactor);
+  this.app.stage.position.y = lerp(this.app.stage.position.y, clampedY, lerpFactor);
   }
 }
 

@@ -1,3 +1,4 @@
+TEMAS:
 - pixi js
 - tiles
 - tabla de distancias precalculada
@@ -23,16 +24,21 @@ los zombies usan boids
 
 0 - js, chrome, github
 
-    Porqué js, la web, cantidad de usuarios, lo facil q es, etc, Node, el NPM
-    Todo es codigo abierto en la web, mostrar algun juego random
-    Chrome, la consola, el ojito, emulador de dispositivos, sources, debugger, ir paso por paso
+    -quien soy
+    -q vamos a hacer
+    -Porqué js, la web, cantidad de usuarios, lo facil q es, etc, Node, el NPM
+    -q cada uno se presente, edad, laburo, cuanto programa    
+    -Todo es codigo abierto en la web, mostrar algun juego random
+        * Angry birds abierto: https://funhtml5games.com/angrybirds/index.html
+        * Arkanoid ofuscado: https://play.arkanoid.online/?lang=en
+    -Chrome, la consola, el ojito, emulador de dispositivos, sources, debugger, ir paso por paso
 
 
 1 - pixi y levantar imagenes
     Pixi,
     WebGL,
     funcion gameloop,
-    contenedores,
+    contenedores,s
     cargar imagenes,
     spritesheets
 

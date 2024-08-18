@@ -267,10 +267,10 @@ class Zombie extends Objeto {
 
     if (this.container.x < 0) fuerza.x = -this.container.x;
     if (this.container.y < 0) fuerza.y = -this.container.y;
-    if (this.container.x > this.app.view.width)
-      fuerza.x = -(this.container.x - this.app.view.width);
-    if (this.container.y > this.app.view.height)
-      fuerza.y = -(this.container.y - this.app.view.height);
+    if (this.container.x > this.juego.canvaswidth)
+      fuerza.x = -(this.container.x - this.juego.canvaswidth);
+    if (this.container.y > this.juego.canvasHeight)
+      fuerza.y = -(this.container.y - this.juego.canvasHeight);
 
     // if(this.debug)console.log(fuerza)
     return fuerza;

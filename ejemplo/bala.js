@@ -29,9 +29,9 @@ class Bala extends Objeto {
 
     if (
       this.container.x < 0 ||
-      this.container.y > window.innerHeight ||
+      this.container.y > this.juego.canvasHeight ||
       this.container.y < 0 ||
-      this.container.x > window.innerWidth
+      this.container.x > this.juego.canvasWidth 
     ) {
       this.borrar();
     }

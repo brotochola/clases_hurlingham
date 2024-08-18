@@ -2,16 +2,18 @@
 class Juego {
   constructor() {
     this.pausa = false;
+    this.canvasWidth = window.innerWidth * 2;
+    this.canvasHeight = window.innerHeight * 2;
     this.app = new PIXI.Application({
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: this.canvasWidth,
+      height: this.canvasHeight,
       resizeTo: window,
       backgroundColor: 0x1099bb,
     });
     document.body.appendChild(this.app.view);
     this.gridActualizacionIntervalo = 10; // Cada 10 frames
     this.contadorDeFrames = 0;
-    this.grid = new Grid(50, this.app); // Tamaño de celda 50
+    this.grid = new Grid(50, this); // Tamaño de celda 50
     this.zombies = [];
     this.balas = [];
 
@@ -22,7 +24,7 @@ class Juego {
     this.ponerFondo();
     this.ponerProtagonista();
 
-    this.ponerZombies(500);
+    this.ponerZombies(1000);
 
     this.ponerListeners();
 
@@ -37,7 +39,6 @@ class Juego {
       // Crear un sprite con la textura del patrón
       this.backgroundSprite = new PIXI.TilingSprite(patternTexture, 5000, 5000);
       // this.backgroundSprite.tileScale.set(0.5);
-      
 
       // Añadir el sprite al stage
       this.app.stage.addChild(this.backgroundSprite);
@@ -58,8 +59,8 @@ class Juego {
       //Y TAMBIEN PARA LA VELOCIDAD DE REPRODUCCION DE UN SPRITE
       let velocidad = Math.random() * 0.2 + 0.5;
       const zombie = new Zombie(
-        Math.random() * 800,
-        Math.random() * 600,
+        Math.random() * this.canvasWidth,
+        Math.random() * this.canvasHeight,
         velocidad,
         this
       ); // Pasar la grid a los zombies
@@ -125,25 +126,39 @@ class Juego {
   }
 
   moverCamara() {
-    let lerpFactor=0.07
-  // Obtener la posición del protagonista
-  const playerX = this.player.container.x;
-  const playerY = this.player.container.y;
+    let lerpFactor = 0.07;
+    // Obtener la posición del protagonista
+    const playerX = this.player.container.x;
+    const playerY = this.player.container.y;
 
-  // Calcular la posición objetivo del stage para centrar al protagonista
-  const halfScreenWidth = this.app.screen.width / 2;
-  const halfScreenHeight = this.app.screen.height / 2;
+    // Calcular la posición objetivo del stage para centrar al protagonista
+    const halfScreenWidth = this.app.screen.width / 2;
+    const halfScreenHeight = this.app.screen.height / 2;
 
-  const targetX = halfScreenWidth - playerX;
-  const targetY = halfScreenHeight - playerY;
+    const targetX = halfScreenWidth - playerX;
+    const targetY = halfScreenHeight - playerY;
 
-  // Aplicar el límite de 0,0
-  const clampedX = Math.min(targetX, 0);
-  const clampedY = Math.min(targetY, 0);
+    // Aplicar el límite de 0,0 y canvasWidth, canvasHeight
+    const clampedX = Math.min(
+      Math.max(targetX, -(this.canvasWidth - this.app.screen.width)),
+      0
+    );
+    const clampedY = Math.min(
+      Math.max(targetY, -(this.canvasHeight - this.app.screen.height)),
+      0
+    );
 
-  // Aplicar Lerp para suavizar el movimiento de la cámara
-  this.app.stage.position.x = lerp(this.app.stage.position.x, clampedX, lerpFactor);
-  this.app.stage.position.y = lerp(this.app.stage.position.y, clampedY, lerpFactor);
+    // Aplicar Lerp para suavizar el movimiento de la cámara
+    this.app.stage.position.x = lerp(
+      this.app.stage.position.x,
+      clampedX,
+      lerpFactor
+    );
+    this.app.stage.position.y = lerp(
+      this.app.stage.position.y,
+      clampedY,
+      lerpFactor
+    );
   }
 }
 

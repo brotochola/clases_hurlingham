@@ -15,7 +15,7 @@ class Player extends Objeto {
       128,
       0.2,
       (e) => {
-        this.listo=true
+        this.listo = true;
         this.cambiarSprite("idle");
       }
     );
@@ -31,8 +31,8 @@ class Player extends Objeto {
     }, 100);
 
     let angulo = Math.atan2(
-      this.juego.mouse.x - this.container.x,
-      this.juego.mouse.y - this.container.y
+      this.juego.mouse.x - this.app.stage.x - this.container.x,
+      this.juego.mouse.y - this.app.stage.y - this.container.y
     );
     this.juego.balas.push(
       new Bala(
@@ -49,7 +49,7 @@ class Player extends Objeto {
   }
 
   update() {
-    if(!this.listo) return;
+    if (!this.listo) return;
     this.vecinos = this.obtenerVecinos();
 
     if (this.juego.keyboard.a) {

@@ -1,9 +1,10 @@
 class Grid {
-  constructor(cellSize, app) {
-    this.app = app;
+  constructor(cellSize, juego) {
+    this.juego = juego;
+    this.app = juego.app;
     this.cellSize = cellSize;
-    this.numColumns = Math.ceil(this.app.view.width / cellSize);
-    this.numRows = Math.ceil(this.app.view.height / cellSize);
+    this.numColumns = Math.ceil(this.juego.canvasWidth / cellSize);
+    this.numRows = Math.ceil(this.juego.canvasHeight / cellSize);
 
     // Crear una matriz de celdas vacías
     this.cells = [];
@@ -52,7 +53,7 @@ class Grid {
     }
   }
 
-  update(objeto) {    
+  update(objeto) {
     this.remove(objeto); // Eliminar el objeto de su celda actual
     this.add(objeto); // Volver a agregar el objeto a la celda nueva
   }

@@ -7,7 +7,7 @@ class Objeto {
     this.juego = juego;
     this.container = new PIXI.Container();
     this.juego.app.stage.addChild(this.container);
-
+    this.listo = false;
     this.container.x = x;
     this.container.y = y;
 
@@ -23,6 +23,7 @@ class Objeto {
   cambiarSprite(cual, numero, loop = true) {
     this.spriteActual = cual;
     let sprite = this.spritesAnimados[cual];
+    if (!sprite) return null;
     if (numero != undefined) {
       sprite.gotoAndPlay(numero);
     }

@@ -15,6 +15,7 @@ class Player extends Objeto {
       128,
       0.2,
       (e) => {
+        this.listo=true
         this.cambiarSprite("idle");
       }
     );
@@ -48,6 +49,7 @@ class Player extends Objeto {
   }
 
   update() {
+    if(!this.listo) return;
     this.vecinos = this.obtenerVecinos();
 
     if (this.juego.keyboard.a) {

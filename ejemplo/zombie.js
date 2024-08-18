@@ -11,6 +11,7 @@ class Zombie extends Objeto {
     this.vision = 100 + Math.floor(Math.random() * 150); //en pixels
     this.vida = 1;
     this.debug = 0;
+    
 
     this.cargarVariosSpritesAnimados(
       {
@@ -25,6 +26,7 @@ class Zombie extends Objeto {
       96,
       velocidad * 0.5,
       (e) => {
+        this.listo=true
         this.cambiarSprite("correr");
       }
     );
@@ -130,6 +132,7 @@ class Zombie extends Objeto {
   }
 
   update() {
+    if(!this.listo) return
     if (this.juego.contadorDeFrames % this.equipoParaUpdate == 0) {
       this.mirarAlrededor();
       this.segunDatosCambiarDeEstado();

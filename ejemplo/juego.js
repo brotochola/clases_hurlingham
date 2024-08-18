@@ -20,7 +20,7 @@ class Juego {
 
     this.ponerProtagonista();
 
-    this.ponerZombies(5);
+    this.ponerZombies(500);
 
     this.ponerListeners();
 

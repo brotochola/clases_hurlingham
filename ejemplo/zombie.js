@@ -145,8 +145,8 @@ class Zombie extends Objeto {
       vecFuerza.y += dif.y;
     });
 
-    vecFuerza.x *= 10;
-    vecFuerza.y *= 10;
+    vecFuerza.x *= 2;
+    vecFuerza.y *= 2;
     return vecFuerza;
   }
 

@@ -20,10 +20,17 @@ class Objeto {
     this.spritesAnimados = {};
   }
 
-  cambiarSprite(cual, numero) {
+  cambiarSprite(cual, numero, loop = true) {
+    this.spriteActual = cual;
     let sprite = this.spritesAnimados[cual];
+    if (numero != undefined) {
+      sprite.gotoAndPlay(numero);
+    }
+    sprite.loop = loop;
     this.container.removeChildren();
     this.container.addChild(sprite);
+
+    return sprite;
   }
 
   cargarVariosSpritesAnimados(inObj, w, h, velocidad, cb) {
@@ -80,13 +87,8 @@ class Objeto {
     });
   }
 
-  getObjetosEnMiCelda() {
-    this.miCelda = this.grid.getCellPX(this.container.x, this.container.y);
-    return this.miCelda.objetosAca;
-  }
-
   borrar() {
-    this.juego.app.stage.removeChild(this.sprite);
+    this.juego.app.stage.removeChild(this.container);
     if (this instanceof Zombie) {
       this.juego.zombies = this.juego.zombies.filter((k) => k != this);
     } else if (this instanceof Bala) {
@@ -101,7 +103,7 @@ class Objeto {
     const cellSize = this.grid.cellSize;
     const xIndex = Math.floor(this.container.x / cellSize);
     const yIndex = Math.floor(this.container.y / cellSize);
-    const margen = 2;
+    const margen = 1;
     // Revisar celdas adyacentes
     for (let i = -margen; i <= margen; i++) {
       for (let j = -margen; j <= margen; j++) {
@@ -116,6 +118,13 @@ class Objeto {
       }
     }
     return vecinos;
+  }
+  estoyEnLaMismaCeldaQue(fulano) {
+    return (
+      fulano.miCeldaActual &&
+      this.miCeldaActual &&
+      fulano.miCeldaActual == this.miCeldaActual
+    );
   }
   normalizarVelocidad() {
     if (this.velocidad.x == 0 && this.velocidad.y == 0) {
@@ -170,8 +179,14 @@ class Objeto {
   actualizarLado() {
     if (this.velocidad.x > 0) {
       this.container.scale.x = 1;
-    } else {
+    } else if (this.velocidad.x < 0) {
       this.container.scale.x = -1;
+    } else if (this.velocidad.y == 0 && this instanceof Zombie) {
+      if (this.juego.player.container.x > this.container.x) {
+        this.container.scale.x = 1;
+      } else {
+        this.container.scale.x = -1;
+      }
     }
   }
   actualizarZIndex() {

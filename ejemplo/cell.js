@@ -10,6 +10,7 @@ class Cell {
     obj.miCeldaActual = this;
   }
   sacar(obj) {
+    obj.miCeldaActual=null
     delete this.objetosAca[obj.id];
   }
 }

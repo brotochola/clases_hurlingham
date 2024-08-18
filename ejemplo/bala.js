@@ -4,7 +4,7 @@
 
 class Bala extends Objeto {
   constructor(x, y, juego, velX, velY) {
-    super(x, y, 10, 1, juego); // Tamaño del zombie
+    super(x, y, 20, juego);
     this.velocidad.x = velX;
     this.velocidad.y = velY;
 
@@ -12,29 +12,33 @@ class Bala extends Objeto {
     this.grid = juego.grid; // Referencia a la grid
     this.vision = 2;
     // Cargar la textura del sprite desde el <img>
+    this.sprite = new PIXI.Sprite();
     this.sprite.texture = PIXI.Texture.from("./bala.png");
+    this.container.addChild(this.sprite);
 
     // Asegurarse de que el tamaño sea 25x25
     this.sprite.width = 2;
     this.sprite.height = 2;
     this.debug = 0;
 
-    this.juego.app.stage.addChild(this.sprite);
+    this.juego.app.stage.addChild(this.container);
   }
 
   update() {
     super.update();
 
     if (
-      this.sprite.x < 0 ||
-      this.sprite.y > window.innerHeight ||
-      this.sprite.y < 0 ||
-      this.sprite.x > window.innerWidth
+      this.container.x < 0 ||
+      this.container.y > window.innerHeight ||
+      this.container.y < 0 ||
+      this.container.x > window.innerWidth
     ) {
       this.borrar();
     }
 
-    let objs = this.getObjetosEnMiCelda().filter((k) => k instanceof Zombie);
+    let objs = Object.values(
+      (this.miCeldaActual || {}).objetosAca || {}
+    ).filter((k) => k instanceof Zombie);
     if (objs.length > 0) {
       let elZombieMasCercano;
       let distMin = 99999;
@@ -42,10 +46,10 @@ class Bala extends Objeto {
       //VEO CUAL ES EL ZOMBIE MS CERCANO CUANDO LA BALA LLEGA A UNA CELDA CON ZOMBIES
       for (let i = 0; i < objs.length; i++) {
         let dist = calculoDeDistanciaRapido(
-          this.sprite.x,
-          this.sprite.y,
-          objs[i].sprite.x,
-          objs[i].sprite.y
+          this.container.x,
+          this.container.y,
+          objs[i].container.x,
+          objs[i].container.y
         );
         if (dist < distMin) {
           distMin = dist;

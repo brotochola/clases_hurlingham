@@ -24,7 +24,7 @@ class Juego {
     this.ponerFondo();
     this.ponerProtagonista();
 
-    this.ponerZombies(1000);
+    this.ponerZombies(1400);
 
     this.ponerListeners();
 
@@ -121,6 +121,11 @@ class Juego {
     this.balas.forEach((bala) => {
       bala.update();
     });
+
+    // //CADA 5 FRAMES ACTUALIZO LA GRILLA
+    // if (this.contadorDeFrames % 5 == 0) {
+    //   this.grid.actualizarCantidadSiLasCeldasSonPasablesONo();
+    // }
 
     this.moverCamara();
   }

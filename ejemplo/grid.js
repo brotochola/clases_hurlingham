@@ -11,7 +11,7 @@ class Grid {
     for (let x = 0; x < this.numColumns; x++) {
       this.cells[x] = [];
       for (let y = 0; y < this.numRows; y++) {
-        this.cells[x][y] = new Cell(x, y);
+        this.cells[x][y] = new Cell(x, y, this.juego);
       }
     }
   }
@@ -50,6 +50,16 @@ class Grid {
     // }
     if (objeto.miCeldaActual) {
       objeto.miCeldaActual.sacar(objeto);
+    }
+  }
+
+  actualizarCantidadSiLasCeldasSonPasablesONo() {
+    //ESTO ES UN EXPERIMENTO
+    for (let i = 0; i < this.cells.length; i++) {
+      for (let j = 0; j < this.cells[i].length; j++) {
+        let cell = this.cells[i][j];
+        if (cell) cell.actualizarSiEsPasableONo();
+      }
     }
   }
 

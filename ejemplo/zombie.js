@@ -11,7 +11,6 @@ class Zombie extends Objeto {
     this.vision = 100 + Math.floor(Math.random() * 150); //en pixels
     this.vida = 1;
     this.debug = 0;
-    
 
     this.cargarVariosSpritesAnimados(
       {
@@ -26,7 +25,7 @@ class Zombie extends Objeto {
       96,
       velocidad * 0.5,
       (e) => {
-        this.listo=true
+        this.listo = true;
         this.cambiarSprite("correr");
       }
     );
@@ -42,20 +41,19 @@ class Zombie extends Objeto {
       this.juego.zombies = this.juego.zombies.filter((k) => k != this);
       //LO SACO DE LA GRILLA
       this.grid.remove(this);
-      let sprite = this.cambiarSprite("morir",0,false);
+      let sprite = this.cambiarSprite("morir", 0, false);
       // sprite.animationSpeed=0.001
-      
-      
     } else {
-      let sprite = this.cambiarSprite("recibeTiro",0,false);
-      
-      this.velocidad.x=0
-      this.velocidad.y=0
+      let sprite = this.cambiarSprite("recibeTiro", 0, false);
+
+      this.velocidad.x = 0;
+      this.velocidad.y = 0;
     }
   }
 
   mirarAlrededor() {
     this.vecinos = this.obtenerVecinos();
+    this.celdasVecinas = this.miCeldaActual.obtenerCeldasVecinas();
     this.estoyViendoAlPlayer = this.evaluarSiEstoyViendoAlPlayer();
     this.tengoDeVecinoAlPlayer = false;
     this.estoyTocandoAlPlayer = false;
@@ -83,7 +81,12 @@ class Zombie extends Objeto {
   }
 
   hacerCosasSegunEstado() {
-    let vecAtraccionAlPlayer, vecSeparacion, vecAlineacion, vecCohesion, bordes;
+    let vecAtraccionAlPlayer,
+      vecSeparacion,
+      vecAlineacion,
+      vecCohesion,
+      bordes;
+
     let sumaDeVectores = new PIXI.Point(0, 0);
 
     //CALCULO LA FUERZA Q TRAE AL PERSONAJE PADENTRO DE LA PANTALLA DE NUEVO
@@ -97,6 +100,7 @@ class Zombie extends Objeto {
       //CALCULO LOS VECTORES PARA LOS PASOS DE BOIDS, SI NO HAY TARGET
       vecAlineacion = this.alineacion(this.vecinos);
       vecCohesion = this.cohesion(this.vecinos);
+   
       this.cambiarSprite("correr");
     }
 
@@ -113,12 +117,14 @@ class Zombie extends Objeto {
       sumaDeVectores.x += (vecCohesion || {}).x || 0;
       sumaDeVectores.x += (vecAtraccionAlPlayer || {}).x || 0;
       sumaDeVectores.x += (bordes || {}).x || 0;
+      
 
       sumaDeVectores.y += (vecSeparacion || {}).y || 0;
       sumaDeVectores.y += (vecAlineacion || {}).y || 0;
       sumaDeVectores.y += (vecCohesion || {}).y || 0;
       sumaDeVectores.y += (vecAtraccionAlPlayer || {}).y || 0;
       sumaDeVectores.y += (bordes || {}).y || 0;
+      
 
       this.aplicarFuerza(sumaDeVectores);
     }
@@ -132,7 +138,7 @@ class Zombie extends Objeto {
   }
 
   update() {
-    if(!this.listo) return
+    if (!this.listo) return;
     if (this.juego.contadorDeFrames % this.equipoParaUpdate == 0) {
       this.mirarAlrededor();
       this.segunDatosCambiarDeEstado();

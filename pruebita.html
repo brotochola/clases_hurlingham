@@ -1,0 +1,89 @@
+<html>
+
+<head>
+    <script>
+
+        const variable = 37
+        const otrVariable = "sdojh"
+
+        let varQSi = "dsioubh"
+
+        let lista = [12, 34, 5, 6, 4, 3, 5, 6]
+
+        let listaLoca = [1, "dss", {}, []]
+
+        function func() {
+
+            alert(1)
+        }
+
+        const func2 = () => {
+
+        }
+
+        const func3 = function () {
+
+        }
+
+        let obj = {
+            prop1: 1,
+            prop2: "juan",
+            hacerCosas: function (parametro) {
+                console.log(parametro * 10)
+            }
+        }
+
+
+        function generarNombresAleatorios() {
+            const nombres = ["Juan", "María", "Carlos", "Ana", "Luis", "Elena", "Jorge", "Lucía", "Miguel", "Sofía",
+                "Pedro", "Laura", "José", "Carmen", "Pablo", "Isabel", "Antonio", "Rosa", "Manuel", "Paula"];
+
+            const nombresAleatorios = [];
+
+            for (let i = 0; i < 10; i++) {
+                const indiceAleatorio = Math.floor(Math.random() * nombres.length);
+                nombresAleatorios.push(nombres[indiceAleatorio]);
+            }
+
+
+            return nombresAleatorios;
+        }
+
+        class Cosa {
+
+            constructor(name) {
+                this.name = name
+            }
+        }
+
+
+        ////////////////////
+        let pausa = true
+        function clickEnBoton() {
+            pausa = !pausa
+            gameLoop()
+        }
+
+
+        function gameLoop() {
+            if (pausa == true) return
+            //aca ya no se ejecuta
+            console.log(Date.now())
+
+          
+
+          requestAnimationFrame(gameLoop)
+        }
+
+
+    </script>
+
+
+</head>
+
+
+<body>
+    <button onclick="clickEnBoton()">un boton</button>
+</body>
+
+</html>

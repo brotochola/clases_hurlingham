@@ -131,7 +131,7 @@ class Juego {
   }
 
   moverCamara() {
-    let lerpFactor = 0.07;
+    let lerpFactor = 0.05;
     // Obtener la posición del protagonista
     const playerX = this.player.container.x;
     const playerY = this.player.container.y;

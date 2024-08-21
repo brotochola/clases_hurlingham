@@ -12,14 +12,17 @@
         let objeto = { prop1: "bla", prop2: 3 }
         //FUNCIONES
         let unaFuncion = function () {
-            console.log(this)
+            console.log("hola")
+            
         }
         let otraFuncion = () => {
-            console.log(this)
+            console.log("hola 2")
         }
         //const no se pueden cambiar, variables definidas como let, si
         const otroObjeto = {
-            funcion: () => {
+            nombre:"Juanelo Godines",
+            edad:23,
+            hacerAlgo: () => {
                 console.log(this)
             }
         }
@@ -33,6 +36,7 @@
 
         for (let i = 0; i < 10; i++) {
             //algo muchas veces
+            console.log("#for",i)
         }
 
 
@@ -42,8 +46,7 @@
                 console.log("objeto pepino creado")
             }
             quienSoy() {
-                console.log(this)
-                return this
+                console.log(this)                
             }
         }
 
@@ -79,10 +82,18 @@
 </head>
 
 <body>
+
+    <!-- boton que al hacerle click se va para abajo -->
+    <button onclick="this.style.top='20px'" id="boton" style="position:relative;top:0px;">
+        pabajo
+    </button>
+
+    <!-- boton q al hacerle click ejecuta unaFuncion() -->
     <button onclick="unaFuncion()">
         unaFuncion()
     </button>
 
+    <!-- boton q arranca el timer -->
     <button onclick="arrancarTimer()" id="botonArrancar" style="position:relative;top:0px;">
         arrancar timer
     </button>

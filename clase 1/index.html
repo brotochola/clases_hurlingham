@@ -63,16 +63,16 @@
 
 
 
-     
 
+        let gato;
         function agregarPNG() {
             PIXI.Assets.load('gato.png').then(e => {
-                let imageSprite = PIXI.Sprite.from('gato.png')
-                app.stage.addChild(imageSprite);
+                gato = PIXI.Sprite.from('gato.png')
+                app.stage.addChild(gato);
             })
 
         }
-
+        agregarPNG()
         //CREA APP DE PIXI
         const app = new PIXI.Application();
         //Y LA INICIALIZA

@@ -11,6 +11,7 @@ TEMAS:
 - mov de camara (mover todo el mundo pal costado)
 - mouse y teclado, manejar algo del juego
 - perlin noise
+- serializacion, guardar, cargar
 
 https://developer.mozilla.org/en-US/docs/Games/Techniques
 
@@ -19,47 +20,100 @@ https://developer.mozilla.org/en-US/docs/Games/Techniques
 
 CLASES:
 
-objetivo: hacer un juego de matar zombies, moviendo al protagnoista con el teclado y mouse.
-los zombies usan boids
+Objetivo del cuatrimestre:
+
+Hacer un juego 2d usando PixiJS, en el cual haya muchos (más de 100) personajes de un tipo que implementen el algoritmo boids o similar, y el usuario pueda mover o decidir algo mediante el mouse o teclado en tiempo real.
+Ejemplos: matar hordas de zombis, un perro que arrea ganado, un simulador de pesca, pelea de grandes grupos de personas, defender a una celebridad de sus fans enloquecidos.
+
+
+
+
 
 0 - js, chrome, github
 
-    -quien soy
-    -q vamos a hacer
-    -Porqué js, la web, cantidad de usuarios, lo facil q es, etc, Node, el NPM
-    -q cada uno se presente, edad, laburo, cuanto programa    
+    - quien soy
+    https://www.linkedin.com/in/facundo-saiegh-60189664/
+    https://github.com/brotochola
+
+    - mencionar mi github, y la url del repositorio de esta clase
+    - hacer grupo de whatsapp
+
+
+    -qué vamos a hacer: 
+        -mostrar juego de los zombies:
+            https://brotochola.github.io/clases_hurlingham/ejemplo/ejemplo.html
+        -mostrar juego q perro espanta ovejas
+        -gta 1
+        -boids como una masa, con imgs blureadas
+
+        -explicar qué tiene y porqué todo...
+        -vamos a ponernos en grupos de a 2
+        -la primer mitad de la clase vemos como cada uno pudo implementar en su juego lo visto en la clase anterior
+        -la segunda mitad de la clase yo voy a pasar contenidos nuevos, q cada grupo deberia implementar durante la semana en su juego y subirlo a su repositorio
+
+        -al final del cuatri (19/11 entrega, 26/11 recuperatorio o 14/12 'te fuiste a final') tinen q presentar un juego hecho con pixijs, funcionando en una "github page", q tenga implementados:
+            -una propuesta clara, q demuestre el potencial y la idea general de la jugabilidad del juego (proof of concept)
+            -una grilla con celdas (spatial hashing)
+            -boids, o similar (vectores, steering behaviours)
+            -algo q se maneje con mouse y/o teclado
+            -mas de un spritesheet animados por cada personaje     
+            -si tiene mas cosas mejor: sonidos, menu, niveles, guardar
+            
+
+   
+
+    -q cada uno se presente, edad, laburo, cuanto programa
+    
+    // empiza el contenido **
+
+    -Porqué js, la web, cantidad de usuarios, lo facil q es, etc
+    -webgl: 'hoy dia la web tambien usa el gpu':
+        https://threejs.org/examples/#webgl_animation_keyframes
+
+    
     -Todo es codigo abierto en la web, mostrar algun juego random
         * Angry birds abierto: https://funhtml5games.com/angrybirds/index.html
         * Arkanoid ofuscado: https://play.arkanoid.online/?lang=en
+
+        
     -Chrome, la consola, el ojito, emulador de dispositivos, sources, debugger, ir paso por paso
 
+    -LocalStorage
 
-1 - pixi y levantar imagenes
+    -arrancar un html de cero, con bloc de notas.
+    -despues pasar al visual studio code, q es un editor de texto para codigo: te pone colorcitos
+    -en js todo es un objeto y mencionar el objeto window y sus propiedades
+    
+    -chatgpt es un capo/a
+
+    -gameloop
+    -request animation frame
+
+
+1 - "Pixi y levantar imagenes"
     Pixi,
-    WebGL,
-    funcion gameloop,
-    contenedores,s
-    cargar imagenes,
-    spritesheets
+    Mostrar el panel de desarrolladores de pixi,        
+    contenedores,
+    cargar imagenes,    
+    -momento CORS, hablar de webservers y Node, el NPM, y vamos a instalar "serve"
 
 
+2 - "mover a un personaje con el teclado y mouse, touches en celu"
+    - Eventos en JS
+    - Meter la data del teclado y del mouse en la clase Juego
+    - Asignar velocidad al protagonista
+    - Spritesheet
+    https://dragonwolfleo.github.io/spritesheet-viewer/
 
-2 - entidades en posiciones y movimientos
 
-    Clase entidades,
-    Clase para personajes, protagonista, arboles,
-    Posicion, velocidad, aceleracion (y fuerza), Newton
-    Vectores
-    update y render    
-
-3 - mover a un personaje con el teclado y mouse, touches en celu
-    Eventos en JS
-    Meter la data del teclado y del mouse en la clase Juego
-    Asignar velocidad al protagonista
-
-4 - movimiento de camara suave con lerp
-
-5 - NPC, Boids
+3 - "entidades en posiciones y movimientos"
+    - Clase entidades,
+    - Clase para personajes, protagonista, arboles,
+    - Posicion, velocidad, aceleracion (y fuerza), Newton (f=m*a)
+    - Vectores
+    - update (calcular) y render (mostrar)
+    
+4 - NPC, Boids
     Zombies persiguen al protagonista
     Otros personajes se escapan de los zombies
     Otros personajes persiguen al protagonista 
@@ -67,9 +121,21 @@ los zombies usan boids
     Separacion
     Cohesion
     Los personajes q perseguian al protagonista le hacen boids
+    - zIndex
 
 
     https://www.youtube.com/watch?v=6dJlhv3hfQ0
+
+
+    
+5 - "movimiento de camara suave con lerp"
+    - calcular mov de camara, moviendo todo el stage
+    - meter todo en un contenedor y moverlo para no tocar el stage
+    - lerp al mov de camara
+    - explicar lerp
+    - aplicarl lerp a la velocidad del personaje
+    - interpolacion exporencial/logaritmica (rapido-lento, o lento-rapido), sigmoid
+    - mencionar zoom
 
 
 6 - grid y tiles (quadtrees)
@@ -84,15 +150,24 @@ los zombies usan boids
     dual grid system:
     https://www.youtube.com/watch?v=jEWFSv3ivTg
 
-
+https://lh6.googleusercontent.com/proxy/lfRcg88KS29QBrEBqxi8bhDnSeHUvtrP2N2yA69I1_tZXE6twcutntlMkUlvHZbDL4rXfvzVKJKDf6qiTGPkresv1aGvpbJdJKx_tCnsojw
     
 7 - finite state machine
+    conceptualmente
 
-8 - colisiones y motor de fisica 2d
+8 - graficos segun estado
 
-9 - graficos segun estado
+9 - colisiones y motor de fisica 2d
 
 10 - optimizacion
-11 - cordova, electron, github pages, itch.io
+    -quadtree
+    -aproximacion de pitagoras
+    -distancias precalculadas
 
+11 - cordova, electron, itch.io
+    - "venderlo primero y desarrollarlo despues"
+    - proof of concept
+    - plan de negocios
+    - no esperar al final para generar todos los graficos necesarios (de hecho esto tiene q ver con el marketing)    
+    - "el desarrollo de software es una gran estafa piramidal, esquema ponzi"
 

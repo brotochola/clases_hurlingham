@@ -69,6 +69,8 @@ class Objeto {
             frameHeight
           );
           const frame = new PIXI.Texture(texture.baseTexture, rectangle);
+          // frame.anchor.set(0.5,1)
+          
           frames.push(frame);
         }
       } //for

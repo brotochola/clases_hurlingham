@@ -137,8 +137,8 @@ class Player extends Objeto {
     
 
     return {
-      x: vecMouse.x - this.velocidad.x,
-      y: vecMouse.y - this.velocidad.y,
+      x: (vecMouse.x - this.velocidad.x)*0.001,
+      y: (vecMouse.y - this.velocidad.y)*0.001,
     };
   }
 }

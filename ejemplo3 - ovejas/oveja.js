@@ -6,7 +6,7 @@ class Oveja extends Objeto {
   constructor(x, y, velMax, juego) {
     super(x, y, velMax, juego);
     this.VelMaxOriginal = velMax;
-    this.velMaxEnModoHuir = velMax * 1.66;
+    this.velMaxEnModoHuir = velMax * 2;
     this.equipoParaUpdate = Math.floor(Math.random() * 9) + 1;
     this.juego = juego;
     this.grid = juego.grid; // Referencia a la grid

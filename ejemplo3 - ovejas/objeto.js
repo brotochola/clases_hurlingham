@@ -223,9 +223,16 @@ class Objeto {
     this.container.x += this.velocidad.x;
     this.container.y += this.velocidad.y;
 
+
     this.actualizarZIndex();
     this.actualizarLado();
     this.actualizarPosicionEnGrid();
+    this.velocidad.x*=0.98
+    this.velocidad.y*=0.98
+  }
+
+  hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad(){
+    this.spritesAnimados[this.spriteActual].animationSpeed=0.07*calculoDeDistanciaRapido(0,0,this.velocidad.x,this.velocidad.y)
   }
   actualizarPosicionEnGrid() {
     this.grid.update(this);

@@ -58,7 +58,7 @@ class Juego {
     for (let i = 0; i < cant; i++) {
       //LA VELOCIDAD SE USA PARA LA VELOCIDAD MAXIMA CON LA Q SE MUEVE EL ZOMBIE
       //Y TAMBIEN PARA LA VELOCIDAD DE REPRODUCCION DE UN SPRITE
-      let velocidad = Math.random() * 1 + 1.5;
+      let velocidad = Math.random() * 1.3 + 1.5;
       const oveja = new Oveja(
         Math.random() * this.canvasWidth,
         Math.random() * this.canvasHeight,

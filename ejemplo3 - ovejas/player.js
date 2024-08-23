@@ -68,44 +68,17 @@ class Player extends Objeto {
 
   update() {
     if (!this.listo) return;
-    // this.vecinos = this.obtenerVecinos();
 
-    // if (this.juego.keyboard.a) {
-    //   this.velocidad.x = -5;
-    // } else if (this.juego.keyboard.d) {
-    //   this.velocidad.x = 5;
-    // } else {
-    //   this.velocidad.x = 0;
-    // }
-
-    // if (this.juego.keyboard.w) {
-    //   this.velocidad.y = -5;
-    // } else if (this.juego.keyboard.s) {
-    //   this.velocidad.y = 5;
-    // } else {
-    //   this.velocidad.y = 0;
-    // }
-
-    // let cantidadDeObjetosEnMiCelda = Object.keys(
-    //   (this.miCeldaActual || {}).objetosAca || {}
-    // ).length;
-
-    // if (cantidadDeObjetosEnMiCelda > 3) {
-    //   let cant = cantidadDeObjetosEnMiCelda - 3;
-    //   this.velocidadMax = this.velocidadMaximaOriginal * (0.3 + 0.7 / cant);
-    // } else {
-    //   this.velocidadMax = this.velocidadMaximaOriginal;
-    // }
-
-    // if (this.juego.contadorDeFrames % 4 == 1) {
-    if (Math.abs(this.velocidad.x) < 1 && Math.abs(this.velocidad.y) < 1) {
-      this.cambiarSprite("idle");
-    } else {
-      //CADA 4 FRAMES
-      this.calcularAngulo();
-      this.ajustarSpriteSegunAngulo();
+    if (this.juego.contadorDeFrames % 4 == 1) {
+      if (Math.abs(this.velocidad.x) < 1 && Math.abs(this.velocidad.y) < 1) {
+        this.cambiarSprite("idle");
+      } else {
+        //CADA 4 FRAMES
+        this.calcularAngulo();
+        this.ajustarSpriteSegunAngulo();
+      }
+      this.hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad();
     }
-    // }
 
     const vecAtraccionMouse = this.atraccionAlMouse();
 
@@ -134,11 +107,9 @@ class Player extends Objeto {
 
     // let distCuadrada = vecMouse.x ** 2 + vecMouse.y ** 2;
 
-    
-
     return {
-      x: (vecMouse.x - this.velocidad.x)*0.001,
-      y: (vecMouse.y - this.velocidad.y)*0.001,
+      x: (vecMouse.x - this.velocidad.x) * 0.001,
+      y: (vecMouse.y - this.velocidad.y) * 0.001,
     };
   }
 }

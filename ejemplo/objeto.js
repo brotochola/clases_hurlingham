@@ -92,8 +92,8 @@ class Objeto {
 
   borrar() {
     this.juego.app.stage.removeChild(this.container);
-    if (this instanceof Oveja) {
-      this.juego.ovejas = this.juego.ovejas.filter((k) => k != this);
+    if (this instanceof Zombie) {
+      this.juego.zombies = this.juego.zombies.filter((k) => k != this);
     } else if (this instanceof Bala) {
       this.juego.balas = this.juego.balas.filter((k) => k != this);
     }
@@ -184,7 +184,7 @@ class Objeto {
       this.container.scale.x = 1;
     } else if (this.velocidad.x < 0) {
       this.container.scale.x = -1;
-    } else if (this.velocidad.y == 0 && this instanceof Oveja) {
+    } else if (this.velocidad.y == 0 && this instanceof Zombie) {
       if (this.juego.player.container.x > this.container.x) {
         this.container.scale.x = 1;
       } else {

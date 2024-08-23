@@ -19,6 +19,15 @@ class Objeto {
 
     this.spritesAnimados = {};
   }
+  calcularAngulo() {
+    this.angulo =
+      (radians_to_degrees(Math.atan2(this.velocidad.x, this.velocidad.y)) -
+        90 +
+        360) %
+      360;
+
+    return this.angulo;
+  }
 
   cambiarSprite(cual, numero, loop = true) {
     this.spriteActual = cual;
@@ -34,6 +43,63 @@ class Objeto {
     return sprite;
   }
 
+  cargarVariosSpritesAnimadosDeUnSoloArchivo(inObj, cb) {
+    console.log(inObj);
+    let texture = PIXI.Texture.from(inObj.archivo);
+    let retObj = {};
+    texture.baseTexture.on("loaded", () => {
+      let width = texture.baseTexture.width;
+      let height = texture.baseTexture.height;
+      let frameWidth = inObj.frameWidth;
+      let frameHeight = inObj.frameHeight;
+      let cantFramesX = width / frameWidth;
+      let cantFramesY = height / frameHeight;
+
+      const frames = [];
+
+      for (let i = 0; i < cantFramesX; i++) {
+        frames[i] = [];
+        for (let j = 0; j < cantFramesY; j++) {
+          const rectangle = new PIXI.Rectangle(
+            i * frameWidth,
+            j * frameHeight,
+            frameWidth,
+            frameHeight
+          );
+          const frame = new PIXI.Texture(texture.baseTexture, rectangle);
+          // frame.anchor.set(0.5,1)
+
+          frames[i][j] = frame;
+        }
+      } //for
+
+      console.log("frames cortados", frames);
+
+      let animaciones = Object.keys(inObj.animaciones);
+      for (let i = 0; i < animaciones.length; i++) {
+        let anim = inObj.animaciones[animaciones[i]];
+        //anim.desde.x
+
+        let framesParaEstaAnimacion = [];
+        for (let x = anim.desde.x; x <= anim.hasta.x; x++) {
+          framesParaEstaAnimacion.push(frames[x][anim.hasta.y]);
+        }
+
+        console.log("#" + animaciones[i], framesParaEstaAnimacion);
+
+        const animatedSprite = new PIXI.AnimatedSprite(framesParaEstaAnimacion);
+        animatedSprite.animationSpeed = inObj.velocidad;
+        animatedSprite.loop = true;
+        animatedSprite.anchor.set(0.5, 1);
+        animatedSprite.play();
+
+        retObj[animaciones[i]] = animatedSprite;
+      } //for animaciones
+      console.log("returnn", retObj);
+      this.spritesAnimados = retObj;
+      if (cb instanceof Function) cb(retObj);
+    });
+  }
   cargarVariosSpritesAnimados(inObj, w, h, velocidad, cb) {
     let ret = {};
     let keys = Object.keys(inObj);
@@ -70,7 +136,7 @@ class Objeto {
           );
           const frame = new PIXI.Texture(texture.baseTexture, rectangle);
           // frame.anchor.set(0.5,1)
-          
+
           frames.push(frame);
         }
       } //for
@@ -93,7 +159,7 @@ class Objeto {
   borrar() {
     this.juego.app.stage.removeChild(this.container);
     if (this instanceof Oveja) {
-      this.juego.ovejas = this.juego.ovejas.filter((k) => k != this);
+      this.juego.zombies = this.juego.zombies.filter((k) => k != this);
     } else if (this instanceof Bala) {
       this.juego.balas = this.juego.balas.filter((k) => k != this);
     }
@@ -152,11 +218,11 @@ class Objeto {
   }
 
   update() {
-    this.normalizarVelocidad();
+    // this.normalizarVelocidad();
 
     this.container.x += this.velocidad.x;
     this.container.y += this.velocidad.y;
-    // this.actualizarRotacion(); //PARA JUEGOS VISTOS DE ARRIBA
+
     this.actualizarZIndex();
     this.actualizarLado();
     this.actualizarPosicionEnGrid();
@@ -194,12 +260,5 @@ class Objeto {
   }
   actualizarZIndex() {
     this.container.zIndex = this.container.y;
-  }
-
-  actualizarRotacion() {
-    if (this.velocidad.x !== 0 || this.velocidad.y !== 0) {
-      const angulo = Math.atan2(this.velocidad.y, this.velocidad.x);
-      this.container.rotation = angulo;
-    }
   }
 }

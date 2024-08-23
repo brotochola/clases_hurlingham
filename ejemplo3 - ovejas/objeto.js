@@ -44,7 +44,7 @@ class Objeto {
   }
 
   cargarVariosSpritesAnimadosDeUnSoloArchivo(inObj, cb) {
-    console.log(inObj);
+    
     let texture = PIXI.Texture.from(inObj.archivo);
     let retObj = {};
     texture.baseTexture.on("loaded", () => {

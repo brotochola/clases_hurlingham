@@ -68,27 +68,27 @@ class Player extends Objeto {
 
   update() {
     if (!this.listo) return;
-    this.vecinos = this.obtenerVecinos();
+    // this.vecinos = this.obtenerVecinos();
 
-    if (this.juego.keyboard.a) {
-      this.velocidad.x = -5;
-    } else if (this.juego.keyboard.d) {
-      this.velocidad.x = 5;
-    } else {
-      this.velocidad.x = 0;
-    }
+    // if (this.juego.keyboard.a) {
+    //   this.velocidad.x = -5;
+    // } else if (this.juego.keyboard.d) {
+    //   this.velocidad.x = 5;
+    // } else {
+    //   this.velocidad.x = 0;
+    // }
 
-    if (this.juego.keyboard.w) {
-      this.velocidad.y = -5;
-    } else if (this.juego.keyboard.s) {
-      this.velocidad.y = 5;
-    } else {
-      this.velocidad.y = 0;
-    }
+    // if (this.juego.keyboard.w) {
+    //   this.velocidad.y = -5;
+    // } else if (this.juego.keyboard.s) {
+    //   this.velocidad.y = 5;
+    // } else {
+    //   this.velocidad.y = 0;
+    // }
 
-    let cantidadDeObjetosEnMiCelda = Object.keys(
-      (this.miCeldaActual || {}).objetosAca || {}
-    ).length;
+    // let cantidadDeObjetosEnMiCelda = Object.keys(
+    //   (this.miCeldaActual || {}).objetosAca || {}
+    // ).length;
 
     // if (cantidadDeObjetosEnMiCelda > 3) {
     //   let cant = cantidadDeObjetosEnMiCelda - 3;
@@ -107,9 +107,9 @@ class Player extends Objeto {
     }
     // }
 
-    // const vecAtraccionMouse = this.atraccionAlMouse(mouse);
+    const vecAtraccionMouse = this.atraccionAlMouse();
 
-    // this.aplicarFuerza(vecAtraccionMouse);
+    this.aplicarFuerza(vecAtraccionMouse);
 
     super.update();
   }
@@ -125,25 +125,20 @@ class Player extends Objeto {
     }
   }
 
-  atraccionAlMouse(mouse) {
-    if (!mouse) return null;
+  atraccionAlMouse() {
+    if (!this.juego.mouse) return null;
     const vecMouse = new PIXI.Point(
-      mouse.x - this.container.x,
-      mouse.y - this.container.y
-    );
-    const distanciaCuadrada = distanciaAlCuadrado(
-      this.container.x,
-      this.container.y,
-      mouse.x,
-      mouse.y
+      this.juego.mouse.x - this.juego.app.stage.x - this.container.x,
+      this.juego.mouse.y - this.juego.app.stage.y - this.container.y
     );
 
-    if (distanciaCuadrada < 100 * 100) {
-      vecMouse.x *= 0.2; // Intensidad de atracción al mouse
-      vecMouse.y *= 0.2;
-      return vecMouse;
-    }
+    // let distCuadrada = vecMouse.x ** 2 + vecMouse.y ** 2;
 
-    return null;
+    
+
+    return {
+      x: vecMouse.x - this.velocidad.x,
+      y: vecMouse.y - this.velocidad.y,
+    };
   }
 }

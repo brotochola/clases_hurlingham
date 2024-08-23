@@ -48,7 +48,7 @@ class Juego {
     this.player = new Player(
       window.innerWidth / 2,
       window.innerHeight * 0.9,
-      7.5,
+      5,
       this
     );
   }

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>PixiJS Auto Movement with Inertia</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Configuración del escenario
+        const app = new PIXI.Application({ width: 800, height: 600 });
+        document.body.appendChild(app.view);
+
+        // Verificar que la aplicación se ha inicializado correctamente
+        if (!app.view) {
+            throw new Error("El lienzo de la aplicación no se ha inicializado correctamente.");
+        }
+
+        // Cargar la textura para el auto
+        const carTexture = PIXI.Texture.from('auto.png'); // Reemplaza con la textura de tu auto
+
+
+        // Clase Auto
+        class Auto {
+            constructor(texture, x, y) {
+                this.sprite = new PIXI.Sprite(texture);
+                this.sprite.scale.set(0.5)
+                this.sprite.anchor.set(0.5);
+                this.sprite.x = x;
+                this.sprite.y = y;
+                this.maxSpeed = 5; // Velocidad máxima
+                this.acceleration = 0.5; // Aceleración
+                this.deceleration = 0.05; // Desaceleración (inercia)
+                this.rotationSpeed = 0.01; // Velocidad de rotación
+                this.velocity = { x: 0, y: 0 };
+
+                this.traccion = 0
+                this.angulo = 0
+                this.velocidadLineal = 0
+
+
+                app.stage.addChild(this.sprite);
+            }
+
+            update() {
+
+                //SEGUN EL ANGULO CALCULO CUANTO EN X Y CUANTO EN Y DEBERIA MOVERSE
+                let cos = Math.cos(this.angulo)
+                let sin = Math.sin(this.angulo)
+
+                //LLAMO TRACCION A LA VELOCIDAD DE ROTACION DE LAS RUEDAS DEL AUTO, O ALGO ASI
+                this.velocity.x = cos * this.traccion
+                this.velocity.y = sin * this.traccion
+
+                //LA TRACCION VA DISMINUYENDO FRAME A FRAME
+                this.traccion *= (1 - this.deceleration)
+
+                //ME GUARDO UNA REFERENCIA DE LA VELOCIDAD LINEAL DEL AUTO, CON PITAGORAS
+                this.velocidadLineal = Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2)
+
+                //QUE LA VELOCIDAD NO EXCEDA LA MAXIMA
+                this.limitSpeed()
+
+                //LA VELOCIDAD SE APLICA A LA POSICION
+                this.sprite.x += this.velocity.x;
+                this.sprite.y += this.velocity.y;
+
+                //EL SPRITE MATCHEA SIEMPRE SU ROTACION CON LA PROPIEDAD ANGULO
+                this.sprite.rotation = this.angulo
+
+            }
+
+            handleInput() {
+                // Rotación
+                if (keys['A']) {
+
+                    if (this.traccion > 0) {
+                        this.angulo -= this.rotationSpeed * this.velocidadLineal
+                    } else {
+                        this.angulo += this.rotationSpeed * this.velocidadLineal
+                    }
+
+
+                }
+                if (keys['D']) {
+
+                    if (this.traccion > 0) {
+                        this.angulo += this.rotationSpeed * this.velocidadLineal
+                    } else {
+                        this.angulo -= this.rotationSpeed * this.velocidadLineal
+                    }
+
+
+                }
+
+
+                if (keys['W']) {
+                    this.traccion += this.acceleration
+                }
+                if (keys['S']) {
+                    this.traccion += - this.acceleration
+                }
+
+            }
+
+            limitSpeed() {
+                // Limitar la velocidad máxima
+                let factor = this.traccion > 0 ? 1 : this.traccion < 0 ? -1 : 0
+                //LIMITAR LA TRACCION
+                this.traccion = Math.abs(this.traccion) > this.maxSpeed ? (this.maxSpeed * factor) : this.traccion
+
+                if (this.velocidadLineal > this.maxSpeed) {
+                    this.velocity.x = (this.velocity.x / this.velocidadLineal) * this.maxSpeed;
+                    this.velocity.y = (this.velocity.y / this.velocidadLineal) * this.maxSpeed;
+                }
+            }
+        }
+
+        // Variables globales para el manejo de teclado
+        const keys = {};
+        window.addEventListener('keydown', (e) => { keys[e.key.toUpperCase()] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.key.toUpperCase()] = false; });
+
+        // Crear una instancia del auto después de que la textura esté cargada
+        let auto
+        carTexture.baseTexture.on('loaded', () => {
+            auto = new Auto(carTexture, app.view.width / 2, app.view.height / 2);
+
+            // Función de actualización
+            app.ticker.add(() => {
+                auto.handleInput();
+                auto.update();
+            });
+        });
+    </script>
+</body>
+
+</html>

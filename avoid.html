@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boid Following Mouse with Obstacles</title>
+    <style>
+        canvas {
+            background: #2c3e50;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="boidCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('boidCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+
+        class Boid {
+            constructor() {
+                this.position = { x: canvas.width / 2, y: canvas.height / 2 };
+                this.velocity = { x: 2, y: 2 };
+                this.acceleration = { x: 0, y: 0 };
+                this.maxSpeed = 6;
+                this.maxForce = 1
+                this.radius = 10;
+            }
+
+            follow(target) {
+                const desired = {
+                    x: target.x - this.position.x,
+                    y: target.y - this.position.y
+                };
+                const distance = Math.sqrt(desired.x ** 2 + desired.y ** 2);
+                if (distance > 0) {
+                    desired.x /= distance;
+                    desired.y /= distance;
+                    desired.x *= this.maxSpeed;
+                    desired.y *= this.maxSpeed;
+                }
+
+                const steer = {
+                    x: desired.x - this.velocity.x,
+                    y: desired.y - this.velocity.y
+                };
+                steer.x = Math.min(Math.max(steer.x, -this.maxForce), this.maxForce);
+                steer.y = Math.min(Math.max(steer.y, -this.maxForce), this.maxForce);
+
+                this.acceleration.x += steer.x;
+                this.acceleration.y += steer.y;
+            }
+
+            avoid(obstacles) {
+                for (const obstacle of obstacles) {
+                    const distX = obstacle.x - this.position.x;
+                    const distY = obstacle.y - this.position.y;
+                    const distance = Math.sqrt(distX ** 2 + distY ** 2);
+                    if (distance < (obstacle.radius + this.radius) * 1.1 + 10) {
+                        const avoidForce = {
+                            x: -distX / distance,
+                            y: -distY / distance
+                        };
+                        avoidForce.x *= this.maxForce * 2
+                        avoidForce.y *= this.maxForce * 2
+
+                        this.acceleration.x += avoidForce.x
+                        this.acceleration.y += avoidForce.y
+                    }
+                }
+            }
+
+            update() {
+                this.velocity.x += this.acceleration.x;
+                this.velocity.y += this.acceleration.y;
+
+                this.velocity.x = Math.min(Math.max(this.velocity.x, -this.maxSpeed), this.maxSpeed);
+                this.velocity.y = Math.min(Math.max(this.velocity.y, -this.maxSpeed), this.maxSpeed);
+
+                this.position.x += this.velocity.x;
+                this.position.y += this.velocity.y;
+
+                this.acceleration.x = 0;
+                this.acceleration.y = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#ecf0f1';
+                ctx.fill();
+                ctx.strokeStyle = '#34495e';
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+
+        const obstacles = []
+        for (let i = 0; i < 100; i++) {
+            obstacles.push({ x: canvas.width * Math.random(), y: canvas.height * Math.random(), radius: 10 + 60 * Math.random() })
+        }
+
+
+        const boid = new Boid();
+
+        canvas.addEventListener('mousemove', (event) => {
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+        });
+
+        function drawObstacles() {
+            for (const obstacle of obstacles) {
+                ctx.beginPath();
+                ctx.arc(obstacle.x, obstacle.y, obstacle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#e74c3c';
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            boid.follow(mouse);
+            boid.avoid(obstacles);
+            boid.update();
+            boid.draw();
+
+            drawObstacles();
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

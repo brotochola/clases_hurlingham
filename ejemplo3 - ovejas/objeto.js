@@ -44,7 +44,6 @@ class Objeto {
   }
 
   cargarVariosSpritesAnimadosDeUnSoloArchivo(inObj, cb) {
-    
     let texture = PIXI.Texture.from(inObj.archivo);
     let retObj = {};
     texture.baseTexture.on("loaded", () => {
@@ -73,19 +72,18 @@ class Objeto {
         }
       } //for
 
-      console.log("frames cortados", frames);
+      // console.log("frames cortados", frames);
 
       let animaciones = Object.keys(inObj.animaciones);
       for (let i = 0; i < animaciones.length; i++) {
         let anim = inObj.animaciones[animaciones[i]];
-        //anim.desde.x
 
         let framesParaEstaAnimacion = [];
         for (let x = anim.desde.x; x <= anim.hasta.x; x++) {
           framesParaEstaAnimacion.push(frames[x][anim.hasta.y]);
         }
 
-        console.log("#" + animaciones[i], framesParaEstaAnimacion);
+        // console.log("#" + animaciones[i], framesParaEstaAnimacion);
 
         const animatedSprite = new PIXI.AnimatedSprite(framesParaEstaAnimacion);
         animatedSprite.animationSpeed = inObj.velocidad;
@@ -95,7 +93,7 @@ class Objeto {
 
         retObj[animaciones[i]] = animatedSprite;
       } //for animaciones
-      console.log("returnn", retObj);
+      // console.log("returnn", retObj);
       this.spritesAnimados = retObj;
       if (cb instanceof Function) cb(retObj);
     });
@@ -223,23 +221,88 @@ class Objeto {
     this.container.x += this.velocidad.x;
     this.container.y += this.velocidad.y;
 
-
     this.actualizarZIndex();
     this.actualizarLado();
     this.actualizarPosicionEnGrid();
-    this.velocidad.x*=0.98
-    this.velocidad.y*=0.98
+
+    if (Math.abs(this.velocidad.x) < 0.2 && Math.abs(this.velocidad.y) < 0.2) {
+      this.velocidad.x = 0;
+      this.velocidad.y = 0;
+    } else {
+      this.velocidad.x *= 0.98;
+      this.velocidad.y *= 0.98;
+    }
   }
 
-  hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad(){
-    this.spritesAnimados[this.spriteActual].animationSpeed=0.07*calculoDeDistanciaRapido(0,0,this.velocidad.x,this.velocidad.y)
+  hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad() {
+    this.spritesAnimados[this.spriteActual].animationSpeed =
+      0.07 * calculoDeDistanciaRapido(0, 0, this.velocidad.x, this.velocidad.y);
   }
   actualizarPosicionEnGrid() {
     this.grid.update(this);
   }
 
+  ajustarPorBordes() {
+    let fuerza = new PIXI.Point(0, 0);
+
+    let margen = this.juego.grid.cellSize * 0.5;
+    let limiteDerecho = this.juego.canvasWidth - margen;
+    let limiteIzquierdo = margen;
+    let limiteArriba = margen;
+    let limiteAbajo = this.juego.canvasHeight - margen;
+
+    let cuantaFuerza = 1;
+
+    if (this.container.x < limiteIzquierdo) fuerza.x = cuantaFuerza;
+    if (this.container.y < limiteArriba) fuerza.y = cuantaFuerza;
+    if (this.container.x > limiteDerecho) fuerza.x = -cuantaFuerza;
+    if (this.container.y > limiteAbajo) fuerza.y = -cuantaFuerza;
+
+    // if(this.debug)console.log(fuerza)
+    return fuerza;
+  }
+
+  repelerObstaculos(vecinos) {
+    const vecFuerza = new PIXI.Point(0, 0);
+    let cant = 0;
+    vecinos.forEach((obstaculo) => {
+      if (obstaculo instanceof Piedra) {
+        const distCuadrada = distanciaAlCuadrado(
+          this.container.x,
+          this.container.y,
+          obstaculo.container.x,
+          obstaculo.container.y
+        );
+
+        if (distCuadrada < obstaculo.radio ** 2) {
+          //SI ESTA A MENOS DE UNA CELDA DE DIST
+          const dif = new PIXI.Point(
+            this.container.x - obstaculo.container.x,
+            this.container.y - obstaculo.container.y
+          );
+          dif.x /= distCuadrada;
+          dif.y /= distCuadrada;
+          vecFuerza.x += dif.x;
+          vecFuerza.y += dif.y;
+          cant++;
+        }
+      }
+    });
+    if (cant) {
+      vecFuerza.x *= 40;
+      vecFuerza.y *= 40;
+      // vecFuerza.x += -this.velocidad.x;
+      // vecFuerza.y += -this.velocidad.y;
+    }
+
+    return vecFuerza;
+  }
+
   aplicarFuerza(fuerza) {
     if (!fuerza) return;
+    // let limiteDeFuerza = 0.1;
+    // //SI LA FUERZA Q LE VAMOS A APLICAR ES MUY POCA, NI LA APLICAMOS
+    // if(Math.abs(fuerza.x)<limiteDeFuerza && Math.abs(fuerza.y)<limiteDeFuerza) return;
     this.velocidad.x += fuerza.x;
     this.velocidad.y += fuerza.y;
 
@@ -266,6 +329,6 @@ class Objeto {
     }
   }
   actualizarZIndex() {
-    this.container.zIndex = this.container.y;
+    this.container.zIndex = Math.floor(this.container.y);
   }
 }

@@ -16,6 +16,7 @@ class Juego {
     this.grid = new Grid(50, this); // Tamaño de celda 50
     this.ovejas = [];
     this.balas = [];
+    this.obstaculos = [];
 
     this.keyboard = {};
 
@@ -24,7 +25,9 @@ class Juego {
     this.ponerFondo();
     this.ponerProtagonista();
 
-    this.ponerOvejas(1000);
+    this.ponerOvejas(500);
+
+    this.ponerPiedras(30);
 
     this.ponerListeners();
 
@@ -53,6 +56,18 @@ class Juego {
     );
   }
 
+  ponerPiedras(cant) {
+    for (let i = 0; i < cant; i++) {
+      this.obstaculos.push(
+        new Piedra(
+          Math.random() * this.canvasWidth,
+          Math.random() * this.canvasHeight,
+          this
+        )
+      );
+    }
+  }
+
   ponerOvejas(cant) {
     // Crear algunos ovejas
     for (let i = 0; i < cant; i++) {
@@ -69,9 +84,7 @@ class Juego {
       this.grid.add(oveja);
     }
   }
-  mouseDownEvent() {
-    
-  }
+  mouseDownEvent() {}
 
   ponerListeners() {
     // Manejar eventos del mouse
@@ -122,6 +135,9 @@ class Juego {
     this.balas.forEach((bala) => {
       bala.update();
     });
+    // this.obstaculos.forEach((obstaculo) => {
+    //   obstaculo.update();
+    // });
 
     // //CADA 5 FRAMES ACTUALIZO LA GRILLA
     // if (this.contadorDeFrames % 5 == 0) {

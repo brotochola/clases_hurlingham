@@ -61,10 +61,11 @@
 
             avoid(obstacles) {
                 for (const obstacle of obstacles) {
-                    const distX = obstacle.x - this.position.x;
-                    const distY = obstacle.y - this.position.y;
+                    const distX = obstacle.x - (this.position.x+this.velocity.x*4);
+                    const distY = obstacle.y - (this.position.y+this.velocity.y*4);
                     const distance = Math.sqrt(distX ** 2 + distY ** 2);
-                    if (distance < (obstacle.radius + this.radius) * 1.1 + 10) {
+                    if (distance < (obstacle.radius + this.radius) * 1.1 ) {
+                        console.log("colision", obstacle.x)
                         const avoidForce = {
                             x: -distX / distance,
                             y: -distY / distance
@@ -104,7 +105,7 @@
         }
 
         const obstacles = []
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 30; i++) {
             obstacles.push({ x: canvas.width * Math.random(), y: canvas.height * Math.random(), radius: 10 + 60 * Math.random() })
         }
 

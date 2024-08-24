@@ -70,21 +70,39 @@ class Player extends Objeto {
     if (!this.listo) return;
 
     if (this.juego.contadorDeFrames % 4 == 1) {
-      if (Math.abs(this.velocidad.x) < 1 && Math.abs(this.velocidad.y) < 1) {
+      if (Math.abs(this.velocidad.x) < 0.5 && Math.abs(this.velocidad.y) < 0.5) {
         this.cambiarSprite("idle");
       } else {
-        //CADA 4 FRAMES
         this.calcularAngulo();
         this.ajustarSpriteSegunAngulo();
       }
       this.hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad();
     }
-
-    const vecAtraccionMouse = this.atraccionAlMouse();
-
-    this.aplicarFuerza(vecAtraccionMouse);
-
+    this.calcularYAplicarFuerzas();
     super.update();
+  }
+
+  calcularYAplicarFuerzas() {
+    //EN FUERZAS VOY A SUMAR TODAS LAS FUERZAS Q FRAME A FRAME ACTUAN SOBRE EL PERRITO
+    let fuerzas = new PIXI.Point(0, 0);
+    //ATRACCION AL MOUSE
+    const vecAtraccionMouse = this.atraccionAlMouse();
+    if (vecAtraccionMouse) {
+      fuerzas.x += vecAtraccionMouse.x;
+      fuerzas.y += vecAtraccionMouse.y;
+    }
+
+    const repulsionAObstaculos = this.repelerObstaculos(this.obtenerVecinos());
+    if (repulsionAObstaculos) {
+      fuerzas.x += repulsionAObstaculos.x;
+      fuerzas.y += repulsionAObstaculos.y;
+    }
+
+    const bordes = this.ajustarPorBordes();
+    fuerzas.x += bordes.x;
+    fuerzas.y += bordes.y;
+    this.fuerzas = fuerzas;
+    this.aplicarFuerza(fuerzas);
   }
   ajustarSpriteSegunAngulo() {
     if (this.angulo >= 315 || this.angulo <= 45) {
@@ -105,7 +123,9 @@ class Player extends Objeto {
       this.juego.mouse.y - this.juego.app.stage.y - this.container.y
     );
 
-    // let distCuadrada = vecMouse.x ** 2 + vecMouse.y ** 2;
+    let distCuadrada = vecMouse.x ** 2 + vecMouse.y ** 2;
+
+    if (distCuadrada < this.juego.grid.cellSize ** 2) return null;
 
     return {
       x: (vecMouse.x - this.velocidad.x) * 0.001,

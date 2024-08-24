@@ -83,7 +83,12 @@ class Oveja extends Objeto {
   }
 
   hacerCosasSegunEstado() {
-    let vecAtraccionAlPlayer, vecSeparacion, vecAlineacion, vecCohesion, bordes;
+    let vecAtraccionAlPlayer,
+      vecSeparacion,
+      vecAlineacion,
+      vecCohesion,
+      bordes,
+      vecRepulsionAObstaculos;
 
     let sumaDeVectores = new PIXI.Point(0, 0);
 
@@ -92,17 +97,18 @@ class Oveja extends Objeto {
 
     if (this.estado == this.estados.HUYENDO) {
       //SI ESTOY VIENDO AL PLAYER, HACERLE ATRACCION
-      vecAtraccionAlPlayer = this.atraccionAlJugador();
-      this.velocidadMax=this.velMaxEnModoHuir
+      vecAtraccionAlPlayer = this.repulsionAlPerro();
+      this.velocidadMax = this.velMaxEnModoHuir;
     } else if (this.estado == this.estados.IDLE) {
       //CALCULO LOS VECTORES PARA LOS PASOS DE BOIDS, SI NO HAY TARGET
       vecAlineacion = this.alineacion(this.vecinos);
       vecCohesion = this.cohesion(this.vecinos);
       // this.velocidad.x*=0.9
       // this.velocidad.y*=0.9
-      this.velocidadMax=this.VelMaxOriginal
+      this.velocidadMax = this.VelMaxOriginal;
     }
 
+    vecRepulsionAObstaculos = this.repelerObstaculos(this.vecinos);
     vecSeparacion = this.separacion(this.vecinos);
 
     //SUMO LOS VECTORES ANTES DE APLICARLOS
@@ -111,12 +117,14 @@ class Oveja extends Objeto {
     sumaDeVectores.x += (vecCohesion || {}).x || 0;
     sumaDeVectores.x += (vecAtraccionAlPlayer || {}).x || 0;
     sumaDeVectores.x += (bordes || {}).x || 0;
+    sumaDeVectores.x += (vecRepulsionAObstaculos || {}).x || 0;
 
     sumaDeVectores.y += (vecSeparacion || {}).y || 0;
     sumaDeVectores.y += (vecAlineacion || {}).y || 0;
     sumaDeVectores.y += (vecCohesion || {}).y || 0;
     sumaDeVectores.y += (vecAtraccionAlPlayer || {}).y || 0;
     sumaDeVectores.y += (bordes || {}).y || 0;
+    sumaDeVectores.y += (vecRepulsionAObstaculos || {}).y || 0;
 
     this.aplicarFuerza(sumaDeVectores);
   }
@@ -181,7 +189,7 @@ class Oveja extends Objeto {
     return false;
   }
 
-  atraccionAlJugador() {
+  repulsionAlPerro() {
     const vecDistancia = new PIXI.Point(
       this.juego.player.container.x - this.container.x,
       this.juego.player.container.y - this.container.y
@@ -270,17 +278,5 @@ class Oveja extends Objeto {
 
     return vecPromedio;
   }
-  ajustarPorBordes() {
-    let fuerza = new PIXI.Point(0, 0);
 
-    if (this.container.x < 0) fuerza.x = -this.container.x;
-    if (this.container.y < 0) fuerza.y = -this.container.y;
-    if (this.container.x > this.juego.canvaswidth)
-      fuerza.x = -(this.container.x - this.juego.canvaswidth);
-    if (this.container.y > this.juego.canvasHeight)
-      fuerza.y = -(this.container.y - this.juego.canvasHeight);
-
-    // if(this.debug)console.log(fuerza)
-    return fuerza;
-  }
 }

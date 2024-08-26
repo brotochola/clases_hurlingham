@@ -17,6 +17,7 @@ class Juego {
     this.ovejas = [];
     this.balas = [];
     this.obstaculos = [];
+    this.decorados=[]
 
     this.keyboard = {};
 
@@ -29,12 +30,25 @@ class Juego {
 
     this.ponerPiedras(20);
 
+    this.ponerPastos(1000);
     this.ponerListeners();
 
     setTimeout(() => {
       this.app.ticker.add(this.actualizar.bind(this));
       window.__PIXI_APP__ = this.app;
     }, 100);
+  }
+
+  ponerPastos(cant){
+    for (let i = 0; i < cant; i++) {
+      this.decorados.push(
+        new Pasto(
+          Math.random() * this.canvasWidth,
+          Math.random() * this.canvasHeight,
+          this
+        )
+      );
+    }
   }
   ponerFondo() {
     // Crear un patrón a partir de una imagen
@@ -135,6 +149,11 @@ class Juego {
     this.balas.forEach((bala) => {
       bala.update();
     });
+
+    this.decorados.forEach((decorado) => {
+      decorado.update();
+    });
+
     // this.obstaculos.forEach((obstaculo) => {
     //   obstaculo.update();
     // });

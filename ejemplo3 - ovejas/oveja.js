@@ -14,7 +14,6 @@ class Oveja extends Objeto {
     this.vida = 1;
     this.debug = 0;
 
-
     this.cargarVariosSpritesAnimadosDeUnSoloArchivo(
       {
         archivo: "./img/oveja.png",
@@ -210,10 +209,12 @@ class Oveja extends Objeto {
     const vecPromedio = new PIXI.Point(0, 0);
     let total = 0;
 
-    vecinos.forEach((zombie) => {
-      vecPromedio.x += zombie.container.x;
-      vecPromedio.y += zombie.container.y;
-      total++;
+    vecinos.forEach((oveja) => {
+      if (oveja instanceof Oveja) {
+        vecPromedio.x += oveja.container.x;
+        vecPromedio.y += oveja.container.y;
+        total++;
+      }
     });
 
     if (total > 0) {
@@ -235,22 +236,24 @@ class Oveja extends Objeto {
   separacion(vecinos) {
     const vecFuerza = new PIXI.Point(0, 0);
 
-    vecinos.forEach((zombie) => {
-      const distancia = distanciaAlCuadrado(
-        this.container.x,
-        this.container.y,
-        zombie.container.x,
-        zombie.container.y
-      );
+    vecinos.forEach((oveja) => {
+      if (oveja instanceof Oveja) {
+        const distancia = distanciaAlCuadrado(
+          this.container.x,
+          this.container.y,
+          oveja.container.x,
+          oveja.container.y
+        );
 
-      const dif = new PIXI.Point(
-        this.container.x - zombie.container.x,
-        this.container.y - zombie.container.y
-      );
-      dif.x /= distancia;
-      dif.y /= distancia;
-      vecFuerza.x += dif.x;
-      vecFuerza.y += dif.y;
+        const dif = new PIXI.Point(
+          this.container.x - oveja.container.x,
+          this.container.y - oveja.container.y
+        );
+        dif.x /= distancia;
+        dif.y /= distancia;
+        vecFuerza.x += dif.x;
+        vecFuerza.y += dif.y;
+      }
     });
 
     vecFuerza.x *= 2.3;
@@ -262,10 +265,12 @@ class Oveja extends Objeto {
     const vecPromedio = new PIXI.Point(0, 0);
     let total = 0;
 
-    vecinos.forEach((zombie) => {
-      vecPromedio.x += zombie.velocidad.x;
-      vecPromedio.y += zombie.velocidad.y;
-      total++;
+    vecinos.forEach((oveja) => {
+      if (oveja instanceof Oveja) {
+        vecPromedio.x += oveja.velocidad.x;
+        vecPromedio.y += oveja.velocidad.y;
+        total++;
+      }
     });
 
     if (total > 0) {
@@ -279,5 +284,4 @@ class Oveja extends Objeto {
 
     return vecPromedio;
   }
-
 }

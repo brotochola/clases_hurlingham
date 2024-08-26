@@ -211,7 +211,9 @@ class Objeto {
         if (cell) {
           vecinos = [
             ...vecinos,
-            ...Object.values(cell.objetosAca).filter((k) => k != this),
+            ...Object.values(cell.objetosAca).filter(
+              (k) => k != this && !k.decorado
+            ),
           ];
         }
       }
@@ -268,7 +270,9 @@ class Objeto {
 
   hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad() {
     this.spritesAnimados[this.spriteActual].animationSpeed =
-      0.07 * calculoDeDistanciaRapido(0, 0, this.velocidad.x, this.velocidad.y)+0.1;
+      0.07 *
+        calculoDeDistanciaRapido(0, 0, this.velocidad.x, this.velocidad.y) +
+      0.1;
   }
   actualizarPosicionEnGrid() {
     this.grid.update(this);

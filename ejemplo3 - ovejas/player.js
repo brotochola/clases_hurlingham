@@ -5,63 +5,72 @@ class Player extends Objeto {
     this.juego = juego;
     this.grid = juego.grid;
 
-    this.cargarVariosSpritesAnimadosDeUnSoloArchivo(
-      {
-        archivo: "./img/perro.png",
-        frameWidth: 32,
-        frameHeight: 32,
-        velocidad: velMax * 0.05,
-        animaciones: {
-          correrAbajo: {
-            desde: {
-              x: 0,
-              y: 0,
-            },
-            hasta: {
-              x: 3,
-              y: 0,
-            },
-          },
-          correrLado: {
-            desde: {
-              x: 0,
-              y: 1,
-            },
-            hasta: {
-              x: 3,
-              y: 1,
-            },
-          },
-          correrArriba: {
-            desde: {
-              x: 0,
-              y: 2,
-            },
-            hasta: {
-              x: 3,
-              y: 2,
-            },
-          },
-          idle: {
-            desde: {
-              x: 3,
-              y: 7,
-            },
-            hasta: {
-              x: 3,
-              y: 7,
-            },
-          },
-        },
-      },
-      (animaciones) => {
-        this.listo = true;
-        this.cambiarSprite("correrLado");
-        for (let sprite of Object.values(this.spritesAnimados)) {
-          sprite.scale.set(2);
-        }
+    this.cargarSpriteSheetAnimadoDeJSON("./img/perro/perro.json", (e) => {
+      this.listo = true;
+      this.cambiarSprite("correrLado");
+      for (let sprite of Object.values(this.spritesAnimados)) {
+        sprite.scale.set(2);
+        sprite.anchor.set(0.5, 1);
       }
-    );
+    });
+
+    // this.cargarVariosSpritesAnimadosDeUnSoloArchivo(
+    //   {
+    //     archivo: "./img/perro.png",
+    //     frameWidth: 32,
+    //     frameHeight: 32,
+    //     velocidad: velMax * 0.05,
+    //     animaciones: {
+    //       correrAbajo: {
+    //         desde: {
+    //           x: 0,
+    //           y: 0,
+    //         },
+    //         hasta: {
+    //           x: 3,
+    //           y: 0,
+    //         },
+    //       },
+    //       correrLado: {
+    //         desde: {
+    //           x: 0,
+    //           y: 1,
+    //         },
+    //         hasta: {
+    //           x: 3,
+    //           y: 1,
+    //         },
+    //       },
+    //       correrArriba: {
+    //         desde: {
+    //           x: 0,
+    //           y: 2,
+    //         },
+    //         hasta: {
+    //           x: 3,
+    //           y: 2,
+    //         },
+    //       },
+    //       idle: {
+    //         desde: {
+    //           x: 3,
+    //           y: 7,
+    //         },
+    //         hasta: {
+    //           x: 3,
+    //           y: 7,
+    //         },
+    //       },
+    //     },
+    //   },
+    //   (animaciones) => {
+    //     this.listo = true;
+    //     this.cambiarSprite("correrLado");
+    //     for (let sprite of Object.values(this.spritesAnimados)) {
+    //       sprite.scale.set(2);
+    //     }
+    //   }
+    // );
 
     // this.juego.app.stage.addChild(this.sprite);
   }
@@ -70,17 +79,44 @@ class Player extends Objeto {
     if (!this.listo) return;
 
     if (this.juego.contadorDeFrames % 4 == 1) {
-      if (Math.abs(this.velocidad.x) < 0.5 && Math.abs(this.velocidad.y) < 0.5) {
-        this.cambiarSprite("idle");
-      } else {
-        this.calcularAngulo();
-        this.ajustarSpriteSegunAngulo();
-      }
-      this.hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad();
+      this.manejarSprites();
     }
     this.calcularYAplicarFuerzas();
     super.update();
+    // this.limitarVelocidadSiHayObstaculos()
   }
+
+  manejarSprites() {
+    if (Math.abs(this.velocidad.x) < 0.3 && Math.abs(this.velocidad.y) < 0.3) {
+      if (this.spriteActual != "idle") {
+        this.cambiarSprite("sentandoseLado", 0, false, () => {          
+          this.cambiarSprite("idle");
+        });
+      }
+      //  this.cambiarSprite("idle");
+    } else {
+      this.calcularAngulo();
+      this.ajustarSpriteSegunAngulo();
+    }
+    this.hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad();
+  }
+
+  // limitarVelocidadSiHayObstaculos(){
+  //   let numeroDeFrames=2
+  //   let xDelFuturo=this.container.x+this.velocidad.x*numeroDeFrames
+  //   let yDelFuturo=this.container.y+this.velocidad.y*numeroDeFrames
+
+  //   let celdaDondeVoyAEstarEnElFuturo=this.juego.grid.getCellPX(xDelFuturo,yDelFuturo)
+  //   let piedrasEnLaCeldaDelFuturo=Object.values(celdaDondeVoyAEstarEnElFuturo.objetosAca).filter(k=>k instanceof Piedra)
+  //   if(piedrasEnLaCeldaDelFuturo.length){
+  //     if(Math.abs(this.velocidad.x)>Math.abs(this.velocidad.y)){
+  //       this.velocidad.x=0
+  //     }else{
+  //       this.velocidad.y=0
+  //     }
+  //   }
+
+  // }
 
   calcularYAplicarFuerzas() {
     //EN FUERZAS VOY A SUMAR TODAS LAS FUERZAS Q FRAME A FRAME ACTUAN SOBRE EL PERRITO
@@ -105,10 +141,24 @@ class Player extends Objeto {
     this.aplicarFuerza(fuerzas);
   }
   ajustarSpriteSegunAngulo() {
-    if (this.angulo >= 315 || this.angulo <= 45) {
-      this.cambiarSprite("correrLado");
-    } else if (this.angulo >= 135 && this.angulo <= 225) {
-      this.cambiarSprite("correrLado");
+    let velLineal = calculoDeDistanciaRapido(
+      0,
+      0,
+      this.velocidad.x,
+      this.velocidad.y
+    );
+
+    if (
+      this.angulo >= 315 ||
+      this.angulo <= 45 ||
+      (this.angulo >= 135 && this.angulo <= 225)
+    ) {
+      //SI LA VELOCIDAD ES LA MITAD DE LA VELOCIDAD MAXIMA, CAMBIO AL SPRITE DE CAMINAR
+      if (velLineal < this.velocidadMax * 0.5) {
+        this.cambiarSprite("caminarLado");
+      } else {
+        this.cambiarSprite("correrLado");
+      }
     } else if (this.angulo > 45 && this.angulo < 135) {
       this.cambiarSprite("correrArriba");
     } else if (this.angulo > 225 && this.angulo < 315) {

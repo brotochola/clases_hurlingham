@@ -25,9 +25,9 @@ class Juego {
     this.ponerFondo();
     this.ponerProtagonista();
 
-    this.ponerOvejas(500);
+    // this.ponerOvejas(500);
 
-    this.ponerPiedras(30);
+    this.ponerPiedras(10);
 
     this.ponerListeners();
 

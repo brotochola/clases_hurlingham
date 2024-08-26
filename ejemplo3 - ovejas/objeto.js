@@ -29,7 +29,9 @@ class Objeto {
     return this.angulo;
   }
 
-  cambiarSprite(cual, numero, loop = true) {
+  cambiarSprite(cual, numero = 0, loop = true, cb) {
+    if (this.spriteActual == cual) return;
+    // console.log("#cambiar sprite", this.spriteActual, "->", cual);
     this.spriteActual = cual;
     let sprite = this.spritesAnimados[cual];
     if (!sprite) return null;
@@ -39,8 +41,37 @@ class Objeto {
     sprite.loop = loop;
     this.container.removeChildren();
     this.container.addChild(sprite);
+    if (cb instanceof Function) {
+      sprite.onComplete = () => {
+        cb();
+      };
+    }
 
     return sprite;
+  }
+
+  cargarSpriteSheetAnimadoDeJSON(url, cb) {
+    console.log("#cargarSpriteSheetAnimadoDeJSON", url);
+    const loader = PIXI.Loader.shared;
+    let nombre = this.constructor.name;
+
+    loader.add(nombre, url).load((loader, resources) => {
+      this.sheet = resources[nombre].spritesheet;
+      let animaciones = Object.keys(this.sheet.animations);
+
+      for (let i = 0; i < animaciones.length; i++) {
+        console.log(animaciones[i]);
+        let frames = this.sheet.animations[animaciones[i]];
+
+        let animacionActual = new PIXI.AnimatedSprite(frames);
+        animacionActual.loop = true;
+        animacionActual.play();
+
+        this.spritesAnimados[animaciones[i]] = animacionActual;
+      }
+
+      if (cb instanceof Function) cb(this.spritesAnimados);
+    });
   }
 
   cargarVariosSpritesAnimadosDeUnSoloArchivo(inObj, cb) {
@@ -236,7 +267,7 @@ class Objeto {
 
   hacerQueLaVelocidadDeLaAnimacionCoincidaConLaVelocidad() {
     this.spritesAnimados[this.spriteActual].animationSpeed =
-      0.07 * calculoDeDistanciaRapido(0, 0, this.velocidad.x, this.velocidad.y);
+      0.07 * calculoDeDistanciaRapido(0, 0, this.velocidad.x, this.velocidad.y)+0.1;
   }
   actualizarPosicionEnGrid() {
     this.grid.update(this);

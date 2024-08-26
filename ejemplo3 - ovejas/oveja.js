@@ -14,6 +14,7 @@ class Oveja extends Objeto {
     this.vida = 1;
     this.debug = 0;
 
+
     this.cargarVariosSpritesAnimadosDeUnSoloArchivo(
       {
         archivo: "./img/oveja.png",

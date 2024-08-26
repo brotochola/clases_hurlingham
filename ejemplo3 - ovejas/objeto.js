@@ -30,6 +30,7 @@ class Objeto {
   }
 
   cambiarSprite(cual, numero = 0, loop = true, cb) {
+    //SI EL SPRITE ACTUAL ES EL MISMO AL Q QUEREMOS CAMBIAR, NO HACE NADA.. RETURN
     if (this.spriteActual == cual) return;
     // console.log("#cambiar sprite", this.spriteActual, "->", cual);
     this.spriteActual = cual;

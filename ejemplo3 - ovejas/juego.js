@@ -38,7 +38,7 @@ class Juego {
   }
   ponerFondo() {
     // Crear un patrón a partir de una imagen
-    PIXI.Texture.fromURL("./img/bg.png").then((patternTexture) => {
+    PIXI.Texture.fromURL("./img/bg2.png").then((patternTexture) => {
       // Crear un sprite con la textura del patrón
       this.backgroundSprite = new PIXI.TilingSprite(patternTexture, 5000, 5000);
       // this.backgroundSprite.tileScale.set(0.5);

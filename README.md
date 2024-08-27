@@ -21,6 +21,11 @@ https://developer.mozilla.org/en-US/docs/Games/Techniques
 
 https://www.red3d.com/cwr/steer/
 
+
+LINK DE ZOOM:
+https://us06web.zoom.us/j/81260618107
+
+
 --
 
 CLASES:

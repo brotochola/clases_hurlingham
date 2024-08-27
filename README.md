@@ -47,6 +47,16 @@ CLASES:
             https://brotochola.github.io/clases_hurlingham/ejemplo4%20-%20avoid.html
         -boids como una masa, con imgs blureadas ?
 
+
+        -otros juegos q seguro usan, o podrian usar, algun algoritmo similar:
+        https://www.youtube.com/watch?v=ZgOfBvD4avw
+        asteroids
+        2d hockey
+        https://www.youtube.com/watch?v=P3YNV1iOdh0
+        2d futbol
+        https://www.youtube.com/watch?v=_SrIcF_uPGY
+        
+
         -explicar qué tienen los ejemplos:
             -grilla (spatial hashing)
             -vectores

@@ -1,6 +1,6 @@
 **UNIVERSIDAD NACIONAL DE HURLINGHAM**  
 **Programación de Videojuegos 1**  
-**Profesor Facundo Saiegh**
+**Profesor Facundo Saiegh**  
 **https://www.linkedin.com/in/facundo-saiegh-60189664/**  
 **https://github.com/brotochola**  
 

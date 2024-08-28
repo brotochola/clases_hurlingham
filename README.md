@@ -192,60 +192,47 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
 
 ### Links / Material
 
-**Ejemplo Zombies**  
+**Ejemplo Zombies**
 https://brotochola.github.io/clases_hurlingham/ejemplo/ejemplo.html  
-
-**Ejempo Ovejas**  
-https://brotochola.github.io/clases_hurlingham/ejemplo3%20-%20ovejas/ovejas.html
-
-**requestAnimationFrame**  
-https://developer.mozilla.org/es/docs/Web/API/Window/requestAnimationFrame
-
-**CORS**  
-https://developer.mozilla.org/es/docs/Web/HTTP/CORS
-
-**PixiJS**  
-https://pixijs.com/
-
-**NodeJS**  
-https://nodejs.org/en
-
-**Serve**  
-https://www.npmjs.com/package/serve
-
-**Free Texture Packer**  
-https://free-tex-packer.com/app/
-
-**Spritesheet Generator**  
-https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/
-
+**Ejempo Ovejas**
+https://brotochola.github.io/clases_hurlingham/ejemplo3%20-%20ovejas/ovejas.html  
+**requestAnimationFrame**
+https://developer.mozilla.org/es/docs/Web/API/Window/requestAnimationFrame  
+**CORS**
+https://developer.mozilla.org/es/docs/Web/HTTP/CORS  
+**PixiJS**
+https://pixijs.com/  
+**NodeJS**
+https://nodejs.org/en  
+**Serve**
+https://www.npmjs.com/package/serve  
+**Free Texture Packer**
+https://free-tex-packer.com/app/  
+**Spritesheet Generator**
+https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/  
 **PIXI.AnimatedSprite**
-https://www.youtube.com/watch?v=FjiQSwohBVs
-
-**Fuerzas Gravitatorias**  
-https://www.youtube.com/watch?v=EpgB3cNhKPM
-
-**Agentes Autónomos**  
-https://www.youtube.com/watch?v=P_xJMH8VvAE
-
-**BOIDS**  
-https://www.youtube.com/watch?v=6dJlhv3hfQ0
-https://www.youtube.com/watch?v=bqtqltqcQhw
-
+https://www.youtube.com/watch?v=FjiQSwohBVs  
+**Fuerzas Gravitatorias**
+https://www.youtube.com/watch?v=EpgB3cNhKPM  
+**Agentes Autónomos**
+https://www.youtube.com/watch?v=P_xJMH8VvAE  
+**BOIDS**
+https://www.youtube.com/watch?v=6dJlhv3hfQ0  
+https://www.youtube.com/watch?v=bqtqltqcQhw  
 **LERP**
-https://www.youtube.com/watch?v=8uLVnM36XUc
-
+https://www.youtube.com/watch?v=8uLVnM36XUc  
 **Spatial Hashing**
-https://www.youtube.com/watch?v=i0OHeCj7SOw
-https://www.youtube.com/watch?v=sx4IIQL0x7c
-https://www.youtube.com/watch?v=h1xXcSvj7Io
-
+https://www.youtube.com/watch?v=i0OHeCj7SOw  
+https://www.youtube.com/watch?v=sx4IIQL0x7c  
+https://www.youtube.com/watch?v=h1xXcSvj7Io  
 **Finite State Machine**
-https://www.youtube.com/watch?v=9lt_nDBiHLY
-
+https://www.youtube.com/watch?v=9lt_nDBiHLY  
 **MatterJS**
-https://www.youtube.com/watch?v=TDQzoe9nslY
+https://www.youtube.com/watch?v=TDQzoe9nslY  
+**Apache Cordova (apps híbridas)**
+https://www.youtube.com/watch?v=Aqzuakon7S0  
 
+--
 
 
 **EXTRAS**  
@@ -253,9 +240,9 @@ https://www.youtube.com/watch?v=TDQzoe9nslY
     Lenia, tipo Game of Life: https://www.youtube.com/watch?v=6kiBYjvyojQ  
     Particles Life: https://www.youtube.com/watch?v=p4YirERTVF0  
     Dual Grid System: https://www.youtube.com/watch?v=jEWFSv3ivTg  
-    Documentación oficial de Mozilla sobre tecnicas básicas de desarrollo de juegos web: https://developer.mozilla.org/es/docs/Games/Techniques  
-    Steering Behaviours by Craig Reynolds: https://www.red3d.com/cwr/steer/
-    Quadtree: https://www.youtube.com/watch?v=OJxEcs0w_kE
-    Flowfield + Perlin Noise: https://www.youtube.com/watch?v=BjoM9oKOAKY
-    Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8
-    Apache Cordova (apps híbridas): https://www.youtube.com/watch?v=Aqzuakon7S0
+    Técnicas para el desarrollo de juegos web: https://developer.mozilla.org/es/docs/Games/Techniques  
+    Steering Behaviours by Craig Reynolds: https://www.red3d.com/cwr/steer/  
+    Quadtree: https://www.youtube.com/watch?v=OJxEcs0w_kE  
+    Flowfield + Perlin Noise: https://www.youtube.com/watch?v=BjoM9oKOAKY  
+    Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8  
+  

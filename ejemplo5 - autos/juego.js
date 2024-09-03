@@ -4,50 +4,59 @@ class Juego {
     this.pausa = false;
     this.canvasWidth = window.innerWidth * 2;
     this.canvasHeight = window.innerHeight * 2;
-    this.app = new PIXI.Application({
-      width: this.canvasWidth,
-      height: this.canvasHeight,
-      resizeTo: window,
-      backgroundColor: 0x1099bb,
-    });
-    document.body.appendChild(this.app.view);
-    this.gridActualizacionIntervalo = 10; // Cada 10 frames
-    this.contadorDeFrames = 0;
-    this.grid = new Grid(50, this); // Tamaño de celda 50
-    this.ovejas = [];
-    this.balas = [];
-    this.obstaculos = [];
-    this.decorados=[]
+    this.app = new PIXI.Application({});
 
-    this.keyboard = {};
+    this.app = new PIXI.Application();
 
-    this.app.stage.sortableChildren = true;
-    // this.hacerCosasParaQSeVeaPixelado()
+    this.app
+      .init({
+        width: this.canvasWidth,
+        height: this.canvasHeight,
+        resizeTo: window,
+        backgroundColor: 0x1099bb,
+      })
+      .then((e) => {
+        document.body.appendChild(this.app.canvas);
 
+        // document.body.appendChild(this.app.view);
+        this.gridActualizacionIntervalo = 10; // Cada 10 frames
+        this.contadorDeFrames = 0;
+        this.grid = new Grid(50, this); // Tamaño de celda 50
+        this.ovejas = [];
+        this.balas = [];
+        this.obstaculos = [];
+        this.decorados = [];
 
-    this.ponerFondo();
-    this.ponerProtagonista();
+        this.keyboard = {};
+        this.cantFramesPorDia = 3000;
 
-    this.ponerOvejas(500);
+        this.app.stage.sortableChildren = true;
+        // this.hacerCosasParaQSeVeaPixelado()
 
-    this.ponerPiedras(20);
+        this.ponerFondo();
+        this.ponerProtagonista();
 
-    this.ponerPastos(1000);
-    this.ponerListeners();
+        // // this.ponerOvejas(500);
 
-    setTimeout(() => {
-      this.app.ticker.add(this.actualizar.bind(this));
-      window.__PIXI_APP__ = this.app;
-    }, 100);
+        this.ponerPiedras(20);
+
+        // this.ponerPastos(1000);
+        this.ponerListeners();
+
+        setTimeout(() => {
+          this.app.ticker.add(this.actualizar.bind(this));
+          window.__PIXI_APP__ = this.app;
+        }, 100);
+      });
   }
 
-  hacerCosasParaQSeVeaPixelado(){
+  hacerCosasParaQSeVeaPixelado() {
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    this.app.view.style.imageRendering = 'pixelated';
+    this.app.view.style.imageRendering = "pixelated";
     PIXI.settings.ROUND_PIXELS = true;
   }
 
-  ponerPastos(cant){
+  ponerPastos(cant) {
     for (let i = 0; i < cant; i++) {
       this.decorados.push(
         new Pasto(
@@ -60,20 +69,35 @@ class Juego {
   }
   ponerFondo() {
     // Crear un patrón a partir de una imagen
-    PIXI.Texture.fromURL("./img/bg2.png").then((patternTexture) => {
+
+    const image = new Image();
+
+    image.onload = () => {
+      // create a texture source
+      const source = new PIXI.ImageSource({
+        resource: image,
+      });
+
+      // create a texture
+      const texture = new PIXI.Texture({
+        source,
+      });
+
       // Crear un sprite con la textura del patrón
-      this.backgroundSprite = new PIXI.TilingSprite(patternTexture, 5000, 5000);
+      this.backgroundSprite = new PIXI.TilingSprite(texture, 5000, 5000);
       // this.backgroundSprite.tileScale.set(0.5);
 
       // Añadir el sprite al stage
       this.app.stage.addChild(this.backgroundSprite);
-    });
+    };
+
+    image.src = "./img/bg2.png";
   }
   ponerProtagonista() {
     this.player = new Player(
       window.innerWidth / 2,
       window.innerHeight * 0.9,
-      5,
+      10,
       this
     );
   }
@@ -162,16 +186,40 @@ class Juego {
       decorado.update();
     });
 
-    // this.obstaculos.forEach((obstaculo) => {
-    //   obstaculo.update();
-    // });
+    this.obstaculos.forEach((obstaculo) => {
+      obstaculo.update();
+    });
 
     // //CADA 5 FRAMES ACTUALIZO LA GRILLA
     // if (this.contadorDeFrames % 5 == 0) {
     //   this.grid.actualizarCantidadSiLasCeldasSonPasablesONo();
     // }
 
+    this.gestionarDiaYNoche();
+
     this.moverCamara();
+  }
+  calcularLuzDelDia() {
+    this.sol = -Math.cos(
+      (2 * Math.PI * (this.contadorDeFrames % this.cantFramesPorDia)) /
+        this.cantFramesPorDia
+    );
+  }
+  calcularHoraDelDia() {
+    const horasPorDia = 24;
+
+    const fraccionDelDia =
+      (this.contadorDeFrames % this.cantFramesPorDia) / this.cantFramesPorDia;
+
+    this.hora = fraccionDelDia * horasPorDia;
+  }
+
+  gestionarDiaYNoche() {
+    // this.sol = -Math.cos(
+    //   (this.contadorDeFrames / this.cantFramesPorDia) % this.cantFramesPorDia
+    // );
+    this.calcularHoraDelDia();
+    this.calcularLuzDelDia();
   }
 
   moverCamara() {

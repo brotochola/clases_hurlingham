@@ -1,90 +1,30 @@
-<!-- HABLAR DE CORS -->
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixiJS Boilerplate</title>
-    <style>
-        body,
-        html {
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: transparent;
-        }
+  <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
+  <script src="juego.js"></script>
 
-        #gameCanvas {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+  <script src="chaboncitos.js"></script>
+
+
 </head>
 
 <body>
 
-    <script src="https://pixijs.download/v8.3.1/pixi.js"></script>
-    <script>
-        //DEFINO FUNCION GAMELOOP
-        function gameLoop(time) {
-            // console.log(time)
-        }
-        //UNA VEZ CARGADO PIXI E INICIALIZADO...
-        function init() {
-            //AGREGA EL CANVAS AL BODY DEL HTML
-            document.body.appendChild(app.canvas);
-            //AGREGA UNA FUNCION Q SE EJECUTA CADA VEZ Q SE PROCESA UN FRAME (TICK)
-            app.ticker.add(gameLoop);
-            //AGREGA UN CUADRADO
-            agregarCuadrado()
-        }
-        //DECLARO LA VARIABLE ACA PARA Q SEA GLOBAL
-        let cuadrado
-        //FUNCION Q AGREGA CUADRADOS
-        function agregarCuadrado() {
-            //COORDENADAS RANDOM
-            let x = Math.random() * window.innerWidth;
-            let y = Math.random() * window.innerHeight;
-            //USANDO EL CONTRUCTOR PIXI.GRAPHICS, CREAMOS UN CUADRADO
-            //** VER DOCUMENTACIOND E PIXI
-            cuadrado = new PIXI.Graphics()
-                .rect(x, y, 100, 100)
-                .fill(0xFF0000);
 
-            //AGREGA EL CUADRADO CREADO AL STAGE
-            app.stage.addChild(cuadrado);
-        }
+  <script>
+
+
+    let juego = new Juego()
 
 
 
+    //
 
-        let gato;
-        function agregarPNG() {
-            PIXI.Assets.load('gato.png').then(e => {
-                gato = PIXI.Sprite.from('gato.png')
-                app.stage.addChild(gato);
-            })
-
-        }
-        agregarPNG()
-        //CREA APP DE PIXI
-        const app = new PIXI.Application();
-        //Y LA INICIALIZA
-        //UNA VEZ TERMINADO ESTE PROCESO EJECUTA NUESTRA FUNCION INIT, Q ESTA DECLARADA MAS ARRIBA
-        app.init({ background: '#000000', resizeTo: window }).then(init)
-
-        //PIXI DEBUGGER
-        globalThis.__PIXI_APP__ = app;
+  </script>
 
 
-
-    </script>
 
 </body>
 

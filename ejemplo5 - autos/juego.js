@@ -4,7 +4,7 @@ class Juego {
     this.pausa = false;
     this.canvasWidth = window.innerWidth * 2;
     this.canvasHeight = window.innerHeight * 2;
-    this.app = new PIXI.Application({});
+    // this.app = new PIXI.Application({});
 
     this.app = new PIXI.Application();
 

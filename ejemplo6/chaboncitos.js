@@ -16,6 +16,8 @@ class Chaboncito {
     this.masa = this.radio * 100000;
     this.aceleracionY = 0;
 
+    this.velMax = 1 + Math.random() ;
+
     this.listo = false;
 
     // this.cargarSpriteAnimado();
@@ -44,8 +46,10 @@ class Chaboncito {
     PIXI.Assets.load("blur.png").then((e) => {
       this.sprite = PIXI.Sprite.from("blur.png");
       this.juego.app.stage.addChild(this.sprite);
-      
-      this.sprite.tint=obtenerColorAleatorioHex()
+      this.sprite.anchor.set(0.5, 0.5);
+      this.sprite.alpha = 0.1;
+      this.sprite.scale.set(1);
+      // this.sprite.tint=obtenerColorAleatorioHex()
       this.listo = true;
     });
   }
@@ -72,8 +76,8 @@ class Chaboncito {
   seguirMouse() {
     let x = this.x - this.juego.mouse.x;
     let y = this.y - this.juego.mouse.y;
-    this.aceleracionX -= x * 0.01;
-    this.aceleracionY -= y * 0.01;
+    this.aceleracionX -= x * 0.01 * this.velMax;
+    this.aceleracionY -= y * 0.01 * this.velMax;
   }
 
   separacion() {

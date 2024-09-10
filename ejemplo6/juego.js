@@ -25,7 +25,7 @@ class Juego {
         this.mouse.y = e.y;
       };
 
-      this.ponerChaboncitos(2000);
+      this.ponerChaboncitos(300);
     });
   }
 

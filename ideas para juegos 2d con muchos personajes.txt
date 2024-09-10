@@ -1,0 +1,28 @@
+ideas para juegos:
+-simuladores:
+  -laburos:
+    -granja
+    -cocina
+    -fabrica
+  -de mercado (tipo rollercoaster tycoon donde hay personitas q compran cosas)
+  -de pelea de grupos de gente
+  -de perro pastor
+  -de ecosistemas
+    -insectos
+    -microorganismos
+    -pajaros
+    -peces
+  -cosas del espacio (naves, planetas, gravedad, meteoritas)
+  -dios 
+-deportes:
+  -futbol, rugby, hockey 
+  -carreras de vehiculos
+-plataformas
+-tower defense
+-estrategia en tiempo real
+
+vistas:
+-isometrica
+-de costado
+-desde arriba
+

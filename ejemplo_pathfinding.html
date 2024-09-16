@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimiento en PixiJS con celdas caminables</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+    <script>
+        // Crear la aplicación PixiJS
+        const app = new PIXI.Application({
+            width: 1024,
+            height: 2048,
+            backgroundColor: 0x1099bb
+        });
+
+        document.body.appendChild(app.view);
+        let path = [];  // Array para guardar el camino generado por A*
+        let currTarget
+        const tileSize = 64; // Tamaño de cada celda
+        const maxSpeed = 4;  // Velocidad máxima del jugador
+        const arrivalRadius = 100;  // Radio en el que el jugador empieza a frenar
+        let target = null;  // Posición objetivo
+        const repulsionRadius = 50;  // Radio de repulsión desde celdas no caminables
+        const repulsionStrength = 200;  // Fuerza de repulsión
+
+        // Seguir el mouse
+        app.stage.interactive = true;
+        let pathGraphics = new PIXI.Graphics();
+        app.stage.addChild(pathGraphics);
+        function generateRandomBinaryGrid(width, height) {
+            const grid = [];
+
+            for (let y = 0; y < height; y++) {
+                const row = [];
+                for (let x = 0; x < width; x++) {
+                    row.push(Math.random() > 0.3 ? 1 : 0);
+                }
+                grid.push(row);
+            }
+
+            return grid;
+        }
+        const grid = generateRandomBinaryGrid(30, 40)
+        const numRows = grid.length;
+        const numCols = grid[0].length;
+
+        // Cargar fondo y personaje
+        const background = PIXI.Sprite.from('https://www.publicdomainpictures.net/pictures/270000/velka/abstract-blue-background.jpg');
+        background.width = app.screen.width;
+        background.height = app.screen.height;
+        app.stage.addChild(background);
+
+        // Crear el jugador (un simple cuadrado)
+        const player = new PIXI.Graphics();
+        player.beginFill(0xff0000);
+        player.drawRect(0, 0, tileSize / 4, tileSize / 4);
+        player.endFill();
+        player.x = 50;  // Posición inicial
+        player.y = 500;  // Posición inicial
+        app.stage.addChild(player);
+        player.pivot.set(tileSize / 8, tileSize / 8);
+
+        player.prevX = player.x;
+        player.prevY = player.y;
+        player.velX = 0
+        player.velY = 0
+
+        // Función para obtener la posición en la grilla
+        function getGridPosition(x, y) {
+            const col = Math.floor(x / tileSize);
+            const row = Math.floor(y / tileSize);
+            return { col, row };
+        }
+
+
+
+
+
+        // Implementación del algoritmo A*
+        function findPath(start, end) {
+            const openList = [];
+            const closedList = [];
+            const startNode = {
+                row: start.row,
+                col: start.col,
+                g: 0,  // Costo desde el inicio
+                h: heuristic(start, end),  // Distancia estimada al final
+                parent: null
+            };
+            openList.push(startNode);
+
+            while (openList.length > 0) {
+                // Obtener el nodo con menor f = g + h
+                openList.sort((a, b) => (a.g + a.h) - (b.g + b.h));
+                const currentNode = openList.shift();
+                closedList.push(currentNode);
+
+                // Si llegamos al destino, reconstruir el camino
+                if (currentNode.row === end.row && currentNode.col === end.col) {
+                    return reconstructPath(currentNode);
+                }
+
+                // Generar los vecinos (nodos adyacentes)
+                const neighbors = getNeighbors(currentNode);
+                for (let neighbor of neighbors) {
+                    if (closedList.some(node => node.row === neighbor.row && node.col === neighbor.col)) {
+                        continue;  // Si ya está en la lista cerrada, ignorar
+                    }
+
+                    const gScore = currentNode.g + 1;  // Suponer que cada movimiento tiene costo 1
+                    const openNode = openList.find(node => node.row === neighbor.row && node.col === neighbor.col);
+
+                    if (!openNode) {
+                        // Añadir el vecino a la lista abierta si no está
+                        openList.push({
+                            row: neighbor.row,
+                            col: neighbor.col,
+                            g: gScore,
+                            h: heuristic(neighbor, end),
+                            parent: currentNode
+                        });
+                    } else if (gScore < openNode.g) {
+                        // Si este camino es mejor, actualizar los datos del vecino
+                        openNode.g = gScore;
+                        openNode.parent = currentNode;
+                    }
+                }
+            }
+
+            return null;  // Si no hay camino, devolver un array vacío
+        }
+
+        // Función para obtener los vecinos de un nodo
+        function getNeighbors(node) {
+            const neighbors = [];
+            const directions = [
+                { row: 0, col: -1 },  // Izquierda
+                { row: 0, col: 1 },   // Derecha
+                { row: -1, col: 0 },  // Arriba
+                { row: 1, col: 0 },  // Abajo
+
+                // { row: -1, col: -1 },
+                // { row: -1, col: 1 },
+                // { row: 1, col: 1 },
+                // { row: 1, col: -1 }
+            ];
+
+            for (let dir of directions) {
+                const newRow = node.row + dir.row;
+                const newCol = node.col + dir.col;
+
+                if (isWalkable(newRow, newCol)) {
+                    neighbors.push({ row: newRow, col: newCol });
+                }
+            }
+
+            return neighbors;
+        }
+
+        // Función heurística (distancia Manhattan)
+        function heuristic(node, goal) {
+            return Math.abs(node.row - goal.row) + Math.abs(node.col - goal.col);
+        }
+
+        // Reconstruir el camino desde el nodo final hasta el inicial
+        function reconstructPath(node) {
+            const path = [];
+            let current = node;
+
+            while (current) {
+                path.unshift(current);  // Insertar al inicio del array
+                current = current.parent;
+            }
+
+            return path;
+        }
+
+        // Mostrar el camino en la grilla (opcional para depuración)
+        function drawPath() {
+            if (!path || (path || []).length === 0) return;
+
+
+            pathGraphics.clear()
+            pathGraphics.lineStyle(2, 0x00ff00, 1);
+
+            let prev = path[0];
+            for (let i = 1; i < path.length; i++) {
+                const next = path[i];
+                pathGraphics.moveTo(prev.col * tileSize + tileSize / 2, prev.row * tileSize + tileSize / 2);
+                pathGraphics.lineTo(next.col * tileSize + tileSize / 2, next.row * tileSize + tileSize / 2);
+                prev = next;
+            }
+
+
+        }
+
+        function isWalkable(row, col) {
+            if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
+                return false;
+            }
+            return grid[row][col] === 1;
+        }
+
+        app.stage.on('pointerdown', (event) => {
+            console.log("pointer down")
+            if (canMoveTo(event.data.global.x, event.data.global.y)) {
+                
+                const targetPos = getGridPosition(event.data.global.x, event.data.global.y);
+                const playerPos = getGridPosition(player.x, player.y);
+
+                // Ejecutar A* para encontrar la ruta hasta la posición del mouse
+                path = findPath(playerPos, targetPos);
+                drawPath();
+
+                if(path) {
+                    target = { x: event.data.global.x, y: event.data.global.y }
+                }
+
+            }
+
+        });
+
+
+        // Función para verificar si el movimiento es posible
+        function canMoveTo(x, y) {
+            const { col, row } = getGridPosition(x, y);
+            if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) {
+                return false;
+            }
+            return grid[row][col] === 1;
+        }
+
+        // Función para calcular la distancia
+        function distance(x1, y1, x2, y2) {
+            return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        }
+
+        // Aplicar fuerza de repulsión del jugador de las celdas no caminables
+        function movePlayerInPath() {
+            // console.log(path)
+            if (!path) return null
+            if (path.length > 0) {
+
+
+                const targetX = path[0].col * tileSize + tileSize / 2;
+                const targetY = path[0].row * tileSize + tileSize / 2;
+
+
+
+                const dx = targetX - player.x;
+                const dy = targetY - player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance > tileSize) {
+                    return { x: targetX, y: targetY };
+                } else {
+                    // El jugador ha llegado al destino
+                    path.splice(0, 1)
+                    return movePlayerInPath()
+                }
+            }
+
+        }
+        function lerp(start, end, t) {
+            return start + (end - start) * t;
+        }
+
+        // Movimiento del jugador
+        function movePlayer() {
+            currTarget = movePlayerInPath() || target
+            if (currTarget) {
+                const dx = currTarget.x - player.x;
+                const dy = currTarget.y - player.y;
+                const dist = distance(player.x, player.y, currTarget.x, currTarget.y);
+
+                let speed = maxSpeed;
+                // if (dist < arrivalRadius) {
+                //     speed = maxSpeed * (dist / arrivalRadius);  // Reducir la velocidad si estamos cerca
+                // }
+
+                const angle = Math.atan2(dy, dx);
+                let vx = Math.cos(angle) * speed;
+                let vy = Math.sin(angle) * speed;
+
+                // let newVx=lerp()
+
+
+                // console.log(vx,vy)
+
+
+                player.prevX = player.x
+                player.prevY = player.y
+
+
+
+                if (canMoveTo(player.x + vx, player.y)) {
+                    player.x += lerp(player.velX, vx, 0.1)
+                }
+
+                if (canMoveTo(player.x, player.y + vy)) {
+                    player.y += lerp(player.velY, vy, 0.1)
+                }
+
+                player.velX = player.x - player.prevX
+                player.velY = player.y - player.prevY
+
+            }
+
+        }
+
+        // Loop principal
+        app.ticker.add(() => {
+            movePlayer();
+        });
+
+        // Dibujar la grilla para visualizar las áreas caminables e impasables
+        function drawGrid() {
+            for (let row = 0; row < grid.length; row++) {
+                for (let col = 0; col < grid[row].length; col++) {
+                    const cell = new PIXI.Graphics();
+                    cell.lineStyle(2, 0xffffff);
+                    if (grid[row][col] === 0) {
+                        cell.beginFill(0x000000, 0.5);  // Celdas impasables en negro
+                    } else {
+                        cell.beginFill(0x00ff00, 0.2);  // Celdas caminables en verde claro
+                    }
+                    cell.drawRect(col * tileSize, row * tileSize, tileSize, tileSize);
+                    cell.endFill();
+                    app.stage.addChild(cell);
+                }
+            }
+        }
+
+        drawGrid();
+
+    </script>
+</body>
+
+</html>

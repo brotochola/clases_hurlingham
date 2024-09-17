@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixiJS Boids + Flowfield</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+    <script>
+        let width=800
+        let height=600
+        const app = new PIXI.Application({ width: width, height: height, backgroundColor: 0x1099bb });
+        document.body.appendChild(app.view);
+
+        const boids = [];
+        const numBoids = 140;
+        const boidRadius=2.5
+        const flowfieldResolution = 20;
+        const flowfield = [];
+
+        class Boid {
+            constructor(x, y) {
+                this.sprite = new PIXI.Graphics();
+                this.sprite.beginFill(0xffff00);
+                this.sprite.drawCircle(0, 0, boidRadius);
+                this.sprite.endFill();
+                this.sprite.x = x;
+                this.sprite.y = y;
+                app.stage.addChild(this.sprite);
+
+                this.velocity = new PIXI.Point(Math.random() * 2 - 1, Math.random() * 2 - 1);
+                this.acceleration = new PIXI.Point(0, 0);
+                this.maxSpeed = 2;
+                this.maxForce = 0.05;
+            }
+
+            applyForce(force) {
+                if(!force) return
+                this.acceleration.x += force.x;
+                this.acceleration.y += force.y;
+            }
+
+            // seek(target) {
+            //     const desired = new PIXI.Point(target.x - this.sprite.x, target.y - this.sprite.y);
+            //     const mag = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
+            //     desired.x /= mag;
+            //     desired.y /= mag;
+            //     desired.x *= this.maxSpeed;
+            //     desired.y *= this.maxSpeed;
+
+            //     const steer = new PIXI.Point(desired.x - this.velocity.x, desired.y - this.velocity.y);
+            //     steer.x = Math.max(-this.maxForce, Math.min(this.maxForce, steer.x));
+            //     steer.y = Math.max(-this.maxForce, Math.min(this.maxForce, steer.y));
+                
+            //     this.applyForce(steer);
+            // }
+
+            separation(boids) {
+                const desiredSeparation = boidRadius*4;
+                let steer = new PIXI.Point(0, 0);
+                let count = 0;
+
+                boids.forEach(other => {
+                    const d = this.distance(other);
+                    if (d > 0 && d < desiredSeparation) {
+                        const diff = new PIXI.Point(this.sprite.x - other.sprite.x, this.sprite.y - other.sprite.y);
+                        const mag = Math.sqrt(diff.x * diff.x + diff.y * diff.y);
+                        diff.x /= mag;
+                        diff.y /= mag;
+                        steer.x += diff.x;
+                        steer.y += diff.y;
+                        count++;
+                    }
+                });
+
+                let strength=25
+
+                if (count > 0) {
+                    steer.x /= count;
+                    steer.y /= count;
+                    const mag = Math.sqrt(steer.x * steer.x + steer.y * steer.y);
+                    steer.x /= mag;
+                    steer.y /= mag;
+                    steer.x *= this.maxSpeed;
+                    steer.y *= this.maxSpeed;
+                    steer.x -= this.velocity.x;
+                    steer.y -= this.velocity.y;
+                    steer.x = Math.max(-this.maxForce, Math.min(this.maxForce, steer.x))*strength;
+                    steer.y = Math.max(-this.maxForce, Math.min(this.maxForce, steer.y))*strength;
+                }
+
+                this.applyForce(steer);
+            }
+
+            followFlowfield(flowfield) {
+                const col = Math.floor(this.sprite.x / flowfieldResolution);
+                const row = Math.floor(this.sprite.y / flowfieldResolution);
+                const index = col + row * Math.floor(app.screen.width / flowfieldResolution);
+                const force = flowfield[index];
+                this.applyForce(force);
+            }
+
+            distance(other) {
+                return Math.sqrt(
+                    (this.sprite.x - other.sprite.x) * (this.sprite.x - other.sprite.x) +
+                    (this.sprite.y - other.sprite.y) * (this.sprite.y - other.sprite.y)
+                );
+            }
+
+            update() {
+                this.velocity.x += this.acceleration.x;
+                this.velocity.y += this.acceleration.y;
+                this.velocity.x = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.velocity.x));
+                this.velocity.y = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.velocity.y));
+
+                this.sprite.x += this.velocity.x;
+                this.sprite.y += this.velocity.y;
+
+                this.acceleration.x = 0;
+                this.acceleration.y = 0;
+
+                this.sprite.x=this.sprite.x%width
+                this.sprite.y=this.sprite.y%height
+            }
+        }
+
+        function createFlowfield() {
+            const cols = Math.floor(app.screen.width / flowfieldResolution);
+            const rows = Math.floor(app.screen.height / flowfieldResolution);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const angle = Math.sin(x * y*0.01) // Curved path (track)
+                    const vector = new PIXI.Point(Math.cos(angle), Math.sin(angle));
+                    flowfield.push(vector);
+                }
+            }
+        }
+
+        function drawFlowfield() {
+            const cols = Math.floor(app.screen.width / flowfieldResolution);
+            const rows = Math.floor(app.screen.height / flowfieldResolution);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const vector = flowfield[x + y * cols];
+                    const arrow = new PIXI.Graphics();
+                    arrow.lineStyle(1, 0xffffff);
+                    arrow.moveTo(x * flowfieldResolution, y * flowfieldResolution);
+                    arrow.lineTo(
+                        x * flowfieldResolution + vector.x * 20,
+                        y * flowfieldResolution + vector.y * 20
+                    );
+                    app.stage.addChild(arrow);
+                }
+            }
+        }
+
+        function setup() {
+            createFlowfield();
+            drawFlowfield();
+
+            for (let i = 0; i < numBoids; i++) {
+                const boid = new Boid(Math.random() * app.screen.width, Math.random() * app.screen.height);
+                boids.push(boid);
+            }
+
+            app.ticker.add(() => {
+                boids.forEach(boid => {
+                    boid.followFlowfield(flowfield);
+                    boid.separation(boids);
+                    boid.update();
+                });
+            });
+        }
+
+        setup();
+    </script>
+</body>
+</html>

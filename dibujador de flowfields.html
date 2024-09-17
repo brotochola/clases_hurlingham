@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <script>
+        let flowfield = [];
+        let cols, rows;
+        let flowfieldResolution = 20;
+        let lastMouse
+
+        function guardarFlowField() {
+            console.log(JSON.stringify(flowfield.map(k => { return { x: k.x, y: k.y } })))
+        }
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            cols = floor(width / flowfieldResolution);
+            rows = floor(height / flowfieldResolution);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    flowfield.push(createVector(0, 0));
+                }
+            }
+        }
+
+        function draw() {
+            background(255);
+            if (!lastMouse) lastMouse = { x: mouseX, y: mouseY }
+            // if (mouseX - lastMouse.x == 0 || mouseY - lastMouse.y == 0) return
+            // Recorrer todas las celdas del flowfield
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    let index = x + y * cols;
+                    let v = flowfield[index];
+                    let px = x * flowfieldResolution;
+                    let py = y * flowfieldResolution;
+
+                    // Solo actualizar si el botón del mouse está presionado y el mouse está cerca
+                    if (mouseIsPressed) {
+                        let distance = dist(mouseX, mouseY, px, py);
+                        if (distance <= flowfieldResolution * 4) {
+                            // Cambiar el ángulo del vector en función de la posición del mouse
+                            let angle = atan2(mouseY - lastMouse.y, mouseX - lastMouse.x);
+                            v.set(cos(angle), sin(angle));
+                        }
+                    }
+
+                    // Dibujar el vector
+                    stroke(0);
+                    push();
+                    translate(px, py);
+                    rotate(v.heading());
+                    line(0, 0, flowfieldResolution / 2, 0);
+                    pop();
+                }
+            }
+            lastMouse = { x: mouseX, y: mouseY }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,43 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixiJS Boilerplate</title>
-    <style>
-        body,
-        html {
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: transparent;
-        }
+    <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="entidad.js"></script>
+    <script src="presa.js"></script>
 
-        #gameCanvas {
-            width: 100%;
-            height: 100%;
+    <script src="depredador.js"></script>
+    <script src="juego.js"></script>
+
+    <style>
+        * {
+            margin: 0;
         }
     </style>
+
+
+
+
 </head>
 
 <body>
 
-    <script src="https://pixijs.download/v8.3.1/pixi.js"></script>
-    <script src="utils.js"></script>
 
-    <script src="entidad.js"></script>
-    <script src="juego.js"></script>
     <script>
-        const app = new Juego()
-        app.agregarEntidad(window.innerWidth * 0.5, window.innerHeight * 0.5)
+
+
+        let juego = new Juego()
+
+        for (let i = 0; i < 3; i++) {
+            juego.agregarDepredador(0.5 * window.innerWidth, Math.random() * window.innerHeight)
+        }
+
+        for (let i = 0; i < 255; i++) {
+            juego.agregarPresa((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight)
+        }
+
+
+
+
+        //
 
     </script>
+
+
 
 </body>
 

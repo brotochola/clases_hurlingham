@@ -1,28 +1,51 @@
 class Juego {
   constructor() {
+    this.app = new PIXI.Application();
+    this.contadorDeFrame = 0;
+    this.ancho = window.innerWidth;
+    this.alto = window.innerHeight;
+
     this.entidades = [];
-    this.pixiApp = new PIXI.Application();
-    this.pixiApp
-      .init({ background: "#000000", resizeTo: window })
-      .then(() => this.init());
+    this.presas = [];
+    this.depredadores = [];
+
+    this.contadorDeFrame = 0;
+
+    let promesa = this.app.init({ width: this.ancho, height: this.alto });
+
+    this.ponerListeners();
+
+    promesa.then((e) => {
+      document.body.appendChild(this.app.canvas);
+      window.__PIXI_APP__ = this.app;
+      this.app.ticker.add(() => {
+        this.gameLoop();
+      });
+    });
   }
 
-  gameLoop(time) {
-    // console.log(time);
+  ponerListeners() {
+    window.onmousemove = (e) => {
+      this.mouse = { x: e.x, y: e.y };
+    };
+  }
+  gameLoop() {
+    this.contadorDeFrame++;
+
     for (let entidad of this.entidades) {
-      entidad.update(time);
+      entidad.update();
+      entidad.render();
     }
   }
-  init() {
-    document.body.appendChild(this.pixiApp.canvas);
-    this.pixiApp.ticker.add((time) => {
-      this.gameLoop(time);
-    });
 
-    window.globalThis.__PIXI_APP__ = this.pixiApp;
+  agregarPresa(x, y) {
+    let presa = new Presa(x, y, this);
+    this.entidades.push(presa);
+    this.presas.push(presa);
   }
-
-  agregarEntidad(x,y) {
-    this.entidades.push(new Entidad(x, y, this));
+  agregarDepredador(x, y) {
+    let depre = new Depredador(x, y, this);
+    this.entidades.push(depre);
+    this.depredadores.push(depre);
   }
 }

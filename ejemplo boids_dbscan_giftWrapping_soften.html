@@ -24,64 +24,167 @@
         const ctx = canvas.getContext('2d');
 
         const perceptionRadius = 50;
-        const RENDER_BOIDS = true
+        const RENDER_BOIDS = false
         const RENDER_OUTER_POINTER = false
 
         function smoothLine(points, ctx) {
-
-
             ctx.fillStyle = '#ff0000';
-            // ctx.fillRect(0, 0, w, h);
-
-
-
             ctx.lineWidth = 6;
             ctx.strokeStyle = '#000000';
+
+            if (points.length < 2) return; // Asegurarse de que haya suficientes puntos
+
             var x = points[0].x,
                 y = points[0].y;
 
             ctx.beginPath();
             ctx.moveTo(x, y);
 
-            for (var i = 0; i < points.length; ++i) {
-
+            // Dibujar curvas suaves entre los puntos
+            for (var i = 1; i < points.length; ++i) {
                 var x2 = points[i].x,
                     y2 = points[i].y,
-
                     mx = (x + x2) / 2,
                     my = (y + y2) / 2;
-                //alert(x +" "+x2 +" "+mx +" ")
-                ctx.quadraticCurveTo(x, y, mx, my);
 
+                ctx.quadraticCurveTo(x, y, mx, my); // Curva cuadrática al punto medio
                 x = x2;
                 y = y2;
-
             }
 
-            //	ctx.lineTo( points[ points.length - 1 ].x, points[ points.length - 1 ].y );
+            // Conectar el último punto con el primero para cerrar la forma
+            var mxFinal = (x + points[0].x) / 2;
+            var myFinal = (y + points[0].y) / 2;
+            ctx.quadraticCurveTo(x, y, mxFinal, myFinal); // Conectar con el punto inicial
+            ctx.quadraticCurveTo(mxFinal, myFinal, points[0].x, points[0].y); // Cerrar la curva
 
             ctx.stroke();
-            if (RENDER_OUTER_POINTER) {
 
+            if (RENDER_OUTER_POINTER) {
                 ctx.fillStyle = '#ff00ff';
                 for (var i = 0; i < points.length; ++i) {
-
                     ctx.beginPath();
                     ctx.arc(points[i].x, points[i].y, 4, 0, Math.PI * 2);
                     ctx.fill();
 
-
-
                     ctx.font = '14px Verdana';
                     ctx.fillText(i, points[i].x - ctx.measureText(i).width / 2, points[i].y + 18);
-
                 }
             }
-
         }
 
 
 
+        // function smoothLine(points, ctx) {
+        //     if (points.length < 2) return; // Asegurarse de que haya suficientes puntos
+
+        //     ctx.fillStyle = '#ff0000';
+        //     ctx.lineWidth = 6;
+        //     ctx.strokeStyle = '#000000';
+
+        //     ctx.beginPath();
+        //     ctx.moveTo(points[0].x, points[0].y);
+
+        //     // Dibujar curvas Bézier cúbicas usando puntos de control calculados
+        //     for (var i = 0; i < points.length - 1; ++i) {
+        //         // Punto actual
+        //         var currentPoint = points[i];
+        //         // Siguiente punto
+        //         var nextPoint = points[i + 1];
+
+        //         // Puntos anteriores y siguientes para calcular los puntos de control
+        //         var prevPoint = points[i - 1] || points[0]; // Si no hay punto previo, usar el primero
+        //         var nextNextPoint = points[i + 2] || points[points.length - 1]; // Si no hay punto siguiente, usar el último
+
+        //         // Calcular puntos de control usando Catmull-Rom
+        //         var cp1x = currentPoint.x + (nextPoint.x - prevPoint.x) / 6;
+        //         var cp1y = currentPoint.y + (nextPoint.y - prevPoint.y) / 6;
+
+        //         var cp2x = nextPoint.x - (nextNextPoint.x - currentPoint.x) / 6;
+        //         var cp2y = nextPoint.y - (nextNextPoint.y - currentPoint.y) / 6;
+
+        //         // Dibujar la curva Bézier cúbica
+        //         ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, nextPoint.x, nextPoint.y);
+        //     }
+
+        //     // Cerrar la forma conectando el último punto con el primero
+        //     var prevPoint = points[points.length - 2] || points[points.length - 1];
+        //     var cp1x = points[points.length - 1].x + (points[0].x - prevPoint.x) / 6;
+        //     var cp1y = points[points.length - 1].y + (points[0].y - prevPoint.y) / 6;
+
+        //     var cp2x = points[0].x - (points[1].x - points[points.length - 1].x) / 6;
+        //     var cp2y = points[0].y - (points[1].y - points[points.length - 1].y) / 6;
+
+        //     ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, points[0].x, points[0].y);
+
+        //     ctx.stroke();
+
+        //     // Opcional: mostrar los puntos de control
+        //     if (RENDER_OUTER_POINTER) {
+        //         ctx.fillStyle = '#ff00ff';
+        //         for (var i = 0; i < points.length; ++i) {
+        //             ctx.beginPath();
+        //             ctx.arc(points[i].x, points[i].y, 4, 0, Math.PI * 2);
+        //             ctx.fill();
+
+        //             ctx.font = '14px Verdana';
+        //             ctx.fillText(i, points[i].x - ctx.measureText(i).width / 2, points[i].y + 18);
+        //         }
+        //     }
+        // }
+
+
+
+
+
+
+
+        // function smoothLine(points, ctx) {
+        //     if (points.length < 2) return; // Asegurarse de que haya suficientes puntos
+
+        //     ctx.fillStyle = '#ff0000';
+        //     ctx.lineWidth = 6;
+        //     ctx.strokeStyle = '#000000';
+
+        //     ctx.beginPath();
+        //     ctx.moveTo(points[0].x, points[0].y);
+
+        //     // Dibujar curvas Bézier cúbicas entre los puntos
+        //     for (var i = 0; i < points.length - 1; ++i) {
+        //         var currentPoint = points[i];
+        //         var nextPoint = points[i + 1];
+
+        //         // Puntos de control: suavizan las transiciones entre puntos
+        //         var cp1x = (currentPoint.x + nextPoint.x) / 2;
+        //         var cp1y = currentPoint.y;
+        //         var cp2x = (currentPoint.x + nextPoint.x) / 2;
+        //         var cp2y = nextPoint.y;
+
+        //         ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, nextPoint.x, nextPoint.y);
+        //     }
+
+        //     // Cerrar la forma conectando el último punto con el primero
+        //     var cp1x = (points[points.length - 1].x + points[0].x) / 2;
+        //     var cp1y = points[points.length - 1].y;
+        //     var cp2x = (points[points.length - 1].x + points[0].x) / 2;
+        //     var cp2y = points[0].y;
+
+        //     ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, points[0].x, points[0].y);
+
+        //     ctx.stroke();
+
+        //     if (RENDER_OUTER_POINTER) {
+        //         ctx.fillStyle = '#ff00ff';
+        //         for (var i = 0; i < points.length; ++i) {
+        //             ctx.beginPath();
+        //             ctx.arc(points[i].x, points[i].y, 4, 0, Math.PI * 2);
+        //             ctx.fill();
+
+        //             ctx.font = '14px Verdana';
+        //             ctx.fillText(i, points[i].x - ctx.measureText(i).width / 2, points[i].y + 18);
+        //         }
+        //     }
+        // }
 
 
         // Boid class representing each boid (not displayed, only for calculation)

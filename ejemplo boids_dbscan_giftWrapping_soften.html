@@ -24,7 +24,7 @@
         const ctx = canvas.getContext('2d');
 
         const perceptionRadius = 50;
-        const RENDER_BOIDS = false
+        const RENDER_BOIDS = true
         const RENDER_OUTER_POINTER = false
 
         function smoothLine(points, ctx) {
@@ -331,16 +331,18 @@
 
             // Update boids' positions
             const boidPositions = boids.map(boid => {
-                boid.update();
                 boid.flock(boids);
+                boid.update();
+
                 if (RENDER_BOIDS) boid.render()
                 return boid.getPosition();
             });
 
             // Draw convex hull around the boids
             // drawConvexHull(boidPositions);
+            dbscan.reset(boids.map(k => [k.position.x, k.position.y]))
 
-            let clusters = getClusters(boidPositions)
+            let clusters = dbscan.run()
             for (let clus of clusters.clusters || []) {
                 // console.log(clus)
                 const hull = giftWrapping(clus.map(k => { return { x: k[0], y: k[1] } }));
@@ -358,6 +360,12 @@
         /////////////////////////////////////////
 
         class DBSCAN {
+            reset(points) {
+                if (points) this.points = points;
+                this.visited = new Set();  // To keep track of visited points
+                this.clusters = [];  // Array of clusters
+                this.noise = [];  // Array to keep track of noise points 
+            }
             constructor(points, epsilon, minPts) {
                 this.points = points;  // Array of points, each point is an array [x, y]
                 this.epsilon = epsilon;  // Maximum radius of the neighborhood
@@ -437,14 +445,15 @@
         }
 
 
-        function getClusters() {
+        // function getClusters() {
 
 
 
-            let dbscan = new DBSCAN(boids.map(k => [k.position.x, k.position.y]), perceptionRadius / 1.33, 5);
-            return dbscan.run();
-        }
+        //     let dbscan = new DBSCAN(boids.map(k => [k.position.x, k.position.y]), perceptionRadius / 1.33, 5);
+        //     return dbscan.run();
+        // }
 
+        let dbscan = new DBSCAN([], perceptionRadius / 1.33, 5);
 
 
         update();

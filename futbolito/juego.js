@@ -1,14 +1,15 @@
 class Juego {
   constructor(ancho, alto, cb) {
     this.app = new PIXI.Application();
-    this.contadorDeFrame = 0;
+    
     this.ancho = ancho;
     this.alto = alto;
 
+    this.equipos = [new Equipo(0), new Equipo(1)];
+
     this.jugadores = [];
-    this.jugadores1 = [];
-    this.jugadores0 = [];
-    this.pelota=new Pelota(this)
+
+    this.pelota = new Pelota(this);
 
     this.contadorDeFrame = 0;
 
@@ -18,14 +19,23 @@ class Juego {
 
     promesa.then((e) => {
       document.body.appendChild(this.app.canvas);
-      this.ponerFondo();
+     
       window.__PIXI_APP__ = this.app;
 
       this.app.ticker.add(() => {
         this.gameLoop();
       });
+
+      this.juegoListo()
+
       if (cb instanceof Function) cb();
     });
+  }
+
+  juegoListo(){
+    this.containerDebug=new PIXI.Container()
+    this.app.stage.addChild(this.containerDebug)
+    this.ponerFondo();
   }
 
   async ponerFondo() {
@@ -47,7 +57,7 @@ class Juego {
     let cual;
 
     for (let dep of this.jugadores) {
-      let dist = distancia({pos:{ x: x, y: y }}, dep);
+      let dist = distancia({ pos: { x: x, y: y } }, dep);
       if (dist < distMenor) {
         distMenor = dist;
         cual = dep;
@@ -63,19 +73,25 @@ class Juego {
     };
 
     window.onmousedown = (e) => {
+      console.log(e.x, e.y);
+      let distanciaParaClick = 30;
       for (let enti of this.jugadores) enti.debug = false;
 
       let entidadMasCerca = this.buscarEntidadMasCercana(e.x, e.y);
-      entidadMasCerca.debug = true;
-      this.entidadSeleccionada = entidadMasCerca;
+      if (
+        distancia(entidadMasCerca, { pos: { x: e.x, y: e.y } }) <
+        distanciaParaClick
+      ) {
+        entidadMasCerca.debug = true;
+        this.entidadSeleccionada = entidadMasCerca;
+      }
     };
   }
   gameLoop() {
     this.contadorDeFrame++;
 
-    this.pelota.update()
-    this.pelota.render()
-
+    this.pelota.update();
+    this.pelota.render();
 
     for (let entidad of this.jugadores) {
       entidad.update();
@@ -83,15 +99,45 @@ class Juego {
     }
   }
 
+  ponerJugadores() {
+    for (let equipo of this.equipos) {
+      //ARQUEROS
+      this.agregarJugador({
+        equipo: equipo.id,
+        rol: ROLES.ARQUERO,
+        numero: 1,  
+        sectorVertical: LADO.ARRIBA,
+      });
+
+      for (let l = 0; l < equipo.formacion.length; l++) {
+        let cantJugadoresEnEstaLinea = equipo.formacion[l];
+        for (let i = 0; i < cantJugadoresEnEstaLinea; i++) {
+          this.agregarJugador({
+            equipo: equipo.id,
+            rol:
+              l == 0
+                ? ROLES.DEFENSOR
+                : l == 1
+                ? ROLES.MEDIOCAMPISTA
+                : ROLES.ATACANTE,
+            numero: equipo.jugadores.length+1,    
+            sectorVertical: LADO.MEDIO,
+          });
+        }
+      }
+    }
+  }
+
+  cambiarFormacionDeEquipo(id, formacion) {
+    this.equipos[id].cambiarFormacion(formacion);
+  }
+
   agregarJugador(obj) {
-    let j = new Jugador(obj, this);
+    let j = new Jugador(obj, this, this.equipos[obj.equipo]);
 
     this.jugadores.push(j);
-    if (obj.equipo == 0) {
-      this.jugadores0.push(j);
-    } else if (obj.equipo == 1) {
-      this.jugadores1.push(j);
-    }
+
+    this.equipos[obj.equipo].jugadores.push(j);
   }
   // agregarDepredador(x, y) {
   //   let depre = new Depredador(x, y, this);

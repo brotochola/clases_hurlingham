@@ -5,7 +5,7 @@ class Entidad {
 
     this.juego = juego;
 
-    this.id = generateRandomID(8);
+    this.nombre = generarNombreAleatorio();
 
     this.juego.app.stage.addChild(this.container);
 
@@ -25,45 +25,49 @@ class Entidad {
     this.container.addChild(this.containerDebug);
   }
 
+  crearCirculoSeleccionador() {
+    //seleccion:
+
+    let borde = 4;
+    this.graficoDebug = new PIXI.Graphics()
+      .circle(0, 0, this.radio + borde)
+      .fill(0xffffff);
+    this.containerDebug.addChild(this.graficoDebug);
+  }
   aplicarFuerza(x, y) {
+    if(isNaN(x) || isNaN(y)) {
+      console.trace(x)
+      return
+    }
     this.acc.x += x;
     this.acc.y += y;
   }
 
-  crearGraficoParaIndicarQueEstaEntidadEStaSeleccionada() {
-    let borde = 4;
-    this.graficoDebug = new PIXI.Graphics()
-      .rect(-borde, -borde, this.lado + borde * 2, this.lado / 2 + borde * 2)
-      .fill(0xffffff);
-    this.containerDebug.addChild(this.graficoDebug);
-  }
-
   rebotarContraLosBordes() {
-    let fuerzaX=0
-    let fuerzaY=0
+    let fuerzaX = 0;
+    let fuerzaY = 0;
     if (this.pos.x < this.changuiMargenes) {
       //SI ESTOY MAS A LA IZQ Q EL MARGEN IZQ -CHANGUI
       // LA FUERZA Q SE LE APLICA ES DIRECTAMENTE PROPORCIONAL A LA DISTANCIA A LA Q ESTA
-      fuerzaX=-this.velocidad.x
+      fuerzaX = -this.velocidad.x;
     } else if (this.pos.x > this.juego.ancho - this.changuiMargenes) {
-      fuerzaX=-this.velocidad.x 
+      fuerzaX = -this.velocidad.x;
     }
 
     if (this.pos.y < this.changuiMargenes) {
-      fuerzaY=-this.velocidad.y
+      fuerzaY = -this.velocidad.y;
     } else if (this.pos.y > this.juego.alto - this.changuiMargenes) {
-      fuerzaY=-this.velocidad.y
+      fuerzaY = -this.velocidad.y;
     }
 
-    this.aplicarFuerza(fuerzaX*2, fuerzaY*2);
-
-
+    this.aplicarFuerza(fuerzaX * 2, fuerzaY * 2);
   }
 
   update() {
     // if(isNaN(this.acc.x)) debugger
 
     this.acc.limit(this.accMax);
+    
     this.velocidad.add(this.acc);
 
     this.acc.setMag(0);
@@ -82,6 +86,7 @@ class Entidad {
 
   render() {
     this.containerDebug.visible = this.debug;
+   if( this.rectAreaDeAccion) this.rectAreaDeAccion.visible=this.debug
     this.container.zIndex = this.pos.y;
     this.container.rotation = this.angulo;
     this.container.x = this.pos.x;

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://rawgit.com/sbrl/69a8fa588865cacef9c0/raw/ee31df596e56210656a93e409a5894aeabfb15de/Vector.js"></script>
+    <script src="https://rawgit.com/sbrl/efd57e458e71f8a54171/raw/95ef1b665b2b6dc14bf58c0186940812606615d0/Bezier.js"></script> -->
+    <title>Boids with Gift Wrapping</title>
+    <style>
+        canvas {
+            background-color: #f0f0f0;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const perceptionRadius = 50;
+        const RENDER_BOIDS = false
+        const RENDER_OUTER_POINTER = false
+
+        function smoothLine(points, ctx) {
+
+
+            ctx.fillStyle = '#ff0000';
+            // ctx.fillRect(0, 0, w, h);
+
+
+
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#000000';
+            var x = points[0].x,
+                y = points[0].y;
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+
+            for (var i = 0; i < points.length; ++i) {
+
+                var x2 = points[i].x,
+                    y2 = points[i].y,
+
+                    mx = (x + x2) / 2,
+                    my = (y + y2) / 2;
+                //alert(x +" "+x2 +" "+mx +" ")
+                ctx.quadraticCurveTo(x, y, mx, my);
+
+                x = x2;
+                y = y2;
+
+            }
+
+            //	ctx.lineTo( points[ points.length - 1 ].x, points[ points.length - 1 ].y );
+
+            ctx.stroke();
+            if (RENDER_OUTER_POINTER) {
+
+                ctx.fillStyle = '#ff00ff';
+                for (var i = 0; i < points.length; ++i) {
+
+                    ctx.beginPath();
+                    ctx.arc(points[i].x, points[i].y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+
+
+                    ctx.font = '14px Verdana';
+                    ctx.fillText(i, points[i].x - ctx.measureText(i).width / 2, points[i].y + 18);
+
+                }
+            }
+
+        }
+
+
+
+
+
+        // Boid class representing each boid (not displayed, only for calculation)
+        class Boid {
+            constructor(x, y) {
+                this.position = { x, y };
+                this.velocity = { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1 };
+                this.acceleration = { x: 0, y: 0 };
+                this.maxSpeed = 2;
+                this.maxForce = 0.05;
+            }
+
+            // Apply a force to the boid (acceleration changes)
+            applyForce(force) {
+                this.acceleration.x += force.x;
+                this.acceleration.y += force.y;
+            }
+
+            // Rules for flocking behavior
+            flock(boids) {
+                let alignment = this.align(boids);
+                let cohesion = this.cohere(boids);
+                let separation = this.separate(boids);
+
+                // Apply the three forces to the boid
+                this.applyForce(alignment);
+                this.applyForce(cohesion);
+                this.applyForce(separation);
+            }
+
+            // Alignment: Steer towards the average heading of local boids
+            align(boids) {
+
+                let steering = { x: 0, y: 0 };
+                let total = 0;
+
+                for (let other of boids) {
+                    let distance = this.distance(this.position, other.position);
+                    if (other !== this && distance < perceptionRadius) {
+                        steering.x += other.velocity.x;
+                        steering.y += other.velocity.y;
+                        total++;
+                    }
+                }
+
+                if (total > 0) {
+                    steering.x /= total;
+                    steering.y /= total;
+
+                    // Steering = desired - velocity
+                    steering = this.setMagnitude(steering, this.maxSpeed);
+                    steering.x -= this.velocity.x;
+                    steering.y -= this.velocity.y;
+                    steering = this.limit(steering, this.maxForce);
+                }
+                return steering;
+            }
+
+            // Cohesion: Steer towards the average position of local boids
+            cohere(boids) {
+
+                let steering = { x: 0, y: 0 };
+                let total = 0;
+
+                for (let other of boids) {
+                    let distance = this.distance(this.position, other.position);
+                    if (other !== this && distance < perceptionRadius) {
+                        steering.x += other.position.x;
+                        steering.y += other.position.y;
+                        total++;
+                    }
+                }
+
+                if (total > 0) {
+                    steering.x /= total;
+                    steering.y /= total;
+
+                    steering.x -= this.position.x;
+                    steering.y -= this.position.y;
+
+                    // Steering = desired - velocity
+                    steering = this.setMagnitude(steering, this.maxSpeed);
+                    steering.x -= this.velocity.x;
+                    steering.y -= this.velocity.y;
+                    steering = this.limit(steering, this.maxForce * 1.5);
+                }
+                return steering;
+            }
+
+            // Separation: Steer to avoid crowding local boids
+            separate(boids) {
+
+                let steering = { x: 0, y: 0 };
+                let total = 0;
+
+                for (let other of boids) {
+                    let distance = this.distance(this.position, other.position);
+                    if (other !== this && distance < perceptionRadius * 0.5) {
+                        let diff = { x: this.position.x - other.position.x, y: this.position.y - other.position.y };
+                        diff = this.setMagnitude(diff, 1 / distance); // Weighted by distance
+                        steering.x += diff.x;
+                        steering.y += diff.y;
+                        total++;
+                    }
+                }
+
+                if (total > 0) {
+                    steering.x /= total;
+                    steering.y /= total;
+
+                    // Steering = desired - velocity
+                    steering = this.setMagnitude(steering, this.maxSpeed);
+                    steering.x -= this.velocity.x;
+                    steering.y -= this.velocity.y;
+                    steering = this.limit(steering, this.maxForce * 1.5);
+                }
+                return steering;
+            }
+            update() {
+                this.velocity.x += this.acceleration.x;
+                this.velocity.y += this.acceleration.y;
+
+                // Limit the speed
+                this.velocity = this.limit(this.velocity, this.maxSpeed);
+
+                this.position.x += this.velocity.x;
+                this.position.y += this.velocity.y;
+
+                // Reset acceleration to 0 after each update
+                this.acceleration = { x: 0, y: 0 };
+
+                // Boundary conditions (wrap around)
+                if (this.position.x > canvas.width) this.position.x = 0;
+                if (this.position.x < 0) this.position.x = canvas.width;
+                if (this.position.y > canvas.height) this.position.y = 0;
+                if (this.position.y < 0) this.position.y = canvas.height;
+            }
+            // Helper functions
+            distance(p1, p2) {
+                return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+            }
+
+            setMagnitude(vector, magnitude) {
+                let length = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+                if (length !== 0) {
+                    vector.x = (vector.x / length) * magnitude;
+                    vector.y = (vector.y / length) * magnitude;
+                }
+                return vector;
+            }
+
+            limit(vector, max) {
+                let length = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+                if (length > max) {
+                    vector.x = (vector.x / length) * max;
+                    vector.y = (vector.y / length) * max;
+                }
+                return vector;
+            }
+            render() {
+                ctx.fillStyle = '#ff00ff';
+
+
+                ctx.beginPath();
+                ctx.arc(this.position.x, this.position.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            getPosition() {
+                return this.position;
+            }
+        }
+
+        // Gift Wrapping (Convex Hull) function
+        function giftWrapping(points) {
+            if (points.length < 3) return points;
+
+            const convexHull = [];
+            let leftmostPoint = getLeftmostPoint(points);
+            let currentPoint = leftmostPoint;
+
+            do {
+                convexHull.push(currentPoint);
+                let nextPoint = points[0];
+
+                for (const point of points) {
+                    if (point === currentPoint) continue;
+                    const o = orientation(currentPoint, nextPoint, point);
+                    if (o === 2 || (o === 0 && distance(currentPoint, point) > distance(currentPoint, nextPoint))) {
+                        nextPoint = point;
+                    }
+                }
+
+                currentPoint = nextPoint;
+
+            } while (currentPoint !== leftmostPoint);
+
+            return convexHull;
+        }
+
+        // Helper functions
+        function getLeftmostPoint(points) {
+            let leftmost = points[0];
+            for (const point of points) {
+                if (point.x < leftmost.x || (point.x === leftmost.x && point.y < leftmost.y)) {
+                    leftmost = point;
+                }
+            }
+            return leftmost;
+        }
+
+        function orientation(p, q, r) {
+            const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+            if (val === 0) return 0;
+            return val > 0 ? 1 : 2;
+        }
+
+        function distance(p, q) {
+            return Math.sqrt((q.x - p.x) ** 2 + (q.y - p.y) ** 2);
+        }
+
+        // Initialize boids and main loop
+        const boids = [];
+        const numBoids = 300;
+
+        for (let i = 0; i < numBoids; i++) {
+            boids.push(new Boid(Math.random() * canvas.width, Math.random() * canvas.height));
+        }
+
+        // function drawConvexHull(points) {
+        //     const hull = giftWrapping(points);
+
+        //     // Draw Convex Hull
+        //     ctx.beginPath();
+        //     ctx.moveTo(hull[0].x, hull[0].y);
+        //     for (let i = 1; i < hull.length; i++) {
+        //         ctx.lineTo(hull[i].x, hull[i].y);
+        //     }
+        //     ctx.closePath();
+        //     ctx.strokeStyle = 'red';
+        //     ctx.lineWidth = 2;
+        //     ctx.stroke();
+        // }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update boids' positions
+            const boidPositions = boids.map(boid => {
+                boid.update();
+                boid.flock(boids);
+                if (RENDER_BOIDS) boid.render()
+                return boid.getPosition();
+            });
+
+            // Draw convex hull around the boids
+            // drawConvexHull(boidPositions);
+
+            let clusters = getClusters(boidPositions)
+            for (let clus of clusters.clusters || []) {
+                // console.log(clus)
+                const hull = giftWrapping(clus.map(k => { return { x: k[0], y: k[1] } }));
+                // drawRoundedPolygon(ctx, hull, 20);
+                smoothLine([...hull, hull[0]], ctx)
+                // drawCatmullRomSpline(ctx, hull,0.1,32)
+
+            }
+
+
+
+            requestAnimationFrame(update);
+        }
+
+        /////////////////////////////////////////
+
+        class DBSCAN {
+            constructor(points, epsilon, minPts) {
+                this.points = points;  // Array of points, each point is an array [x, y]
+                this.epsilon = epsilon;  // Maximum radius of the neighborhood
+                this.minPts = minPts;  // Minimum number of points required to form a cluster
+                this.visited = new Set();  // To keep track of visited points
+                this.clusters = [];  // Array of clusters
+                this.noise = [];  // Array to keep track of noise points
+            }
+
+            // Euclidean distance between two points
+            distance(point1, point2) {
+                return Math.sqrt(
+                    Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2)
+                );
+            }
+
+            // Get neighbors of a point
+            regionQuery(point) {
+                let neighbors = [];
+                for (let i = 0; i < this.points.length; i++) {
+                    if (this.distance(point, this.points[i]) <= this.epsilon) {
+                        neighbors.push(i);
+                    }
+                }
+                return neighbors;
+            }
+
+            // Expand cluster recursively
+            expandCluster(pointIdx, neighbors) {
+                let cluster = [pointIdx];
+                this.visited.add(pointIdx);
+
+                let i = 0;
+                while (i < neighbors.length) {
+                    let neighborIdx = neighbors[i];
+
+                    if (!this.visited.has(neighborIdx)) {
+                        this.visited.add(neighborIdx);
+                        let neighborNeighbors = this.regionQuery(this.points[neighborIdx]);
+
+                        if (neighborNeighbors.length >= this.minPts) {
+                            neighbors = neighbors.concat(neighborNeighbors);
+                        }
+                    }
+
+                    let inAnyCluster = this.clusters.some(cluster => cluster.includes(neighborIdx));
+                    if (!inAnyCluster) {
+                        cluster.push(neighborIdx);
+                    }
+
+                    i++;
+                }
+
+                this.clusters.push(cluster);
+            }
+
+            // Main function to run DBSCAN
+            run() {
+                for (let i = 0; i < this.points.length; i++) {
+                    if (!this.visited.has(i)) {
+                        let neighbors = this.regionQuery(this.points[i]);
+
+                        if (neighbors.length < this.minPts) {
+                            this.noise.push(i);  // Mark as noise if not enough neighbors
+                        } else {
+                            this.expandCluster(i, neighbors);  // Otherwise expand the cluster
+                        }
+                    }
+                }
+
+                // Convert indices in clusters to actual points
+                return {
+                    clusters: this.clusters.map(cluster => cluster.map(idx => this.points[idx])),
+                    noise: this.noise.map(idx => this.points[idx]),
+                };
+            }
+        }
+
+
+        function getClusters() {
+
+
+
+            let dbscan = new DBSCAN(boids.map(k => [k.position.x, k.position.y]), perceptionRadius / 1.33, 5);
+            return dbscan.run();
+        }
+
+
+
+        update();
+    </script>
+</body>
+
+</html>

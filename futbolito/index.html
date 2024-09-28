@@ -1,9 +1,45 @@
+<!-- DATA Q HAY EN EL JUEGO:
+-pos de todos
+-vel de todos
+-pos, vel de la pelota
+-pos, vel mias
+
+//sgundo layer de datos
+-jugador mas cerca de la pelota
+  -"quien la tiene"
+-si yo le puedo pegar (mi dist a la pelota)
+-si hay jugadores contrarios entre la pelota(o yo) y el arco u otros amigos
+
+
+
+
+
+CUANTAS DIFERENTES MOTIVACIONES PUEDE TENER UN JUGADOR DE FUTBOL:
+
+
+-ir a la pelota
+-ir a marcar a cada jugador contrario: 
+  AL 2, AL 3, AL 4, AL 5, AL 6, ETC
+-ir al arco
+-ir a buscar una posicion desde la cual pueda recibir un pase y q tenga sentido en esa jugada.
+-ir a alguna posicion de mi area de accion
+
+
+
+NO HAY MAQUINA DE ESTADOS:
+LAS VARIABLES DEL ENTORNO GENERAN UN VALOR ENTRE 0 Y 1 PARA CADA 'MOTIVACION' (para la fuerza q genera cada uno de los posibles vectores de fuerza)
+ -->
+
+
+
 <html>
 
 
 <head>
     <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
     <script src="utils.js"></script>
+    <script src="equipo.js"></script>
+
     <script src="entidad.js"></script>
     <script src="jugador.js"></script>
     <script src="vector.js"></script>
@@ -44,76 +80,36 @@
 
         const ANCHO = 1050
         const ALTO = 750
-        const LIMITE_IZQ = LIMITE_ARRIBA = 40
+        const LIMITE_IZQ = 40
+        const LIMITE_ARRIBA = 40
         const LIMITE_DER = ANCHO - LIMITE_IZQ
         const LIMITE_ABAJO = ALTO - 30
+
         const MITAD_DE_CANCHA = 525
         const MITAD_TRANSVERSAL = 386
         const DISTANCIA_PARA_PEGARLE = 15
+        const ANCHO_CANCHA = LIMITE_ABAJO - LIMITE_ARRIBA
+        const LARGO_CANCHA = LIMITE_DER - LIMITE_IZQ
+
+        const PRIMER_TERCIO = LARGO_CANCHA / 3 + LIMITE_IZQ
+        const SEGUNDO_TERCIO = (2 * LARGO_CANCHA) / 3 + LIMITE_IZQ
+
+        const CANTIDAD_PX_AGRANDAR_AREA_DE_ACCION=ANCHO*0.1
+
+
 
         console.log("arrancando juego")
         let juego = new Juego(ANCHO, ALTO, () => {
-            console.log("juego inicializado")
-
-            for (let i = 0; i < 2; i++) {
-                juego.agregarJugador({
-                    equipo: i,
-                    rol: ROLES.ARQUERO,
-                    numero: 1,
-                    x: i == 0 ? LIMITE_IZQ : LIMITE_DER,
-                    y: MITAD_TRANSVERSAL,
-                    sectorVertical: LADO.MEDIO
-
-                })
-
-                // 2 defensores:
-
-                juego.agregarJugador({
-                    equipo: i,
-                    rol: ROLES.DEFENSOR,
-                    numero: 2,
-                    x: i == 0 ? LIMITE_IZQ + 100 : LIMITE_DER - 100,
-                    y: LIMITE_ARRIBA + 100,
-                    sectorVertical: LADO.ARRIBA
-
-                })
+            console.log("juego inicializado, cargando equipos")
+            juego.cambiarFormacionDeEquipo(0, "253")
+            juego.cambiarFormacionDeEquipo(1, "433")
 
 
-                juego.agregarJugador({
-                    equipo: i,
-                    rol: ROLES.DEFENSOR,
-                    numero: 3,
-                    x: i == 0 ? LIMITE_IZQ + 100 : LIMITE_DER - 100,
-                    y: LIMITE_ABAJO - 100,
-                    sectorVertical: LADO.ABAJO
-
-                })
+            console.log("generando jugadores")
 
 
+            juego.ponerJugadores()
 
-                //ATACANTES
-
-                juego.agregarJugador({
-                    equipo: i,
-                    rol: ROLES.ATACANTE,
-                    numero: 9,
-                    x: i == 0 ? LIMITE_DER - 200 : LIMITE_IZQ + 200,
-                    y: LIMITE_ARRIBA + 100,
-                    sectorVertical: LADO.ARRIBA
-
-                })
-
-
-                juego.agregarJugador({
-                    equipo: i,
-                    rol: ROLES.ATACANTE,
-                    numero: 3,
-                    x: i == 0 ? LIMITE_DER - 200 : LIMITE_IZQ + 200,
-                    y: LIMITE_ABAJO - 100,
-                    sectorVertical: LADO.ABAJO
-
-                })
-            }
 
         })
 

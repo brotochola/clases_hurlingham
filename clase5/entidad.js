@@ -1,7 +1,9 @@
 class Entidad {
   constructor(x, y, juego) {
     this.container = new PIXI.Container();
+    this.container.name = "contenedorPrincipal"
     this.innerContainer = new PIXI.Container();
+    this.innerContainer.name = "innerContainer"
     this.container.addChild(this.innerContainer);
     this.crearContainerDebug();
 
@@ -9,7 +11,7 @@ class Entidad {
 
     this.id = generateRandomID(8);
 
-    this.juego.app.stage.addChild(this.container);
+    this.juego.contenedorPrincipal.addChild(this.container);
 
     this.x = x;
     this.y = y;
@@ -26,10 +28,8 @@ class Entidad {
     this.crearGraficosParaDebug();
   }
   crearGraficosParaDebug() {
-    let borde = 4;
-    this.graficoDebug = new PIXI.Graphics()
-      .rect(-borde, -borde, this.lado + borde * 2, this.lado / 2 + borde * 2)
-      .fill(0xffffff);
+
+
 
     this.circuloVisionDebug = new PIXI.Graphics()
       .circle(0, 0, this.vision)
@@ -52,7 +52,7 @@ class Entidad {
     this.containerDebug.addChild(this.lineaAgrupamientoDebug);
     this.containerDebug.addChild(this.lineaAlineacionDebug);
 
-    // this.containerDebug.addChild(this.graficoDebug);
+
     this.containerDebug.addChild(this.circuloSeparacionDebug);
     this.containerDebug.addChild(this.circuloVisionDebug);
   }
@@ -83,9 +83,9 @@ class Entidad {
 
     this.aplicarFuerza(
       this.vectorQApuntaAlPromedioDePosicionesParaAgrupamiento.x *
-        this.factorAgruparse,
+      this.factorAgruparse,
       this.vectorQApuntaAlPromedioDePosicionesParaAgrupamiento.y *
-        this.factorAgruparse
+      this.factorAgruparse
     );
   }
 
@@ -98,6 +98,7 @@ class Entidad {
   crearContainerDebug() {
     this.containerDebug = new PIXI.Container();
     this.containerDebug.visible = false;
+    this.containerDebug.name = "containerDebug"
 
     this.container.addChild(this.containerDebug);
   }
@@ -116,11 +117,11 @@ class Entidad {
         distancia(this, { x: this.changuiMargenes, y: this.y }) *
         this.fuerzaParavolverDeLosBordes;
       this.aplicarFuerza(fuerza, 0);
-    } else if (this.x > window.innerWidth - this.changuiMargenes) {
+    } else if (this.x > this.juego.ancho - this.changuiMargenes) {
       //SI ESTOY MAS A LA DER Q EL MARGEN DERECHO-CHANGUI
       let fuerza =
         distancia(this, {
-          x: window.innerWidth - this.changuiMargenes,
+          x: this.juego.ancho - this.changuiMargenes,
           y: this.y,
         }) * this.fuerzaParavolverDeLosBordes;
       this.aplicarFuerza(-fuerza, 0);
@@ -134,12 +135,12 @@ class Entidad {
           y: this.changuiMargenes,
         }) * this.fuerzaParavolverDeLosBordes;
       this.aplicarFuerza(0, fuerza);
-    } else if (this.y > window.innerHeight - this.changuiMargenes) {
+    } else if (this.y > this.juego.alto - this.changuiMargenes) {
       //ABAJO
       let fuerza =
         distancia(this, {
           x: this.x,
-          y: window.innerHeight - this.changuiMargenes,
+          y: this.juego.alto - this.changuiMargenes,
         }) * this.fuerzaParavolverDeLosBordes;
       this.aplicarFuerza(0, -fuerza);
     }
@@ -162,8 +163,8 @@ class Entidad {
       if (dist < obs.radio * 3) {
         //SI LA DISTANCIA ES MENOR AL TRIPLE DEL RADIO...
         let vectorQApuntaDelObstaculoHaciaMi = {
-          x: this.x + this.velocidad.x * framesParaPredecir - obs.x,
-          y: this.y + this.velocidad.y * framesParaPredecir - obs.y,
+          x: this.x + this.velocidad.x - obs.x,
+          y: this.y + this.velocidad.y - obs.y,
         };
         //APLICO EL FACTOR DE FUERZA INICIAL Q ES UNA BOCHA, DIVIDIDO LA DIST AL CUBO.
         //LA IDEA ES QUE CUANTO MAS LEJOS MENOS FUERZA Y CUANTO MAS CERCA ESTAS MAS FUERZA EJERCE
@@ -212,8 +213,12 @@ class Entidad {
     this.velocidad.x *= 0.99;
     this.velocidad.y *= 0.99;
 
-    this.actualizarGRraficosDeDebug();
-    if (this.debug) this.dibujarAMedidaQVa();
+    if (this.debug) {
+
+      this.actualizarGRraficosDeDebug();
+      this.dibujarAMedidaQVa();
+    }
+
   }
   actualizarGRraficosDeDebug() {
     if (this.lineaSeparacionDebug) {

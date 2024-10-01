@@ -106,21 +106,23 @@ usar el algoritmo gift wrapping, y usar a los boids simplemente como puntitos te
         let juego
 
         function init() {
-            juego = new Juego()
+            juego = new Juego(() => {
+                ponerSlidersEnPosicionInicial()
 
-            ponerSlidersEnPosicionInicial()
+                for (let i = 0; i < 1; i++) {
+                    juego.agregarDepredador(0.5 * window.innerWidth, Math.random() * window.innerHeight)
+                }
 
-            for (let i = 0; i < 50; i++) {
-                juego.agregarDepredador(0.5 * window.innerWidth, Math.random() * window.innerHeight)
-            }
+                for (let i = 0; i < 125; i++) {
+                    juego.agregarPresa((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight)
+                }
 
-            for (let i = 0; i < 250; i++) {
-                juego.agregarPresa((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight)
-            }
+                for (let i = 0; i < 13; i++) {
+                    juego.agregarObstaculo((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight, i * 3 + 20)
+                }
+            })
 
-            for (let i = 0; i < 13; i++) {
-                juego.agregarObstaculo((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight, 30)
-            }
+
 
         }
 
@@ -138,6 +140,7 @@ usar el algoritmo gift wrapping, y usar a los boids simplemente como puntitos te
 
 
         function cambiarValoresDeBoids(cual, valor) {
+            console.log(cual, valor)
             if (!cual || !valor) return
 
             for (let presa of juego.presas) {
@@ -157,7 +160,7 @@ usar el algoritmo gift wrapping, y usar a los boids simplemente como puntitos te
         escaparse:<input id="escaparse" type="range" min="0" max="100" step="1"
             onmousemove="cambiarValoresDeBoids('factorEscapar', this.value)">
 
-        vision:<input id="vision" type="range" min="0" max="100" step="1"
+        vision:<input id="vision" type="range" min="0" max="1000" step="1"
             onmousemove="cambiarValoresDeBoids('vision', this.value)">
 
 

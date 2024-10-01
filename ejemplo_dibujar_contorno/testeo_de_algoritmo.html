@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixiJS Click Points and Lines</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+    <script type="module">
+        import alphaShape from 'https://cdn.jsdelivr.net/npm/@davepagurek/alpha-shape/+esm';
+        window.alphaShape = alphaShape
+        window.convertirAlphaShapeEnAlgoLegible = (hull, points, w, h) => {
+            let ret = [];
+
+            for (var numP = 0; numP < hull.length; ++numP) {
+                var cell = hull[numP];
+                // console.log("cell",cell)
+                for (var j = 0; j < cell.length; ++j) {
+                    var p = points[cell[j]];
+                    // console.log(p)
+                    var q = points[cell[(j + 1) % cell.length]];
+                    // ctx.beginPath()
+                    // ctx.moveTo(p[0], p[1])
+                    // ctx.lineTo(q[0], q[1])
+                    ret.push({ x: q[0], y: q[1] });
+
+                    //   ctx.stroke();
+                }
+            }
+            return ret;
+        }
+    </script>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+    <script src="utils.js"></script>
+    <script>
+
+
+        let distanceThreshold = 100; // Ajusta este valor según tus necesidades
+        let minDistanceToCenter = 50; // Ajusta este valor según tus necesidades
+
+        let RADIO_PARA_EL_ALGORITMO_CIRCULAR = 30
+        let CANT_SUBDIVISIONES_ALGORITMO_CIRCULAR = 180
+        let CANT_PASADAS_CHAIKIN = 2
+
+        let mousedown = false
+        let ALPHA_SHAPE_VALUE = 0.012
+        let CONCAVE_HULL_K_VALUE = 1
+
+        let MAX_DISTANCE_CONCAVE_HULL = 50
+        let MAX_ANGLE_CHANGE = Math.PI / 3
+
+        const perceptionRadius = 80;
+        const separationRadius = 20;
+        const maxDistParaClusterizarlos = 150
+        // const RENDER_BOIDS = false
+        // const RENDER_OUTER_POINTER = true
+        // const numBoids = 250;
+
+        let dbscan = new DBSCAN([], maxDistParaClusterizarlos, 3);
+
+
+        // Create the PixiJS Application
+        const app = new PIXI.Application({
+            width: window.innerWidth,
+            height: window.innerHeight,
+            backgroundColor: 0x1099bb
+        });
+        document.body.appendChild(app.view);
+
+        // Array to store points
+        let points = [];
+
+        // Graphics object to draw points and lines
+        const graphics = new PIXI.Graphics();
+        app.stage.addChild(graphics);
+
+        // Function to draw points
+        function drawPoints() {
+            graphics.clear();
+            graphics.lineStyle(2, 0xffffff, 1);
+            graphics.beginFill(0xff0000);
+            points.forEach(point => {
+                graphics.drawCircle(point.x, point.y, 5);
+            });
+            graphics.endFill();
+        }
+
+        // Function to draw a line connecting the points
+        function drawLines(arrOfPoints) {
+            if (arrOfPoints.length < 2) return;  // At least two points are needed to draw a line
+
+            graphics.lineStyle(2, 0x00ff00, 1); // Green lines
+            graphics.moveTo(arrOfPoints[0].x, arrOfPoints[0].y);
+
+            // Draw a line from each point to the next
+            for (let i = 1; i < arrOfPoints.length; i++) {
+                graphics.lineTo(arrOfPoints[i].x, arrOfPoints[i].y);
+            }
+        }
+
+
+        function drawHull() {
+
+
+
+            let clusters = dbscan.run(points.map(k => [k.x, k.y]))
+
+
+
+            for (let clus of clusters.clusters || []) {
+
+                let clusterComoArrayDeObjetos = convertirEnArrDeObj(clus)
+                let centro = calcularCentro(clus)
+                drawPoint(centro.x, centro.y, graphics)
+                let hull;
+
+                //CONCAVE HULL BY CHATGPT
+
+                // hull = ordenarPuntos(concaveHull(clusterComoArrayDeObjetos, CONCAVE_HULL_K_VALUE, centro, MAX_DISTANCE_CONCAVE_HULL, MAX_ANGLE_CHANGE), centro)
+
+
+
+
+                // hull = ordenarPuntos(convertirEnArrDeObj(unique(findConcaveHull(clus, distanceThreshold, minDistanceToCenter))), centro)
+
+
+
+
+                if (window.alphaShape) {
+                    hull = unique(ordenarPuntos(convertirAlphaShapeEnAlgoLegible(window.alphaShape(ALPHA_SHAPE_VALUE, clus), clus, window.innerWidth, window.innerHeight), centro))
+                    hull = [...hull, hull[0]]
+                    hull = optimizarHull(hull)
+                }
+
+                // hull=convertirEnArrDeObj(concaveHullPArtiendoDEsdeConvex(clus, MAX_DISTANCE_CONCAVE_HULL))
+                
+
+
+                // hull = unique(calcularPuntoMasLejanoEn360ConCirculos(clusterComoArrayDeObjetos, RADIO_PARA_EL_ALGORITMO_CIRCULAR, centro, CANT_SUBDIVISIONES_ALGORITMO_CIRCULAR))
+
+
+
+                // //algoritmo de lau:
+                // hull = algoritmoDeLau(clus, centro, perceptionRadius)
+
+
+
+
+
+
+                // console.log(hull.length, unique(hull).length)
+
+
+
+
+                // //RENDER:
+
+                if (hull.length > 3) hull = chaikin(hull, CANT_PASADAS_CHAIKIN)
+
+                window.hull = hull
+                drawLines(hull)
+            }
+        }
+
+
+        // Function to update the canvas (draw points and lines)
+        function updateCanvas() {
+            drawPoints();
+            // drawLines(points);
+            drawHull()
+            requestAnimationFrame(updateCanvas)
+        }
+
+
+
+        app.view.addEventListener('mouseup', (e) => {
+            mousedown = false
+
+        })
+
+        app.view.addEventListener('mousedown', (e) => {
+            mousedown = true
+
+        })
+
+
+
+        app.view.addEventListener('mousemove', (e) => {
+            if (mousedown) {
+                agregarPunto(e.clientX, e.clientY)
+            }
+
+        })
+
+        function agregarPunto(x, y) {
+            const rect = app.view.getBoundingClientRect();
+            const mouseX = x - rect.left;
+            const mouseY = y - rect.top;
+
+            // Add the clicked point to the array
+            points.push({ x: mouseX, y: mouseY });
+        }
+
+        // Handle click event to add points
+        app.view.addEventListener('click', (e) => {
+
+            agregarPunto(e.clientX, e.clientY)
+            // Redraw points and lines
+            // updateCanvas();
+        });
+        updateCanvas();
+    </script>
+</body>
+
+</html>

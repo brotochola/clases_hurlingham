@@ -4,9 +4,9 @@ class Juego {
     this.contadorDeFrame = 0;
     this.ancho = window.innerWidth * 4;
     this.alto = window.innerHeight * 4;
+    this.tamanoCelda = 100;
 
-    this.escala = 1
-
+    this.escala = 1;
 
     this.entidades = [];
     this.presas = [];
@@ -24,31 +24,53 @@ class Juego {
 
     promesa.then((e) => {
       this.juegoListo();
-      if (callback instanceof Function) callback()
+      if (callback instanceof Function) callback();
     });
   }
 
-  juegoListo() {
+  cargarNivel(url) {
+    fetch(url).then((e) => {
+      e.json().then((data) => {
+        this.nivel = data;
 
-    this.contenedorPrincipal = new PIXI.Container()
-    this.contenedorPrincipal.name = "contenedorPrincipal"
-    this.app.stage.addChild(this.contenedorPrincipal)
+        for (let i = 0; i < this.nivel.entidades.length; i++) {
+          let enti = this.nivel.entidades[i];
+          if (enti.tipo.toLowerCase() == "presa") {
+            this.agregarPresa(
+              this.nivel.entidades[i].x,
+              this.nivel.entidades[i].y,
+              enti.vel,
+              enti.id
+            );
+          }
+        }
+      });
+    });
+  }
+
+  guardarNivel() {
+    let nivel = { entidades: [] };
+    for (let e of this.entidades) {
+      nivel.entidades.push(e.serializar());
+    }
+
+    console.log(nivel);
+  }
+
+  juegoListo() {
+    this.contenedorPrincipal = new PIXI.Container();
+    this.contenedorPrincipal.name = "contenedorPrincipal";
+    this.app.stage.addChild(this.contenedorPrincipal);
 
     // this.contenedorPrincipal.interactive = true;
     // this.contenedorPrincipal.on('mousedown', () => {
     //   console.log('hello');
     // });
 
-
     // this.meterFondo()
 
     document.body.appendChild(this.app.canvas);
     window.__PIXI_APP__ = this.app;
-    this.app.ticker.add((e) => {
-      this.gameLoop(e);
-    });
-
-
 
     this.dibujador = new PIXI.Graphics();
     this.contenedorPrincipal.addChild(this.dibujador);
@@ -56,6 +78,15 @@ class Juego {
     this.crearUI();
 
     this.ponerListeners();
+
+    this.grid = new Grid(this, this.tamanoCelda);
+
+    this.cargarNivel("nivel1.json");
+
+    //ARRANCAR EL GAMELOOP DPS DE HABER CREADO TODAS LAS COSAS
+    this.app.ticker.add((e) => {
+      this.gameLoop(e);
+    });
   }
 
   crearUI() {
@@ -73,7 +104,7 @@ class Juego {
     this.tiempoText.text = "00";
     this.tiempoText.style.fontFamily = "fuente";
     this.tiempoText.style.align = "right";
-    juego.tiempoText.x = this.ancho - 80;
+    juego.tiempoText.x = window.innerWidth - 150;
     juego.tiempoText.y = 30;
     this.tiempoText.style.fill = "white";
     this.ui.addChild(this.tiempoText);
@@ -88,16 +119,12 @@ class Juego {
 
   meterFondo() {
     PIXI.Assets.load("img/bg.jpg").then((textura) => {
-
-
-
       this.fondo = new PIXI.Sprite(textura);
-      this.fondo.scale.set(10)
+      this.fondo.scale.set(10);
 
       this.contenedorPrincipal.addChild(this.fondo);
     });
   }
-
 
   cargarImagenes() {
     PIXI.Assets.load("img/vida.png").then((textura) => {
@@ -133,27 +160,17 @@ class Juego {
   }
 
   ponerListeners() {
+    window.onwheel = (e) => {
+      this.escala -= e.deltaY / 2000;
 
-    window.onwheel = e => {
-
-
-
-
-      this.escala -= e.deltaY / 2000
-
-      
-      this.contenedorPrincipal.pivot.x = e.x - (window.innerWidth / 2) / this.escala
-      this.contenedorPrincipal.pivot.y = e.y - (window.innerHeight / 2) / this.escala
-
-      
-    }
+      this.contenedorPrincipal.pivot.x =
+        e.x - window.innerWidth / 2 / this.escala;
+      this.contenedorPrincipal.pivot.y =
+        e.y - window.innerHeight / 2 / this.escala;
+    };
     window.onmousemove = (e) => {
-      
-
-      let xDelContenedor = e.x + this.contenedorPrincipal.pivot.x
-      let yDelContenedor = e.y + this.contenedorPrincipal.pivot.y
-
-
+      let xDelContenedor = e.x + this.contenedorPrincipal.pivot.x;
+      let yDelContenedor = e.y + this.contenedorPrincipal.pivot.y;
 
       this.mouse = { x: e.x, y: e.y };
       if (this.entidadSeleccionada && this.clickEn) {
@@ -170,20 +187,15 @@ class Juego {
     };
 
     document.body.onmouseleave = () => {
-      this.clickEn = null
-    }
-
-
-
+      this.clickEn = null;
+    };
 
     window.onmousedown = (e) => {
-      let xDelContenedor = e.x + this.contenedorPrincipal.pivot.x
-      let yDelContenedor = e.y + this.contenedorPrincipal.pivot.y
-
+      let xDelContenedor = e.x + this.contenedorPrincipal.pivot.x;
+      let yDelContenedor = e.y + this.contenedorPrincipal.pivot.y;
 
       // let grafico=new PIXI.Graphics().rect(xDelContenedor,yDelContenedor,10,10).fill(0xffffff)
       // this.contenedorPrincipal.addChild(grafico)
-
 
       // console.log(e.x,e.y, xDelContenedor,yDelContenedor)
 
@@ -191,25 +203,33 @@ class Juego {
         enti.debug = false;
       }
 
-      this.dibujador.clear();
-
-      let entidadMasCerca = this.buscarEntidadMasCercana(xDelContenedor, yDelContenedor);
+      let entidadMasCerca = this.buscarEntidadMasCercana(
+        xDelContenedor,
+        yDelContenedor
+      );
       this.clickEn = { x: xDelContenedor, y: yDelContenedor };
 
       let objetoConXeYRelativasAlcontenedorPrincipal = {
-        x: xDelContenedor, y: yDelContenedor
-      }
+        x: xDelContenedor,
+        y: yDelContenedor,
+      };
 
-      if (distancia(objetoConXeYRelativasAlcontenedorPrincipal, entidadMasCerca) < 50) {
+      if (
+        distancia(objetoConXeYRelativasAlcontenedorPrincipal, entidadMasCerca) <
+        50
+      ) {
         entidadMasCerca.debug = true;
         this.entidadSeleccionada = entidadMasCerca;
-      }else{
-        this.entidadSeleccionada=null
+      } else {
+        this.entidadSeleccionada = null;
       }
     };
   }
   gameLoop(e) {
     this.objetoTickDePixi = e;
+
+    this.dibujador.clear();
+
     // console.log(e)
     this.contadorDeFrame++;
 
@@ -218,36 +238,43 @@ class Juego {
       entidad.render();
     }
 
-    this.moverCamara()
+    this.grid.update();
 
+    this.moverCamara();
 
+    this.actualizarUI(e);
+  }
 
+  actualizarUI(e) {
     ///COSAS DE LA UI
     //PONGO EL TIEMPO ARRIBA A LA DERECHA
-    let tiempoInicial = 100
+    let tiempoInicial = 100;
     let tiempoRestante = tiempoInicial - Math.floor(e.lastTime / 1000);
     this.setearVida(tiempoRestante / 100);
-    this.tiempoText.text = tiempoRestante.toString();
+    this.tiempoText.text = this.app.ticker.FPS.toFixed(2); //tiempoRestante.toString();
   }
 
   moverCamara() {
-    if (this.entidadSeleccionada instanceof Presa || this.entidadSeleccionada instanceof Depredador) {
-      this.contenedorPrincipal.pivot.x = this.entidadSeleccionada.x - (window.innerWidth / 2) / this.escala
-      this.contenedorPrincipal.pivot.y = this.entidadSeleccionada.y - (window.innerHeight / 2) / this.escala
+    if (
+      this.entidadSeleccionada instanceof Presa ||
+      this.entidadSeleccionada instanceof Depredador
+    ) {
+      this.contenedorPrincipal.pivot.x =
+        this.entidadSeleccionada.x - window.innerWidth / 2 / this.escala;
+      this.contenedorPrincipal.pivot.y =
+        this.entidadSeleccionada.y - window.innerHeight / 2 / this.escala;
     }
 
-    this.contenedorPrincipal.scale.set(this.escala)
+    this.contenedorPrincipal.scale.set(this.escala);
     //   let valX = -this.entidadSeleccionada.x + window.innerWidth / 2
     //   let valY = -this.entidadSeleccionada.y + window.innerHeight / 2
     //   this.contenedorPrincipal.x = lerp(this.contenedorPrincipal.x, valX, 0.05)
     //   this.contenedorPrincipal.y = lerp(this.contenedorPrincipal.y, valY, 0.05)
     // }
-
-
   }
 
-  agregarPresa(x, y) {
-    let presa = new Presa(x, y, this);
+  agregarPresa(x, y, vel, id) {
+    let presa = new Presa(x, y, this, vel,id);
     this.entidades.push(presa);
     this.presas.push(presa);
   }

@@ -34,32 +34,26 @@ class Grid {
   }
 
   actualizarPosicionDeEntidad(entidad) {
-    let gridX = Math.floor(entidad.x / this.tamanoCelda);
-    let gridY = Math.floor(entidad.y / this.tamanoCelda);
+    if (entidad.estoyEnLaMismaCeldaQueEnElFrameAnterior()) return;
+    try {
+      let gridX = Math.floor(entidad.x / this.tamanoCelda);
+      let gridY = Math.floor(entidad.y / this.tamanoCelda);
 
-    let gridXAnterior = Math.floor(entidad.xAnterior / this.tamanoCelda);
-    let gridYAnterior = Math.floor(entidad.yAnterior / this.tamanoCelda);
+      if (gridX < 0) gridX = 0;
+      if (gridY < 0) gridY = 0;
 
-    if (
-      (isNaN(entidad.xAnterior) || isNaN(entidad.yAnterior)) &&
-      gridX == gridXAnterior &&
-      gridY == gridYAnterior
-    ) {
-      return;
+      //si la entidad ya estaba en una celda, la sacamos de esa celda
+      if (entidad.celda) entidad.celda.borrar(entidad);
+
+      //buscamos la celda en la q esta ahora esta entidad
+      let celda = this.celdas[gridX][gridY];
+      //y le asignamos a la entidad esta celda en su propiedad homonima
+      entidad.celda = celda;
+
+      celda.agregar(entidad);
+    } catch (e) {
+      debugger;
     }
-
-    if (gridX < 0) gridX = 0;
-    if (gridY < 0) gridY = 0;
-
-    //si la entidad ya estaba en una celda, la sacamos de esa celda
-    if (entidad.celda) entidad.celda.borrar(entidad);
-
-    //buscamos la celda en la q esta ahora esta entidad
-    let celda = this.celdas[gridX][gridY];
-    //y le asignamos a la entidad esta celda en su propiedad homonima
-    entidad.celda = celda;
-
-    celda.agregar(entidad);
   }
 
   update() {

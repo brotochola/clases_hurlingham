@@ -36,12 +36,11 @@ class Juego {
         for (let i = 0; i < this.nivel.entidades.length; i++) {
           let enti = this.nivel.entidades[i];
           if (enti.tipo.toLowerCase() == "presa") {
-            this.agregarPresa(
-              this.nivel.entidades[i].x,
-              this.nivel.entidades[i].y,
-              enti.vel,
-              enti.id
-            );
+            this.agregarPresa(enti);
+          } else if (enti.tipo.toLowerCase() == "obstaculo") {
+            this.agregarObstaculo(enti);
+          } else if (enti.tipo.toLowerCase() == "depredador") {
+            this.agregarDepredador(enti);
           }
         }
       });
@@ -273,18 +272,18 @@ class Juego {
     // }
   }
 
-  agregarPresa(x, y, vel, id) {
-    let presa = new Presa(x, y, this, vel,id);
+  agregarPresa(obj) {
+    let presa = new Presa({ ...obj, juego: this });
     this.entidades.push(presa);
     this.presas.push(presa);
   }
-  agregarDepredador(x, y) {
-    let depre = new Depredador(x, y, this);
+  agregarDepredador(obj) {
+    let depre = new Depredador({ ...obj, juego: this });
     this.entidades.push(depre);
     this.depredadores.push(depre);
   }
-  agregarObstaculo(x, y, radio) {
-    let depre = new Obstaculo(x, y, radio, this);
+  agregarObstaculo(obj) {
+    let depre = new Obstaculo({ ...obj, juego: this });
     this.entidades.push(depre);
     this.obstaculos.push(depre);
   }

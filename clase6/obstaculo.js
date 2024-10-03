@@ -1,7 +1,7 @@
 class Obstaculo extends Entidad {
-  constructor(x, y, radio, juego) {
-    super(x, y, juego);
-    this.radio = radio;
+  constructor(obj) {
+    super(obj);
+    this.radio = obj.radio;
 
     this.crearGrafico();
   }
@@ -11,8 +11,8 @@ class Obstaculo extends Entidad {
     this.innerContainer.addChild(this.grafico);
   }
 
-  update(){
-    // console.log(this.x,this.y)
-    super.update()
-  }
+  // update() {
+  //   // console.log(this.x,this.y)
+  //   super.update();
+  // }
 }

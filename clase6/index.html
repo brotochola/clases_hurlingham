@@ -112,17 +112,33 @@ usar el algoritmo gift wrapping, y usar a los boids simplemente como puntitos te
                 ponerSlidersEnPosicionInicial()
 
 
-                // for (let i = 0; i < 1; i++) {
-                //     juego.agregarDepredador(0.5 * window.innerWidth, Math.random() * window.innerHeight)
-                // }
+                for (let i = 0; i < 3; i++) {
+                    juego.agregarDepredador({
+                        x: (Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth,
+                        y: (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight,
+                    })
+                }
 
-                // for (let i = 0; i < 1000; i++) {
-                //     juego.agregarPresa((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight)
-                // }
+                for (let i = 0; i < 300; i++) {
+                    juego.agregarPresa({
+                        x: (Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth,
+                        y: (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight,
+                    })
+                }
 
-                // for (let i = 0; i < 20; i++) {
-                //     juego.agregarObstaculo((Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth, (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight, Math.random()*20 + 20)
-                // }
+                for (let i = 0; i < 10; i++) {
+                    juego.agregarObstaculo(
+
+                        {
+
+                            x: (Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth,
+                            y: (Math.random() * window.innerHeight) * 0.9 + 0.1 * window.innerHeight,
+                            radio: Math.random() * 20 + 20,
+
+
+                        })
+
+                }
             })
 
 
@@ -149,7 +165,7 @@ usar el algoritmo gift wrapping, y usar a los boids simplemente como puntitos te
             console.log("cambiandoValorEnTodosLosBoids", cual, valor)
 
 
-           
+
             if (!cual) return
 
 

@@ -73,7 +73,7 @@ class Juego {
     this.tiempoText.text = "00";
     this.tiempoText.style.fontFamily = "fuente";
     this.tiempoText.style.align = "right";
-    juego.tiempoText.x = this.ancho - 80;
+    juego.tiempoText.x = window.innerWidth - 180;
     juego.tiempoText.y = 30;
     this.tiempoText.style.fill = "white";
     this.ui.addChild(this.tiempoText);
@@ -227,7 +227,7 @@ class Juego {
     let tiempoInicial = 100
     let tiempoRestante = tiempoInicial - Math.floor(e.lastTime / 1000);
     this.setearVida(tiempoRestante / 100);
-    this.tiempoText.text = tiempoRestante.toString();
+    this.tiempoText.text = this.app.ticker.FPS
   }
 
   moverCamara() {

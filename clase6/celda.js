@@ -27,7 +27,7 @@ class Celda {
   }
 
   update() {
-    this.dibujame();
+    // this.dibujame();
   }
 
   obtenerCeldasVecinas() {
@@ -86,7 +86,7 @@ class Celda {
 
   
   obtenerEntidadesAcaYEnLasCeldasVecinas2Niveles() {
-    let celdas = [this, this.obtenerCeldasVecinas2Niveles()];
+    let celdas = [this, ...this.obtenerCeldasVecinas2Niveles()];
 
     let arrParaRetornar = [];
 
@@ -104,7 +104,7 @@ class Celda {
 
 
   obtenerEntidadesAcaYEnLasCeldasVecinas() {
-    let celdas = [this, this.obtenerCeldasVecinas()];
+    let celdas = [this, ...this.obtenerCeldasVecinas()];
 
     let arrParaRetornar = [];
 

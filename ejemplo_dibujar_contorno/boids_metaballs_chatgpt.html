@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boids and Metaballs in PixiJS</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const app = new PIXI.Application({
+            width: window.innerWidth,
+            height: window.innerHeight,
+            backgroundColor: 0x000000,
+            antialias: true
+        });
+        document.body.appendChild(app.view);
+
+
+
+        const fragSource = [
+                'precision mediump float;',
+                'varying vec2 vTextureCoord;',
+                'uniform sampler2D uSampler;',
+                'uniform float threshold;',
+                'uniform float mr;',
+                'uniform float mg;',
+                'uniform float mb;',
+                'void main(void)',
+                '{',
+                '    vec4 color = texture2D(uSampler, vTextureCoord);',
+                '    vec3 mcolor = vec3(mr, mg, mb);',
+                '    if (color.a > threshold) {',
+                '       gl_FragColor = vec4(mcolor, 1.0);',
+                '    } else {',
+                '       gl_FragColor = vec4(vec3(0.0), 0.0);',
+                '    }',
+                '}'
+            ].join('\n');
+
+             uniformsData = {
+                threshold: 0.5,
+                mr: 255.0 / 255.0,
+                mg: 255.0 / 255.0,
+                mb: 255.0 / 255.0,
+            };
+
+            const thresholdFilter = new PIXI.Filter(null, fragSource, uniformsData);
+
+    
+        // Aplicar el filtro al sprite
+        app.stage.filters = [thresholdFilter];
+
+        const boidCount = 200;
+        const boids = [];
+        const boidRadius = 120;
+        const maxSpeed = 5;
+        const maxForce = 0.1;
+
+        const cohesionFactor = 0.04;
+        const separationFactor = 0//.01;
+        const alignmentFactor = 0//.01;
+        const separationDistance = boidRadius / 2;
+
+        class Boid {
+            constructor() {
+                this.position = new PIXI.Point(
+                    Math.random() * app.screen.width,
+                    Math.random() * app.screen.height
+                );
+                this.velocity = new PIXI.Point(
+                    Math.random() * 2 - 1,
+                    Math.random() * 2 - 1
+                );
+                this.acceleration = new PIXI.Point(0, 0);
+                this.graphics = new PIXI.Graphics();
+
+                this.generarGradiente()
+                app.stage.addChild(this.graphics);
+            }
+
+            // Boid behavior (cohesion, separation, alignment)
+            update(boids) {
+                this.acceleration = this.applyBehaviors(boids);
+                this.velocity.x += this.acceleration.x;
+                this.velocity.y += this.acceleration.y;
+
+                // Limit velocity to max speed
+                const speed = Math.hypot(this.velocity.x, this.velocity.y);
+                if (speed > maxSpeed) {
+                    this.velocity.x = (this.velocity.x / speed) * maxSpeed;
+                    this.velocity.y = (this.velocity.y / speed) * maxSpeed;
+                }
+
+                this.position.x += this.velocity.x;
+                this.position.y += this.velocity.y;
+
+                // Wrap around the screen
+                if (this.position.x > app.screen.width) this.position.x = 0;
+                if (this.position.x < 0) this.position.x = app.screen.width;
+                if (this.position.y > app.screen.height) this.position.y = 0;
+                if (this.position.y < 0) this.position.y = app.screen.height;
+
+                this.draw();
+            }
+
+            applyBehaviors(boids) {
+                const cohesion = this.cohesion(boids);
+                const separation = this.separation(boids);
+                const alignment = this.alignment(boids);
+
+                return {
+                    x: cohesion.x * cohesionFactor + separation.x * separationFactor + alignment.x * alignmentFactor,
+                    y: cohesion.y * cohesionFactor + separation.y * separationFactor + alignment.y * alignmentFactor
+                };
+            }
+
+            cohesion(boids) {
+                let sum = new PIXI.Point(0, 0);
+                let count = 0;
+                for (let boid of boids) {
+                    if (boid !== this) {
+                        sum.x += boid.position.x;
+                        sum.y += boid.position.y;
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    sum.x /= count;
+                    sum.y /= count;
+                    return this.seek(sum);
+                }
+                return sum;
+            }
+
+            separation(boids) {
+                let steer = new PIXI.Point(0, 0);
+                let count = 0;
+                for (let boid of boids) {
+                    const distance = Math.hypot(
+                        boid.position.x - this.position.x,
+                        boid.position.y - this.position.y
+                    );
+                    if (distance > 0 && distance < separationDistance) {
+                        steer.x += this.position.x - boid.position.x;
+                        steer.y += this.position.y - boid.position.y;
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    steer.x /= count;
+                    steer.y /= count;
+                }
+                return steer;
+            }
+
+            alignment(boids) {
+                let sum = new PIXI.Point(0, 0);
+                let count = 0;
+                for (let boid of boids) {
+                    if (boid !== this) {
+                        sum.x += boid.velocity.x;
+                        sum.y += boid.velocity.y;
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    sum.x /= count;
+                    sum.y /= count;
+                }
+                return sum;
+            }
+
+            seek(target) {
+                const desired = new PIXI.Point(
+                    target.x - this.position.x,
+                    target.y - this.position.y
+                );
+                const distance = Math.hypot(desired.x, desired.y);
+                desired.x = (desired.x / distance) * maxSpeed;
+                desired.y = (desired.y / distance) * maxSpeed;
+
+                const steer = new PIXI.Point(
+                    desired.x - this.velocity.x,
+                    desired.y - this.velocity.y
+                );
+                return steer;
+            }
+            generarGradiente() {
+                // Limpiar el gráfico antes de dibujar
+                this.graphics.clear();
+
+                // Crear un canvas temporal para generar el gradiente
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const size = boidRadius * 2;  // El tamaño del canvas depende del radio del boid
+                canvas.width = size;
+                canvas.height = size;
+
+                // Crear un gradiente radial desde el centro (blanco opaco) hacia el borde (transparente)
+                const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); // Blanco en el centro
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)'); // Transparente en el borde
+
+                // Rellenar el canvas con el gradiente
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+
+                // Crear una textura a partir del canvas
+                const texture = PIXI.Texture.from(canvas);
+
+                // Dibujar el círculo con el gradiente como una textura
+                const sprite = new PIXI.Sprite(texture);
+                sprite.anchor.set(0.5); // Centrar el sprite
+                sprite.x = this.position.x;
+                sprite.y = this.position.y;
+                sprite.width = boidRadius * 2;  // Ajustar al tamaño del boid
+                sprite.height = boidRadius * 2;
+
+                // Añadir el sprite al gráfico
+                this.graphics.addChild(sprite);
+            }
+
+            draw() {
+
+                this.graphics.x = this.position.x;
+                this.graphics.y = this.position.y
+            }
+        }
+
+        // Create boids
+        for (let i = 0; i < boidCount; i++) {
+            boids.push(new Boid());
+        }
+
+        // Render loop
+        app.ticker.add(() => {
+            boids.forEach(boid => boid.update(boids));
+
+            // Metaball effect
+            // app.renderer.gl.blendFunc(app.renderer.gl.ONE, app.renderer.gl.ONE_MINUS_SRC_ALPHA);
+        });
+    </script>
+</body>
+
+</html>

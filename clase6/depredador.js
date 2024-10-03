@@ -1,6 +1,6 @@
 class Depredador extends Entidad {
-  constructor(x, y, juego) {
-    super(x, y, juego);
+  constructor(obj) {
+    super(obj);
     this.lado = 10;
     this.velMax = 3 + Math.random();
     this.accMax = 0.1 + Math.random() * 0.1;
@@ -8,18 +8,14 @@ class Depredador extends Entidad {
 
     this.factorSeparacion = SEPARACION_DEFAULT * 2;
     this.factorAlineacion = ALINEACION_DEFAULT * 0.15;
-    this.factorAgruparse = COHESION_DEFAULT*0.5;
+    this.factorAgruparse = COHESION_DEFAULT * 0.5;
     //
     this.factorEscapar = ESCAPAR_DEFAULT;
-    this.factorPerseguir = ESCAPAR_DEFAULT*3;
+    this.factorPerseguir = ESCAPAR_DEFAULT * 3;
 
     this.vision = VISION_DEFAULT;
     this.distanciaLimiteParaEstarCerca = DISTANCIA_SEPARACION_DEFAULT;
-
-
   }
-
-
 
   crearGrafico() {
     this.grafico = new PIXI.Graphics()
@@ -34,12 +30,10 @@ class Depredador extends Entidad {
     //steering = desired_velocity - velocity
 
     let vectorQApuntaAlTarget = { x: aQuien.x - this.x, y: aQuien.y - this.y };
-    if(serPiolaEIrADondeVaAEstar){
-      vectorQApuntaAlTarget.x+=target.velocidad.x*5
-      vectorQApuntaAlTarget.y+=target.velocidad.y*5
+    if (serPiolaEIrADondeVaAEstar) {
+      vectorQApuntaAlTarget.x += target.velocidad.x * 5;
+      vectorQApuntaAlTarget.y += target.velocidad.y * 5;
     }
-
-
 
     //NORMALIZAR UN VECTOR ES LLEVAR SU DISTANCIA A 1 (LA DISTANCIA ES LA HIPOTENUSA DEL TRIANGULO RECTANGULO Q SE GENERA ENTRE 0,0 Y EL PUNTO x,y DEL VECTOR)
     let vectorNormalizado = normalizeVector(vectorQApuntaAlTarget);
@@ -49,37 +43,34 @@ class Depredador extends Entidad {
       y: vectorNormalizado.y * this.factorPerseguir,
     };
 
-
-    this.aplicarFuerza(velocidadDeseadaNormalizada.x, velocidadDeseadaNormalizada.y);
+    this.aplicarFuerza(
+      velocidadDeseadaNormalizada.x,
+      velocidadDeseadaNormalizada.y
+    );
   }
 
-  buscarPresaMasCercana() {
-    let distMenor = 99999999;
-    let cual;
 
-    for (let dep of this.juego.presas) {
-      let dist = distancia(this, dep);
-      if (dist < distMenor) {
-        distMenor = dist;
-        cual = dep;
-      }
-    }
-
-    return cual;
-  }
 
   update() {
-    //EJECUTA EL METODO UPDATE DE LA CLASE DE LA CUAL ESTA HEREDA
-    this.presa = this.buscarPresaMasCercana();
-    this.depredadoresCerca = this.buscarDepredadoresCerca();
+    if (this.celda) {
+      //EJECUTA EL METODO UPDATE DE LA CLASE DE LA CUAL ESTA HEREDA
+      this.entidadesCerca = this.celda.obtenerEntidadesAcaYEnLasCeldasVecinas();
+      this.depredadoresCerca = this.buscarDepredadoresCercaUsandoGrid();
+      this.presasCerca = this.buscarPresasCercaUsandoGrid();
+      // this.presasCerca = this.buscarPresasCerca();
 
-    this.cohesion(this.depredadoresCerca);
-    this.separacion(this.depredadoresCerca);
-    this.alineacion(this.depredadoresCerca);
+      this.obstaculosCercanos = this.obtenerObstaculosCerca();
 
-    this.perseguir(this.presa);
-    this.evadirObstaculos();
-    
+      this.presa = this.buscarPresaMasCercana();
+
+      this.cohesion(this.depredadoresCerca);
+      this.separacion(this.depredadoresCerca);
+      this.alineacion(this.depredadoresCerca);
+
+      if (this.presa) this.perseguir(this.presa);
+      this.evadirObstaculos();
+    }
+
     super.update();
   }
 }

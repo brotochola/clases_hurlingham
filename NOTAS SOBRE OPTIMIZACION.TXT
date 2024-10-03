@@ -1,0 +1,18 @@
+COSAS PARA OPTIMIZAR:
+
+-mostrar el profiler de performance
+-pasarle codigo a chatgpt y preguntarle sobre optimizacion
+-Object.Values no: usar un array en lugar de un objeto para guardar las Entidades de cada Celda
+-dividir a los boids en subgrupos y actualizarles boids cada X frames (Throttling o Decimation)
+-cacheo de distancias (si tenemos la dist de A a B, no calculemos la dist de B a A)
+-probar diferentes tamaños de celdas
+-comparar distancias cuadradas en lugar de distancias posta
+-no renderizar cosas q no se ven
+-menos calculos a las cosas q no se ven (Level of Detail)
+-Tabla de datos precalculada (Look up table)
+-Aproximar calculos
+
+
+
+-Si en el frame anterior hay cosas q no cambiaron, evaluar si tiene sentido calcular todo de nuevo, o usar el resultado del calculo del frame anterior
+-No destruir objetos sino q mandarlos al Pool de Objetos, y cuando necesitamos uno nuevo, le cambiamos las propiedades y lo reusamos. Asi no hay q instanciar un nuevo objeto

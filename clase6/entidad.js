@@ -1,5 +1,6 @@
 class Entidad {
-  constructor(x, y, juego) {
+  constructor(obj) {
+    const { x, y, vel, id, juego } = obj;
     this.container = new PIXI.Container();
     this.container.name = "containerDeCadaEntidad";
     this.innerContainer = new PIXI.Container();
@@ -9,13 +10,13 @@ class Entidad {
 
     this.juego = juego;
 
-    this.id = generateRandomID(8);
+    this.generarID(id);
 
     this.juego.contenedorPrincipal.addChild(this.container);
 
     this.x = x;
     this.y = y;
-    this.velocidad = { x: 0, y: 0 };
+    this.velocidad = vel || { x: 0, y: 0 };
     this.acc = { x: 0, y: 0 };
 
     this.changuiMargenes = 10;
@@ -26,6 +27,14 @@ class Entidad {
     this.vectorPromedioDeVelocidadesDeLosVecinos = { x: 0, y: 0 };
 
     this.crearGraficosParaDebug();
+  }
+  generarID(id) {
+    if (id) this.id = id;
+    else this.id = generateRandomID(8);
+
+    if (this.juego.entidades.map((k) => k.id).includes(this.id)) {
+      this.id = generateRandomID(8);
+    }
   }
   crearGraficosParaDebug() {
     this.circuloVisionDebug = new PIXI.Graphics()
@@ -157,7 +166,7 @@ class Entidad {
     let framesParaPredecir = 10;
     let factor = 1000000;
 
-    for (let obs of this.obtenerObstaculosCerca()) {
+    for (let obs of this.obstaculosCercanos) {
       //VEO LA DISTANCIA DESDE DONDE VOY A ESTAR EN 10 FRAMES HASTA EL OBSTACULO
       let dist = distancia(obs, {
         x: this.x + this.velocidad.x * framesParaPredecir,
@@ -199,8 +208,10 @@ class Entidad {
   }
 
   update() {
-    // if(isNaN(this.acc.x)) debugger
-    this.rebotarContraLosBoredes();
+    //LOS OBSTACULOS NO TIENEN PORQUÉ REBOTAR, Y PARA MOVERLOS ES MUY MOLESTO
+    if (!(this instanceof Obstaculo)) {
+      this.rebotarContraLosBoredes();
+    }
 
     this.acc = limitMagnitude(this.acc, this.accMax);
     // this.velocidad.x =lerp(this.velocidad.x, this.velocidad.x+this.acc.x,0.2)
@@ -231,9 +242,23 @@ class Entidad {
       this.pintarLaCeldaEnLaQueEstoyYLasDeAlrededor();
     }
 
-    
-
     this.actualizarPosicionEnGrid();
+  }
+
+  estoyEnLaMismaCeldaQueEnElFrameAnterior() {
+    if (isNaN(this.xAnterior) || isNaN(this.yAnterior)) return false;
+
+    let gridX = Math.floor(this.x / this.tamanoCelda);
+    let gridY = Math.floor(this.y / this.tamanoCelda);
+
+    let gridXAnterior = Math.floor(this.xAnterior / this.tamanoCelda);
+    let gridYAnterior = Math.floor(this.yAnterior / this.tamanoCelda);
+
+    if (gridX == gridXAnterior && gridY == gridYAnterior) {
+      return true;
+    }
+
+    return false;
   }
 
   pintarLaCeldaEnLaQueEstoyYLasDeAlrededor() {
@@ -247,6 +272,16 @@ class Entidad {
         .rect(x, y, this.juego.tamanoCelda, this.juego.tamanoCelda)
         .fill(0x00ff00, 0.3);
     }
+
+    //LA CELDA EN LA Q ESTOY LA PINTO DIFERENTE
+    this.juego.dibujador
+      .rect(
+        this.celda.x * this.juego.tamanoCelda,
+        this.celda.y * this.juego.tamanoCelda,
+        this.juego.tamanoCelda,
+        this.juego.tamanoCelda
+      )
+      .fill(0x00ff00, 0.5);
   }
 
   pintarLaCeldaEnLaQueEstoy() {
@@ -394,9 +429,10 @@ class Entidad {
   buscarPresasCercaUsandoGrid() {
     let ret = [];
     if (this.celda) {
-      let entidadesCerca = this.celda.obtenerEntidadesAcaYEnLasCeldasVecinas();
-      for (let i = 0; i < entidadesCerca.length; i++) {
-        let presa = entidadesCerca[i];
+      // let entidadesCerca = this.celda.obtenerEntidadesAcaYEnLasCeldasVecinas();
+
+      for (let i = 0; i < this.entidadesCerca.length; i++) {
+        let presa = this.entidadesCerca[i];
         if (presa instanceof Presa) {
           let dist = distancia(presa, this);
           ret.push({ presa: presa, dist: dist });
@@ -407,6 +443,51 @@ class Entidad {
     }
 
     return ret;
+  }
+
+  buscarDepredadoresCercaUsandoGrid() {
+    let ret = [];
+    if (this.celda) {
+      // let entidadesCerca = this.celda.obtenerEntidadesAcaYEnLasCeldasVecinas();
+
+      for (let i = 0; i < this.entidadesCerca.length; i++) {
+        let dep = this.entidadesCerca[i];
+        if (dep instanceof Depredador) {
+          let dist = distancia(dep, this);
+          if (dist < this.vision) {
+            ret.push({ presa: dep, dist: dist });
+          }
+        }
+      }
+    } else {
+      return [];
+    }
+
+    return ret;
+  }
+
+  buscarPresaMasCercana() {
+    let presasCercaOrdenadasPorDist = this.presasCerca.sort((a, b) =>
+      a.dist < b.dist ? -1 : 1
+    );
+
+    if (presasCercaOrdenadasPorDist[0]) {
+      return presasCercaOrdenadasPorDist[0].presa;
+    }
+
+    return null;
+  }
+
+  buscarDepredadorMasCercano() {
+    let depredadoresCercaOrdenadosPorDist = this.depredadoresCerca.sort(
+      (a, b) => (a.dist < b.dist ? -1 : 1)
+    );
+
+    if (depredadoresCercaOrdenadosPorDist[0]) {
+      return depredadoresCercaOrdenadosPorDist[0].presa;
+    }
+
+    return null;
   }
 
   render() {

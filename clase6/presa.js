@@ -1,11 +1,9 @@
 class Presa extends Entidad {
-  constructor(x, y, juego, vel, id) {
-    super(x, y, juego);
+  constructor(obj) {
+    super(obj);
     this.lado = 10;
     this.velMax = 4;
     this.accMax = 0.25;
-
-    this.inicializarConDataGuardada(vel, id);
 
     this.crearGrafico();
 
@@ -16,14 +14,6 @@ class Presa extends Entidad {
     this.factorEscapar = ESCAPAR_DEFAULT;
     this.vision = VISION_DEFAULT;
     this.distanciaLimiteParaEstarCerca = DISTANCIA_SEPARACION_DEFAULT;
-  }
-
-  inicializarConDataGuardada(vel, id) {
-    this.id = id;
-    if (vel) {
-      this.velocidad.x = vel.x;
-      this.velocidad.y = vel.y;
-    }
   }
 
   crearGrafico() {
@@ -54,7 +44,9 @@ class Presa extends Entidad {
     );
   }
 
-  buscarDepredadorMasCercano() {
+
+
+  buscarDepredadorMasCercanoUsandoLaGrid() {
     let distMenor = 99999999;
     let cual;
 
@@ -70,17 +62,25 @@ class Presa extends Entidad {
   }
 
   update() {
-    //EJECUTA EL METODO UPDATE DE LA CLASE DE LA CUAL ESTA HEREDA
-    this.depredador = this.buscarDepredadorMasCercano();
-    this.presasCerca = this.buscarPresasCercaUsandoGrid();
-    // this.presasCerca=this.buscarPresasCerca();
+    if (this.celda) {
+      this.entidadesCerca = this.celda.obtenerEntidadesAcaYEnLasCeldasVecinas();
+      this.depredadoresCerca = this.buscarDepredadoresCercaUsandoGrid();
+      this.presasCerca = this.buscarPresasCercaUsandoGrid();
+      // this.presasCerca = this.buscarPresasCerca();
 
-    // console.log(this.juego.depredadores , depredador)
-    this.cohesion(this.presasCerca);
-    this.separacion(this.presasCerca);
-    this.alineacion(this.presasCerca);
-    if (this.depredador) this.escaparse(this.depredador);
-    this.evadirObstaculos();
+      this.obstaculosCercanos = this.obtenerObstaculosCerca();
+
+      this.depredador = this.buscarDepredadorMasCercano();
+
+      // this.presasCerca=this.buscarPresasCerca();
+
+      // console.log(this.juego.depredadores , depredador)
+      this.cohesion(this.presasCerca);
+      this.separacion(this.presasCerca);
+      this.alineacion(this.presasCerca);
+      if (this.depredador) this.escaparse(this.depredador);
+      this.evadirObstaculos();
+    }
 
     super.update();
   }

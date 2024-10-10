@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="marchingSquares.js"></script>
     <title>PixiJS Click Points and Lines</title>
     <style>
         body {
@@ -13,6 +14,14 @@
 
         canvas {
             display: block;
+        }
+
+        #tempCanvas {
+            pointer-events: none;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            opacity: 0.4;
         }
     </style>
     <script type="module">
@@ -46,7 +55,8 @@
     <script src="utils.js"></script>
     <script>
 
-
+        let MARCHING_SQUARES_THRESHOLD = 200;
+        let MARCHING_SQUARES_PARTICLE_RADIUS=50
         let distanceThreshold = 100; // Ajusta este valor según tus necesidades
         let minDistanceToCenter = 50; // Ajusta este valor según tus necesidades
 
@@ -88,7 +98,7 @@
 
         // Function to draw points
         function drawPoints() {
-            graphics.clear();
+
             graphics.lineStyle(2, 0xffffff, 1);
             graphics.beginFill(0xff0000);
             points.forEach(point => {
@@ -138,14 +148,32 @@
 
 
 
-                if (window.alphaShape) {
-                    hull = unique(ordenarPuntos(convertirAlphaShapeEnAlgoLegible(window.alphaShape(ALPHA_SHAPE_VALUE, clus), clus, window.innerWidth, window.innerHeight), centro))
-                    hull = [...hull, hull[0]]
-                    hull = optimizarHull(hull)
-                }
+                // if (window.alphaShape) {
+                //     hull = unique(ordenarPuntos(convertirAlphaShapeEnAlgoLegible(window.alphaShape(ALPHA_SHAPE_VALUE, clus), clus, window.innerWidth, window.innerHeight), centro))
+                //     hull = [...hull, hull[0]]
+                //     hull = optimizarHull(hull)
+                // }
+
+
+
+
+
+                //MARCHING SQUARES
+
+                hull = runMarchingSquaresOpt(convertirEnArrDeObj(clus), MARCHING_SQUARES_PARTICLE_RADIUS, MARCHING_SQUARES_THRESHOLD)
+                // console.log(hull.length)
+                // hull = optimizarHullDividiendo(hull, 2)
+                // console.log(hull)
+
+
+
+
+
+
+
 
                 // hull=convertirEnArrDeObj(concaveHullPArtiendoDEsdeConvex(clus, MAX_DISTANCE_CONCAVE_HULL))
-                
+
 
 
                 // hull = unique(calcularPuntoMasLejanoEn360ConCirculos(clusterComoArrayDeObjetos, RADIO_PARA_EL_ALGORITMO_CIRCULAR, centro, CANT_SUBDIVISIONES_ALGORITMO_CIRCULAR))
@@ -167,16 +195,18 @@
 
                 // //RENDER:
 
-                if (hull.length > 3) hull = chaikin(hull, CANT_PASADAS_CHAIKIN)
+                // if (hull.length > 3) hull = chaikin(hull, CANT_PASADAS_CHAIKIN)
 
                 window.hull = hull
                 drawLines(hull)
             }
         }
 
-
+        let frameCount = 0
         // Function to update the canvas (draw points and lines)
         function updateCanvas() {
+            frameCount++
+            graphics.clear();
             drawPoints();
             // drawLines(points);
             drawHull()

@@ -396,7 +396,7 @@ class Jugador extends Entidad {
     this.velocidad.mult(0.9);
 
 
-    console.log(this.nombre, this.acc)
+    // console.log(this.nombre, this.acc)
 
     super.update();
   }

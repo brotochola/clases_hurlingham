@@ -717,6 +717,21 @@ function optimizarHull(points) {
   return arr;
 }
 
+function optimizarHullDividiendo(points, divisor) {
+  if (!points || !Array.isArray(points) || !points[0]) return points;
+
+  let newPoints = points.map((k) => {
+    return { x: Math.floor(k.x / divisor), y: Math.floor(k.y / divisor) };
+  });
+
+  newPoints = unique(newPoints);
+
+  newPoints = newPoints.map((k) => {
+    return { x: k.x * divisor, y: k.y * divisor };
+  });
+
+  return newPoints;
+}
 ////////////
 
 // Calcular distancia euclidiana entre dos puntos
@@ -774,7 +789,7 @@ function findConcavePoints(points, hull, maxSegmentLength) {
 
     // Si el segmento es demasiado largo, buscamos puntos concavos
     if (segmentLength > maxSegmentLength) {
-        // console.log("Segment too long", pointA, pointB);
+      // console.log("Segment too long", pointA, pointB);
       let posCentralX = (pointA[0] - pointB[0]) / 2;
       let posCentralY = (pointA[1] - pointB[1]) / 2;
 
@@ -836,10 +851,53 @@ function calculateDistanceToSegment(point, pointA, pointB) {
 }
 
 // Función principal que genera el concave hull
-function concaveHullPArtiendoDEsdeConvex(points, maxSegmentLength) {
+function concaveHullPArtiendoDEsdeConvex(points, maxSegmentLength, centro) {
   let convexHull = giftWrapping(points);
 
   let concaveHull = findConcavePoints(points, convexHull, maxSegmentLength);
 
   return concaveHull;
+}
+
+let tempCanvas = document.createElement("canvas");
+tempCanvas.id = "tempCanvas";
+tempCanvas.willReadFrequently = true;
+let tempCTX = tempCanvas.getContext("2d", { willReadFrequently: true });
+tempCTX.willReadFrequently = true;
+let circleImage = new Image();
+circleImage.src = "circulo.png";
+// document.body.appendChild(tempCanvas);
+function runMarchingSquaresOpt(points, radio = 10, threshold, width, height) {
+  if (!width) width = window.innerWidth;
+  if (!height) height = window.innerHeight;
+  tempCanvas.width = width;
+  tempCanvas.height = height;
+  tempCTX.clearRect(0, 0, width * 2, height * 2);
+  for (let p of points) {
+    tempCTX.drawImage(
+      circleImage,
+      p.x - radio,
+      p.y - radio,
+      radio * 2,
+      radio * 2
+    );
+  }
+
+  // const data4 = tempCTX.getImageData(0, 0, width, height).data;
+
+  // for (let i = 0; i < data4.length; ++i) {
+  //   console.log(data4[i + 3]);
+  // }
+  // console.log(data);
+  return formatOutlineFromMarchingSquares(
+    MarchingSquares.getBlobOutlinePoints(tempCanvas, threshold)
+  ); // returns [x1,y1,x2,y2,x3,y3... etc.]
+}
+
+function formatOutlineFromMarchingSquares(arr) {
+  let retArr = [];
+  for (let i = 0; i < arr.length; i += 2) {
+    retArr.push({ x: arr[i], y: arr[i + 1] });
+  }
+  return retArr;
 }

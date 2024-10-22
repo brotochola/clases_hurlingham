@@ -245,4 +245,4 @@ https://www.youtube.com/watch?v=Aqzuakon7S0
     Quadtree: https://www.youtube.com/watch?v=OJxEcs0w_kE  
     Flowfield + Perlin Noise: https://www.youtube.com/watch?v=BjoM9oKOAKY  
     Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8  
-  
+    Diferentes Métodos para simular física: https://www.youtube.com/watch?v=-GWTDhOQU6M

@@ -1,0 +1,1310 @@
+{
+  "frames": {
+    "AMBULANCE_CLEAN_ALLD0003.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 31,
+        "w": 106,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0022.png": {
+      "frame": {
+        "x": 106,
+        "y": 0,
+        "w": 106,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 31,
+        "w": 106,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0002.png": {
+      "frame": {
+        "x": 212,
+        "y": 0,
+        "w": 106,
+        "h": 61
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 36,
+        "w": 106,
+        "h": 61
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0023.png": {
+      "frame": {
+        "x": 318,
+        "y": 0,
+        "w": 106,
+        "h": 61
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 36,
+        "w": 106,
+        "h": 61
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0026.png": {
+      "frame": {
+        "x": 424,
+        "y": 0,
+        "w": 106,
+        "h": 59
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 41,
+        "w": 106,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0045.png": {
+      "frame": {
+        "x": 530,
+        "y": 0,
+        "w": 106,
+        "h": 59
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 41,
+        "w": 106,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0025.png": {
+      "frame": {
+        "x": 636,
+        "y": 0,
+        "w": 106,
+        "h": 55
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 41,
+        "w": 106,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0046.png": {
+      "frame": {
+        "x": 742,
+        "y": 0,
+        "w": 106,
+        "h": 55
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 41,
+        "w": 106,
+        "h": 55
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0001.png": {
+      "frame": {
+        "x": 848,
+        "y": 0,
+        "w": 104,
+        "h": 54
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 40,
+        "w": 104,
+        "h": 54
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0047.png": {
+      "frame": {
+        "x": 952,
+        "y": 0,
+        "w": 104,
+        "h": 52
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 41,
+        "w": 104,
+        "h": 52
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0004.png": {
+      "frame": {
+        "x": 1056,
+        "y": 0,
+        "w": 103,
+        "h": 80
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 26,
+        "w": 103,
+        "h": 80
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0021.png": {
+      "frame": {
+        "x": 952,
+        "y": 52,
+        "w": 103,
+        "h": 78
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 27,
+        "w": 103,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0044.png": {
+      "frame": {
+        "x": 848,
+        "y": 54,
+        "w": 103,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 41,
+        "w": 103,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0027.png": {
+      "frame": {
+        "x": 636,
+        "y": 55,
+        "w": 103,
+        "h": 63
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 41,
+        "w": 103,
+        "h": 63
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0000.png": {
+      "frame": {
+        "x": 739,
+        "y": 55,
+        "w": 103,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 20,
+        "y": 42,
+        "w": 103,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0024.png": {
+      "frame": {
+        "x": 739,
+        "y": 105,
+        "w": 103,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 17,
+        "y": 42,
+        "w": 103,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0020.png": {
+      "frame": {
+        "x": 842,
+        "y": 118,
+        "w": 99,
+        "h": 85
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 20,
+        "y": 23,
+        "w": 99,
+        "h": 85
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0028.png": {
+      "frame": {
+        "x": 842,
+        "y": 203,
+        "w": 99,
+        "h": 68
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 20,
+        "y": 40,
+        "w": 99,
+        "h": 68
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0016.png": {
+      "frame": {
+        "x": 842,
+        "y": 271,
+        "w": 67,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 37,
+        "y": 18,
+        "w": 67,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0008.png": {
+      "frame": {
+        "x": 424,
+        "y": 59,
+        "w": 65,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 37,
+        "y": 18,
+        "w": 65,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0015.png": {
+      "frame": {
+        "x": 521,
+        "y": 59,
+        "w": 59,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 41,
+        "y": 18,
+        "w": 59,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0009.png": {
+      "frame": {
+        "x": 212,
+        "y": 61,
+        "w": 56,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 41,
+        "y": 18,
+        "w": 56,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0014.png": {
+      "frame": {
+        "x": 309,
+        "y": 61,
+        "w": 50,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 46,
+        "y": 18,
+        "w": 50,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0010.png": {
+      "frame": {
+        "x": 309,
+        "y": 111,
+        "w": 49,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 45,
+        "y": 18,
+        "w": 49,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0011.png": {
+      "frame": {
+        "x": 0,
+        "y": 70,
+        "w": 43,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 48,
+        "y": 18,
+        "w": 43,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0013.png": {
+      "frame": {
+        "x": 97,
+        "y": 70,
+        "w": 43,
+        "h": 97
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 49,
+        "y": 18,
+        "w": 43,
+        "h": 97
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0017.png": {
+      "frame": {
+        "x": 0,
+        "y": 113,
+        "w": 76,
+        "h": 96
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 32,
+        "y": 18,
+        "w": 76,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0007.png": {
+      "frame": {
+        "x": 96,
+        "y": 113,
+        "w": 74,
+        "h": 96
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 33,
+        "y": 18,
+        "w": 74,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0012.png": {
+      "frame": {
+        "x": 192,
+        "y": 117,
+        "w": 38,
+        "h": 95
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 51,
+        "y": 19,
+        "w": 38,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0005.png": {
+      "frame": {
+        "x": 192,
+        "y": 155,
+        "w": 94,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 22,
+        "w": 94,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0006.png": {
+      "frame": {
+        "x": 96,
+        "y": 187,
+        "w": 84,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 28,
+        "y": 19,
+        "w": 84,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0018.png": {
+      "frame": {
+        "x": 0,
+        "y": 189,
+        "w": 84,
+        "h": 94
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 28,
+        "y": 19,
+        "w": 84,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0043.png": {
+      "frame": {
+        "x": 521,
+        "y": 118,
+        "w": 94,
+        "h": 72
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 38,
+        "w": 94,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0019.png": {
+      "frame": {
+        "x": 406,
+        "y": 155,
+        "w": 92,
+        "h": 90
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 24,
+        "y": 21,
+        "w": 92,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0029.png": {
+      "frame": {
+        "x": 406,
+        "y": 245,
+        "w": 92,
+        "h": 73
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 24,
+        "y": 37,
+        "w": 92,
+        "h": 73
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0030.png": {
+      "frame": {
+        "x": 406,
+        "y": 318,
+        "w": 84,
+        "h": 77
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 28,
+        "y": 35,
+        "w": 84,
+        "h": 77
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0042.png": {
+      "frame": {
+        "x": 286,
+        "y": 160,
+        "w": 84,
+        "h": 77
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 28,
+        "y": 35,
+        "w": 84,
+        "h": 77
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0032.png": {
+      "frame": {
+        "x": 286,
+        "y": 237,
+        "w": 67,
+        "h": 82
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 37,
+        "y": 32,
+        "w": 67,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0036.png": {
+      "frame": {
+        "x": 368,
+        "y": 237,
+        "w": 38,
+        "h": 81
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 51,
+        "y": 32,
+        "w": 38,
+        "h": 81
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0040.png": {
+      "frame": {
+        "x": 190,
+        "y": 243,
+        "w": 65,
+        "h": 82
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 37,
+        "y": 32,
+        "w": 65,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0033.png": {
+      "frame": {
+        "x": 190,
+        "y": 308,
+        "w": 59,
+        "h": 82
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 41,
+        "y": 32,
+        "w": 59,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0039.png": {
+      "frame": {
+        "x": 272,
+        "y": 304,
+        "w": 56,
+        "h": 82
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 41,
+        "y": 32,
+        "w": 56,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0034.png": {
+      "frame": {
+        "x": 354,
+        "y": 318,
+        "w": 50,
+        "h": 82
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 46,
+        "y": 32,
+        "w": 50,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0038.png": {
+      "frame": {
+        "x": 272,
+        "y": 360,
+        "w": 49,
+        "h": 82
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 45,
+        "y": 32,
+        "w": 49,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0035.png": {
+      "frame": {
+        "x": 354,
+        "y": 400,
+        "w": 43,
+        "h": 82
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 49,
+        "y": 32,
+        "w": 43,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0037.png": {
+      "frame": {
+        "x": 94,
+        "y": 271,
+        "w": 43,
+        "h": 82
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 48,
+        "y": 32,
+        "w": 43,
+        "h": 82
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0031.png": {
+      "frame": {
+        "x": 0,
+        "y": 273,
+        "w": 76,
+        "h": 81
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 32,
+        "y": 33,
+        "w": 76,
+        "h": 81
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "AMBULANCE_CLEAN_ALLD0041.png": {
+      "frame": {
+        "x": 81,
+        "y": 314,
+        "w": 74,
+        "h": 81
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 33,
+        "y": 33,
+        "w": 74,
+        "h": 81
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "animations": {
+    "1": [
+      "AMBULANCE_CLEAN_ALLD0001.png"
+    ],
+    "2": [
+      "AMBULANCE_CLEAN_ALLD0002.png"
+    ],
+    "3": [
+      "AMBULANCE_CLEAN_ALLD0003.png"
+    ],
+    "4": [
+      "AMBULANCE_CLEAN_ALLD0004.png"
+    ],
+    "5": [
+      "AMBULANCE_CLEAN_ALLD0005.png"
+    ],
+    "6": [
+      "AMBULANCE_CLEAN_ALLD0006.png"
+    ],
+    "7": [
+      "AMBULANCE_CLEAN_ALLD0007.png"
+    ],
+    "8": [
+      "AMBULANCE_CLEAN_ALLD0008.png"
+    ],
+    "9": [
+      "AMBULANCE_CLEAN_ALLD0009.png"
+    ],
+    "10": [
+      "AMBULANCE_CLEAN_ALLD0010.png"
+    ],
+    "11": [
+      "AMBULANCE_CLEAN_ALLD0011.png"
+    ],
+    "12": [
+      "AMBULANCE_CLEAN_ALLD0012.png"
+    ],
+    "13": [
+      "AMBULANCE_CLEAN_ALLD0013.png"
+    ],
+    "14": [
+      "AMBULANCE_CLEAN_ALLD0014.png"
+    ],
+    "15": [
+      "AMBULANCE_CLEAN_ALLD0015.png"
+    ],
+    "16": [
+      "AMBULANCE_CLEAN_ALLD0016.png"
+    ],
+    "17": [
+      "AMBULANCE_CLEAN_ALLD0017.png"
+    ],
+    "18": [
+      "AMBULANCE_CLEAN_ALLD0018.png"
+    ],
+    "19": [
+      "AMBULANCE_CLEAN_ALLD0019.png"
+    ],
+    "20": [
+      "AMBULANCE_CLEAN_ALLD0020.png"
+    ],
+    "21": [
+      "AMBULANCE_CLEAN_ALLD0021.png"
+    ],
+    "22": [
+      "AMBULANCE_CLEAN_ALLD0022.png"
+    ],
+    "23": [
+      "AMBULANCE_CLEAN_ALLD0023.png"
+    ],
+    "24": [
+      "AMBULANCE_CLEAN_ALLD0024.png"
+    ],
+    "25": [
+      "AMBULANCE_CLEAN_ALLD0025.png"
+    ],
+    "26": [
+      "AMBULANCE_CLEAN_ALLD0026.png"
+    ],
+    "27": [
+      "AMBULANCE_CLEAN_ALLD0027.png"
+    ],
+    "28": [
+      "AMBULANCE_CLEAN_ALLD0028.png"
+    ],
+    "29": [
+      "AMBULANCE_CLEAN_ALLD0029.png"
+    ],
+    "30": [
+      "AMBULANCE_CLEAN_ALLD0030.png"
+    ],
+    "31": [
+      "AMBULANCE_CLEAN_ALLD0031.png"
+    ],
+    "32": [
+      "AMBULANCE_CLEAN_ALLD0032.png"
+    ],
+    "33": [
+      "AMBULANCE_CLEAN_ALLD0033.png"
+    ],
+    "34": [
+      "AMBULANCE_CLEAN_ALLD0034.png"
+    ],
+    "35": [
+      "AMBULANCE_CLEAN_ALLD0035.png"
+    ],
+    "36": [
+      "AMBULANCE_CLEAN_ALLD0036.png"
+    ],
+    "37": [
+      "AMBULANCE_CLEAN_ALLD0037.png"
+    ],
+    "38": [
+      "AMBULANCE_CLEAN_ALLD0038.png"
+    ],
+    "39": [
+      "AMBULANCE_CLEAN_ALLD0039.png"
+    ],
+    "40": [
+      "AMBULANCE_CLEAN_ALLD0040.png"
+    ],
+    "41": [
+      "AMBULANCE_CLEAN_ALLD0041.png"
+    ],
+    "42": [
+      "AMBULANCE_CLEAN_ALLD0042.png"
+    ],
+    "43": [
+      "AMBULANCE_CLEAN_ALLD0043.png"
+    ],
+    "44": [
+      "AMBULANCE_CLEAN_ALLD0044.png"
+    ],
+    "45": [
+      "AMBULANCE_CLEAN_ALLD0045.png"
+    ],
+    "46": [
+      "AMBULANCE_CLEAN_ALLD0046.png"
+    ],
+    "47": [
+      "AMBULANCE_CLEAN_ALLD0047.png"
+    ]
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "ambulancia.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1159,
+      "h": 482
+    },
+    "scale": 1
+  }
+}

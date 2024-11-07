@@ -236,14 +236,17 @@ https://www.youtube.com/watch?v=Aqzuakon7S0
 
 
 **EXTRAS**  
+    Técnicas para el desarrollo de juegos web: https://developer.mozilla.org/es/docs/Games/Techniques  
     Game of Life: https://www.youtube.com/watch?v=FWSR_7kZuYg  
     Lenia, tipo Game of Life: https://www.youtube.com/watch?v=6kiBYjvyojQ  
-    Particles Life: https://www.youtube.com/watch?v=p4YirERTVF0  
-    Dual Grid System: https://www.youtube.com/watch?v=jEWFSv3ivTg  
-    Técnicas para el desarrollo de juegos web: https://developer.mozilla.org/es/docs/Games/Techniques  
+    Particles Life: https://www.youtube.com/watch?v=p4YirERTVF0          
     Steering Behaviours by Craig Reynolds: https://www.red3d.com/cwr/steer/  
     Quadtree: https://www.youtube.com/watch?v=OJxEcs0w_kE  
+    Quadtree, ejemplos: https://codepen.io/_bm/pen/ExPBMrW
+                        https://codepen.io/afterburn/pen/pQVYXp
+
     Flowfield + Perlin Noise: https://www.youtube.com/watch?v=BjoM9oKOAKY  
     Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8  
     Diferentes Métodos para simular física: https://www.youtube.com/watch?v=-GWTDhOQU6M
     Animación Esquelética: https://www.youtube.com/watch?v=sq6mnix8eAg
+    Dual Grid System: https://www.youtube.com/watch?v=jEWFSv3ivTg  

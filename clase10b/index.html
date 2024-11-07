@@ -1,0 +1,226 @@
+<!-- BOIDS FUNCIONANDO CON SLIDERS
+ 
+HABLAR DE UI
+METER FONT
+METER LIBRERIA DE VECTORES 2D
+
+obstaculos q repelen
+los mecanismos principales estan en la clase principal, y las clases q heredan los usan
+
+separar funciones q recogen datos del entorno de funciones q hacen cosas
+
+cuando haces click agarrar al mas cercano
+
+herramientras propias de debug: en este caso, mostrar q pasa cuando ahces click
+
+mostrar drag and drop
+
+mostrar el tema de los contenedores de cada entidad, q tienen otro adentro q es el q gira
+
+mostrar el dibujador
+
+hacer q cuando el depredador llega a la presa, desaparece, y usamos el contador para eso
+
+si llegamos dar mov de camara con lerp
+
+mostrar futbolito
+
+---------------------------------------------------
+IDEA:
+usar el algoritmo gift wrapping, y usar a los boids simplemente como puntitos teoricos para dibujar un "fuego q vuela" o bien un "fantasma" y le ponemos carita en el centro de los puntitos, q es el promedio de X y Ys
+
+
+-->
+
+<html>
+
+
+<head>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.min.js"></script>
+    <!-- IMPORTO P5JS PERO NO LO VAMOS A USAR COMO NORMALIMENTE SE USA, ME GUSTA LA CLASE P5.VECTOR PARA LABURAR CON VECTORES -->
+    <!-- <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script> -->
+    <!-- <script src="https://pixijs.io/filters/dist/pixi-filters.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+
+
+    <script src="utils.js"></script>
+    <script src="distanceLookUpTable.js"></script>
+    <script src="grid.js"></script>
+    <script src="celda.js"></script>
+    <script src="entidad.js"></script>
+    <script src="obstaculo.js"></script>
+
+    <script src="presa.js"></script>
+
+    <script src="depredador.js"></script>
+    <script src="juego.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'fuente';
+            src: url('fuente.ttf');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            font-family: fuente;
+            user-select: none;
+            margin: 0;
+        }
+
+        body,
+        html {
+            overflow: hidden;
+        }
+
+        #botones {
+            position: fixed;
+            left: 30px;
+            bottom: 10px;
+            color: white;
+            display: flex;
+            gap: 10px;
+            width: 100vw;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+            flex-direction: column;
+            padding: 10px;
+
+        }
+    </style>
+
+
+
+
+</head>
+
+<body onload="init()">
+
+
+    <script>
+
+        const SEPARACION_DEFAULT = 42
+        const ALINEACION_DEFAULT = 42
+        const COHESION_DEFAULT = 2
+        const ESCAPAR_DEFAULT = 32
+        const VISION_DEFAULT = 100
+        const DISTANCIA_SEPARACION_DEFAULT = 20
+        const FUERZA_PARA_VOLVER = 9999
+        let juego
+
+        function init() {
+
+            juego = new Juego(juego => {
+
+                // cargarValoresDeLS()
+                // ponerSlidersEnPosicionInicial()
+
+
+                for (let i = 0; i < 500; i++) {
+                    juego.agregarDepredador({
+                        x: (Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth,
+                        y: (Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth,
+                    })
+                }
+
+                for (let i = 0; i < 100; i++) {
+                    juego.agregarPresa({
+                        x: (Math.random() * window.innerWidth * 0.9) + 0.1 * window.innerWidth,
+                        y: (Math.random() * window.innerHeight* 0.9) + 0.1 * window.innerHeight,
+                    })
+                }
+
+                for (let i = 0; i < 40; i++) {
+                    juego.agregarObstaculo(
+
+                        {
+
+                            x: i * 40 + Math.random() * 20,
+                            y: Math.random()*window.innerHeight*4,
+                            radio: Math.random() * 50 + 20,
+
+
+                        })
+
+                }
+            })
+
+
+
+        }
+
+
+        let settings = {}
+
+        function ponerSlidersEnPosicionInicial() {
+            document.querySelector("#separacion").value = SEPARACION_DEFAULT
+            document.querySelector("#alineacion").value = ALINEACION_DEFAULT
+
+            document.querySelector("#cohesion").value = COHESION_DEFAULT
+
+            document.querySelector("#escaparse").value = ESCAPAR_DEFAULT
+            document.querySelector("#vision").value = VISION_DEFAULT
+            document.querySelector("#distSeparacion").value = DISTANCIA_SEPARACION_DEFAULT
+        }
+
+
+        function cambiarValoresDeBoids(cual, valor) {
+
+            console.log("cambiandoValorEnTodosLosBoids", cual, valor)
+
+
+
+            if (!cual) return
+
+
+            settings[cual] = valor
+
+
+            for (let presa of juego.presas) {
+                presa[cual] = valor
+            }
+            localStorage.settings = JSON.stringify(settings)
+
+        }
+
+
+        function cargarValoresDeLS() {
+            if (localStorage.settings) {
+                settings = JSON.parse(localStorage.settings)
+                for (let setting of Object.keys(settings)) {
+                    cambiarValoresDeBoids(setting, settings[setting])
+                }
+
+            }
+        }
+
+
+
+    </script>
+    <!-- 
+    <div id="botones" onclick="event.stopPropagation()">
+        separacion:<input id="separacion" type="range" min="0" max="100" step="1"
+            onmousemove="cambiarValoresDeBoids('factorSeparacion', this.value)">
+        alineacion:<input id="alineacion" type="range" min="0" max="100" step="1"
+            onmousemove="cambiarValoresDeBoids('factorAlineacion', this.value), this.value">
+        cohesion:<input id="cohesion" type="range" min="0" max="100" step="1"
+            onmousemove="cambiarValoresDeBoids('factorAgruparse',this.value)">
+        escaparse:<input id="escaparse" type="range" min="0" max="100" step="1"
+            onmousemove="cambiarValoresDeBoids('factorEscapar', this.value)">
+
+        vision:<input id="vision" type="range" min="0" max="1000" step="1"
+            onmousemove="cambiarValoresDeBoids('vision', this.value)">
+
+
+        dist minima separacion:<input id="distSeparacion" type="range" min="0" max="100" step="1"
+            onmousemove="cambiarValoresDeBoids('distanciaLimiteParaEstarCerca', this.value)">
+
+    </div> -->
+
+
+</body>
+
+</html>

@@ -2,29 +2,22 @@ class Depredador extends Entidad {
   constructor(obj) {
     super(obj, "metaballs");
     this.lado = 10;
-    this.velMax = 7
-    this.accMax = 0.5
+    this.velMax = 7;
+    this.accMax = 0.5;
     this.crearGrafico();
 
-    this.factorSeparacion = 400
-    this.factorAlineacion =120
-    this.factorAgruparse = 50
+    this.factorSeparacion = 400;
+    this.factorAlineacion = 120;
+    this.factorAgruparse = 50;
     //
     // this.factorEscapar = ESCAPAR_DEFAULT;
-    this.factorPerseguir = 850
+    this.factorPerseguir = 850;
 
     this.vision = VISION_DEFAULT;
     this.distanciaLimiteParaEstarCerca = DISTANCIA_SEPARACION_DEFAULT;
   }
 
   crearGrafico() {
-
-
-
-
-
-
-
     if (!Depredador.textura) {
       Depredador.textura = "loading";
       this.juego.app.loader
@@ -47,8 +40,7 @@ class Depredador extends Entidad {
       }
     }
 
-
-    this.rect = new PIXI.Graphics()
+    this.rect = new PIXI.Graphics();
     this.rect.beginFill(0xff0000); // Green color
     this.rect.drawRect(0, 0, this.lado, this.lado / 2);
     this.rect.endFill();
@@ -58,9 +50,6 @@ class Depredador extends Entidad {
     //   .fill(0x00ff00);
     // this.grafico.pivot.set(this.grafico.width, this.grafico.height);
     this.innerContainer.addChild(this.rect);
-
-
-
   }
 
   perseguir(aQuien, serPiolaEIrADondeVaAEstar) {
@@ -88,20 +77,15 @@ class Depredador extends Entidad {
     );
   }
 
-
-
   update() {
     if (this.celda && this.meToca()) {
-
       // this.acc.y+=((this instanceof Obstaculo) ? 0 : this.juego.gravedad)
-
 
       //EJECUTA EL METODO UPDATE DE LA CLASE DE LA CUAL ESTA HEREDA
       this.entidadesCerca = this.celda.obtenerEntidadesAcaYEnLasCeldasVecinas();
       this.depredadoresCerca = this.buscarDepredadoresCercaUsandoGrid();
       this.presasCerca = this.buscarPresasCercaUsandoGrid();
       // this.presasCerca = this.buscarPresasCerca();
-
 
       this.presa = this.buscarPresaMasCercana();
 
@@ -110,7 +94,6 @@ class Depredador extends Entidad {
       this.alineacion(this.depredadoresCerca);
 
       if (this.presa) this.perseguir(this.presa);
-     
     }
     this.obstaculosCercanos = this.obtenerObstaculosCerca();
 

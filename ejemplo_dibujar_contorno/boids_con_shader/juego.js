@@ -12,7 +12,7 @@ class Juego {
     this.app = new PIXI.Application({
       width: this.ancho,
       height: this.alto,
-      backgroundColor: 0xffffff,
+      backgroundColor: 0x000000,
     });
 
     this.escala = 1;

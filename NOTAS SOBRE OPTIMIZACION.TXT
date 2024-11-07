@@ -4,15 +4,25 @@ COSAS PARA OPTIMIZAR:
 -mostrar el profiler de performance
 -pasarle codigo a chatgpt y preguntarle sobre optimizacion
 -las celdas vecinas de una celda, siempre van a ser las mismas, y todo lo q pueda ser calculado una sola vez al principio, hacerlo
+
+
 -Object.Values no: usar un array en lugar de un objeto para guardar las Entidades de cada Celda
+
 -dividir a los boids en subgrupos y actualizarles boids cada X frames (Throttling o Decimation), quiza para buscar vecinos hacerlo cada 10frames, y los calculos de boids cada 5?
 -cacheo de distancias (si tenemos la dist de A a B, no calculemos la dist de B a A)
+
 -probar diferentes tamaños de celdas
+
 -comparar distancias cuadradas en lugar de distancias posta
 -no renderizar cosas q no se ven
+
+
+
 -menos calculos a las cosas q no se ven (Level of Detail)
 -Tabla de datos precalculada (Look up table)
 -Aproximar calculos
+
+-calcular cohesion, separacion, y alineacion, con una cantidad max de boids, no con todos los cercanos
 
 
 

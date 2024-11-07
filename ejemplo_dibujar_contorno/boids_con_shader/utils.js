@@ -43,7 +43,6 @@ function limitMagnitude(vector, maxMagnitude) {
   return vector;
 }
 
-
 function calculoDeDistanciaRapido(x1, y1, x2, y2) {
   const dx = Math.abs(x2 - x1);
   const dy = Math.abs(y2 - y1);
@@ -55,10 +54,7 @@ function calculoDeDistanciaRapido(x1, y1, x2, y2) {
   }
 }
 
-
-
 function distancia(obj1, obj2) {
-
   // return calculoDeDistanciaRapido(obj1.x , obj1.y, obj2.x, obj2.y);
   return Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2);
 }

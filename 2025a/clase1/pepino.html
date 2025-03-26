@@ -1,0 +1,85 @@
+<button onclick="crearPersona()"> crear persona</button>
+
+<button onclick="moverBoton()" id="botonQSeMueve"> boton q se mueve</button>
+
+<script>
+
+    var unaVariable = 12
+
+    var otraVariable = 10;
+
+    let listaDePersonas = []
+
+
+    function crearPersona() {
+        let nuevaPersona = new Persona("Pepito " + Math.floor(Math.random() * 10))
+        console.log("esta es una persona nuva", nuevaPersona)
+        listaDePersonas.push(nuevaPersona)
+    }
+
+
+
+    class Persona {
+        constructor(nombre) {
+            this.nombre = nombre
+            this.edad = Math.floor(Math.random() * 100)
+            this.altura = Math.random() * 100
+            this.nacionalidad = "argentina"
+        }
+
+        saludar() {
+            console.log("Hola soy", this.nombre)
+        }
+    }
+
+
+
+
+
+
+    function moverBoton() {
+        let boton = document.querySelector("#botonQSeMueve")
+        boton.style.position = "absolute"
+
+        let posX = Math.sin(numeroDeFrame / 10) * 10
+        let posY = Math.cos(numeroDeFrame / 10) * 10
+
+
+
+        boton.style.left = posX + "px"
+        boton.style.top = posY + "px"
+    }
+
+
+    var numeroDeFrame = 0;
+
+
+    function funcionQueSeEjecutaCuandoTodoArranca() {
+        console.log("init")
+
+        gameLoop()
+    }
+
+
+    function gameLoop() {
+
+        numeroDeFrame = numeroDeFrame + 1
+
+        //  console.log("gameLoop", numeroDeFrame)
+
+
+
+        moverBoton()
+
+
+        setTimeout(gameLoop, 30)
+    }
+
+
+
+    funcionQueSeEjecutaCuandoTodoArranca()
+
+
+
+
+</script>

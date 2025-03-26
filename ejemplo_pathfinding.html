@@ -30,7 +30,7 @@
         document.body.appendChild(app.view);
         let path = [];  // Array para guardar el camino generado por A*
         let currTarget
-        const tileSize = 64; // Tamaño de cada celda
+        const tileSize = 32; // Tamaño de cada celda
         const maxSpeed = 4;  // Velocidad máxima del jugador
         const arrivalRadius = 100;  // Radio en el que el jugador empieza a frenar
         let target = null;  // Posición objetivo
@@ -59,10 +59,10 @@
         const numCols = grid[0].length;
 
         // Cargar fondo y personaje
-        const background = PIXI.Sprite.from('https://www.publicdomainpictures.net/pictures/270000/velka/abstract-blue-background.jpg');
-        background.width = app.screen.width;
-        background.height = app.screen.height;
-        app.stage.addChild(background);
+        // const background = PIXI.Sprite.from('https://www.publicdomainpictures.net/pictures/270000/velka/abstract-blue-background.jpg');
+        // background.width = app.screen.width;
+        // background.height = app.screen.height;
+        // app.stage.addChild(background);
 
         // Crear el jugador (un simple cuadrado)
         const player = new PIXI.Graphics();
@@ -224,6 +224,7 @@
 
                 // Ejecutar A* para encontrar la ruta hasta la posición del mouse
                 path = findPath(playerPos, targetPos);
+                console.log(path)
                 drawPath();
 
                 if(path) {

@@ -1,0 +1,79 @@
+<!-- https://www.npmjs.com/package/js-quadtree -->
+<html>
+
+<head>
+
+
+    <script src="https://unpkg.com/js-quadtree"></script>
+    <style>
+        .punto {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background-color: black;
+            border-radius: 100%;
+        }
+
+        #circulo {
+            border-radius: 100%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            border: 2px solid red;
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="circulo"></div>
+
+    <script>
+
+        const width = window.innerWidth
+        const height = window.innerHeight
+
+        const config = {
+            capacity: 3,            // Specify the maximum amount of point per node (default: 4)
+            removeEmptyNodes: true,  // Specify if the quadtree has to remove subnodes if they are empty (default: false).
+            maximumDepth: 6,         // Specify the maximum depth of the quadtree. -1 for no limit (default: -1).
+            // Specify a custom method to compare point for removal (default: (point1, point2) => point1.x === point2.x && point1.y === point2.y).
+            arePointsEqual: (point1, point2) => point1.data.foo === point2.data.foo
+        };
+
+
+        const quadtree = new QT.QuadTree(new QT.Box(0, 0, width, height), config);
+
+
+ 
+
+        let radio = 30
+        const circuloDiv = document.querySelector("#circulo")
+        for (let i = 0; i < 1000; i++) {
+            let x = Math.random() * width
+            let y = Math.random() * height
+            quadtree.insert(new QT.Point(x, y, { i }));
+
+            let div = document.createElement("div")
+            div.classList.add("punto")
+            div.style.left = x + "px";
+            div.style.top = y + "px";
+            document.body.appendChild(div)
+
+        }
+
+        window.onmousemove = e => {
+            circuloDiv.style.left = e.x + "px"
+            circuloDiv.style.top = e.y + "px"
+            circuloDiv.style.width = (radio * 2) + "px"
+            circuloDiv.style.height = (radio * 2) + "px"
+            console.log(quadtree.query(new QT.Circle(e.x, e.y, radio)))
+        }
+
+
+
+
+    </script>
+
+</body>
+
+</html>

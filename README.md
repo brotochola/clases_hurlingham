@@ -1,3 +1,5 @@
+https://discord.gg/2vfM6WAt
+
 **UNIVERSIDAD NACIONAL DE HURLINGHAM**  
 **Programación de Videojuegos 1**  
 **Profesor Facundo Saiegh**  
@@ -6,14 +8,14 @@
 
 **Objetivos de la Materia:**
 
-El propósito de este cuatrimestre es introducir a los estudiantes en los conceptos fundamentales de JavaScript y PixiJS, y familiarizarlos con el entorno de desarrollo de Google Chrome.  
+El propósito de este cuatrimestre es introducir a los estudiantes en los conceptos fundamentales de JavaScript y PixiJS, y familiarizarlos con el entorno de desarrollo web usando las herramientas para desarolladores de Google Chrome.
 A lo largo del curso, los estudiantes adquirirán las habilidades necesarias para desarrollar un videojuego 2D utilizando la librería PixiJS.
 
 **Trabajo Práctico Final:**
 
-Organizados en grupos de dos personas, los estudiantes deberán desarrollar y presentar un videojuego 2D que cumpla con los siguientes requisitos:
+Organizados en grupos de dos personas, los estudiantes deberán desarrollar y presentar, en la fecha del segundo parcial, un videojuego 2D que cumpla con los siguientes requisitos:
 
-1. **Cantidad de Personajes**: El juego debe incluir un número significativo de personajes (más de 50\) que implementen el algoritmo Boids o una variación similar.  
+1. **Cantidad de Personajes**: El juego debe incluir al menos 50 NPCs -non-playable characters- que implementen el algoritmo Boids o una variación similar. Es decir, evaluar el entorno, cambiar de estado, establecer un objetivo fijo o móvil y moverse hacia el mismo.
 2. **Interactividad**: El usuario debe tener la capacidad de interactuar con el juego en tiempo real mediante el uso del mouse y/o teclado.  
 3. **Ejemplos de Juegos**: Algunas posibles ideas incluyen:  
    * Juego de matar hordas de zombis.  
@@ -21,6 +23,8 @@ Organizados en grupos de dos personas, los estudiantes deberán desarrollar y pr
    * Simulador de pesca.  
    * Pelea entre grandes grupos de personas.  
    * Defender a una celebridad de sus fanáticos enloquecidos.
+   * Simulador de supermercado
+
 
 **Requisitos Técnicos:**
 
@@ -29,9 +33,10 @@ El juego desarrollado deberá incluir, como mínimo, los siguientes aspectos té
 * **Input del Usuario**: Interacción a través de mouse y/o teclado.  
 * **Spatial Hashing**: Optimización espacial para manejar grandes cantidades de personajes.  
 * **Spritesheets**: Uso de múltiples spritesheets por personaje.  
-* **Algoritmo Boids**: Implementación del algoritmo Boids para la simulación de comportamiento grupal.  
+* **Algoritmo Boids**: Implementación del algoritmo Boids (o variantes del mismo) para la simulación de comportamiento grupal.
 * **Movimiento de Cámara**: Movimiento suave de cámara utilizando interpolación lineal (Lerp).  
 * **Finite State Machine (FSM)**: Implementación de una máquina de estados finitos para gestionar las transiciones y comportamientos de los personajes.
+
 
 **Elementos Opcionales:**
 
@@ -45,10 +50,19 @@ El juego puede también incorporar uno o más de los siguientes elementos opcion
 * **Path Finding**: Algoritmos de búsqueda de caminos, como A\* o similares.
 
 
+**Primer Parcial:**
+En la fecha del primer examen parcial, cada grupo deberá tener implementado en su proyecto los siguientes aspectos:
+* Idea definida y game design document con las mecánicas del juego explicadas.
+* Gráficos y estética definidas: Paleta de colores, spritesheets/atlas 
+* Repositorio en github con commits de ambos integrantes del grupo y funcionando en Github Pages.
+* Estructura de clases que representen a las entidades y personajes del juego.
+* Tener el proyecto funcionando, sin errores en la consola y que se vea al menos un spritesheet animado y en movimiento en la pantalla :)
+
+
 **Estructura de las Clases:**
 
 Cada clase del curso estará dividida en dos partes:
-1. **Primera Parte:** Durante la primera mitad de la clase, se dedicarán a resolver dudas y brindar apoyo a los estudiantes en la implementación de los contenidos vistos en la clase anterior dentro de sus proyectos  
+1. **Primera Parte:** Durante la primera mitad de la clase, se dedicarán a resolver dudas y brindar apoyo a los estudiantes en la implementación de los contenidos vistos en la clase anterior dentro de sus proyectos. Cada semana un grupo diferente deberá mostrar sus avances.
 2. **Segunda Parte:** En la segunda mitad de la clase, se presentarán nuevos contenidos que los estudiantes deberán implementar en sus proyectos a lo largo de la semana. Estos nuevos conceptos serán fundamentales para la progresión del desarrollo del juego y su complejidad.
 
 
@@ -63,17 +77,23 @@ Cada clase del curso estará dividida en dos partes:
 
 El curso está estructurado en 12 clases, cada una con un enfoque específico. A continuación, se detalla el contenido de las mismas:
 
-1.  **Conceptos Básicos de JavaScript**  
+1.  **Presentación de la materia y conceptos Básicos de JavaScript**
+   * **Porqué Javascript, porqué web, ejemplos de juegos web**:  
+      1. Presentación de la materia, leer este documento, explicar sistema e instancias de evaluación.
+      2. Ventajas del desarrollo web.
+      3. Ejemplos de juegos y experimentos web.
+      4. Cómo elegir el juego a desarrollar durante la materia.
+   *  **JavaScript Básico**:   
+      1. **HTML, CSS, JS**: Lenguajes compilados vs. lenguajes interpretados.
+      2. **Tipos de Datos y sintaxis**: Introducción a JavaScript.
+      3. **Gameloop**: Concepto de bucle de juego y su implementación básica.  
+      4. **setTimeout, setInterval, RequestAnimationFrame**: Uso de `requestAnimationFrame` para sincronizar la animación con la tasa de refresco de la pantalla.  
    * **Uso de las Herramientas de Desarrollo de Google Chrome**:  
       1. **Pestaña Network**: Monitoreo de solicitudes de red.  
       2. **Pestaña Sources**: Exploración del código fuente y manejo de archivos.  
       3. **Consola**: Ejecución de comandos y debugging en tiempo real.  
       4. **Debugger y Breakpoints**: Uso de breakpoints para depurar código.  
       5. **LocalStorage**: Almacenamiento local en el navegador.  
-   *  **JavaScript Básico**:  
-      1. **Tipos de Datos y sintaxis**: Introducción a JavaScript.  
-      2. **Gameloop**: Concepto de bucle de juego y su implementación básica.  
-      3. **setTimeout, setInterval, RequestAnimationFrame**: Uso de `requestAnimationFrame` para sincronizar la animación con la tasa de refresco de la pantalla.  
    *  **Uso de ChatGPT para Generación de Código**: Introducción al uso de herramientas de inteligencia artificial como ChatGPT para asistencia en la programación.
 
 --
@@ -90,12 +110,13 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
 
 --
 
-3. **Movimiento del Personaje con Teclado y/o Mouse**  
+3. **Movimiento del Personaje con Teclado y/o Mouse**
+   *  **Uso de Spritesheets**: Introducción al uso de spritesheets para animar el personaje.  
+   *  **Herramientas Externas para el manejo de SpriteSheets**
+   *  **Animación Esqueletal vs. Secuencia de frames**
    *  **Eventos en JavaScript**: Captura y manejo de eventos de teclado y mouse.  
    *  **Gestión de Input**: Almacenamiento y procesamiento de la entrada del usuario dentro de la estructura del juego.  
    *  **Asignación de Velocidad al Protagonista**: Implementación de movimiento basado en la entrada del usuario.  
-   *  **Uso de Spritesheets**: Introducción al uso de spritesheets para animar el personaje.  
-   *  **Herramientas Externas para el manejo de SpriteSheets**
  
  --
 
@@ -125,15 +146,16 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
 
 6. **Movimiento de Cámara \+ Interpolación Lineal**  
    *  **Cálculo del Movimiento de Cámara**: Descripción del proceso para implementar un movimiento de cámara que sigue al protagonista del juego, moviendo todo el escenario de forma fluida.  
-   *  **Aplicación de Lerp al Movimiento de Cámara**: Implementación de interpolación lineal (Lerp) para suavizar el movimiento de la cámara  
-   *  **Explicación de Lerp**: Introducción al concepto de Lerp (Linear Interpolation), su funcionamiento y su aplicación en el contexto del desarrollo de videojuegos.  
+   *  **Aplicación de Lerp al Movimiento de Cámara**: Implementación de interpolación lineal (Lerp) para suavizar el movimiento de cámara  
+   *  **Explicación de Lerp**: Introducción al concepto de Lerp (interpolación lineal), su funcionamiento y su aplicación en el contexto del desarrollo de videojuegos.  
    *  **Aplicación de Lerp a la Velocidad del Personaje**: O a otras variables de física.  
-   *  **Interpolación Exponencial y Logarítmica**: Explicación de métodos avanzados de interpolación, como la exponencial y logarítmica, así como la función sigmoidea, para crear transiciones de movimiento más naturales.  
+   *  **Interpolación Exponencial y Logarítmica**: Explicación de métodos avanzados de interpolación, como la exponencial y logarítmica, así como la función sigmoidea, para crear transiciones de movimiento más naturales.
+   *  **Proyección isométrica**
 
 --
 
 7. **Grid y Tiles: Spatial Hashing**  
-   *  **Problemas con el Cálculo del Teorema de Pitágoras en Múltiples Objetos**: Análisis de las dificultades y limitaciones que surgen al calcular la distancia entre muchos objetos utilizando el teorema de Pitágoras, especialmente en términos de rendimiento computacional en juegos con numerosos elementos móviles.  
+   *  **Problemas con el Cálculo del Teorema de Pitágoras en Múltiples Objetos**: Análisis de las dificultades y limitaciones que surgen al calcular la distancia entre muchos objetos utilizando el teorema de Pitágoras, especialmente en términos de rendimiento computacional en juegos con numerosos elementos móviles. Big O Notation.
    *  **Spatial Hashing: Funcionamiento Detallado**: Exploración en detalle del concepto de Spatial Hashing, una técnica que divide el espacio en celdas y asigna objetos a estas celdas para reducir el número de cálculos necesarios.
 
 --

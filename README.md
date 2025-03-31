@@ -207,9 +207,9 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
 ### Links / Material
 
 **Panel de desarrolladores de Google Chrome**
-https://www.youtube.com/watch?v=bBB-dMgeisk 
+https://www.youtube.com/watch?v=bBB-dMgeisk   
 **Introducción a Javascript**
-https://www.youtube.com/watch?v=8GTaO9XhA5M
+https://www.youtube.com/watch?v=8GTaO9XhA5M  
 **Ejemplo Zombies**
 https://brotochola.github.io/clases_hurlingham/ejemplo/ejemplo.html  
 **Ejempo Ovejas**

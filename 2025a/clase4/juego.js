@@ -10,16 +10,16 @@ class Juego {
     this.gravedad = { x: 0, y: 3 };
 
     this.personas = [];
+    this.presas = [];
+    this.depredadores = [];
 
-    const opciones = { width: this.ancho, height: this.alto };
-
-    this.app.init(opciones).then(() => {
+    this.app.init({ width: this.ancho, height: this.alto }).then(() => {
       this.pixiListo();
     });
   }
 
   pixiListo() {
-    console.log("pixi listo", performance.now());
+    console.log("pixi listo");
 
     document.body.appendChild(this.app.canvas);
 
@@ -27,7 +27,8 @@ class Juego {
 
     window.__PIXI_APP__ = this.app;
 
-    this.ponerChaboncitos(1);
+    this.ponerPresas(10);
+    this.ponerDepredadores(1);
 
     this.app.ticker.add(() => this.gameLoop());
   }
@@ -52,11 +53,29 @@ class Juego {
     }
   }
 
-  ponerChaboncitos(cantidad) {
+  ponerPresas(cantidad) {
     for (let i = 0; i < cantidad; i++) {
-      const chabon = new Persona(i * 50, i * 30, this);
+      const chabon = new Presa(
+        Math.random() * this.ancho,
+        Math.random() * this.alto,
+        this
+      );
       chabon.asignarAceleracion(Math.random() * 20, Math.random() * 2);
       this.personas.push(chabon);
+      this.presas.push(chabon);
+    }
+  }
+
+  ponerDepredadores(cantidad) {
+    for (let i = 0; i < cantidad; i++) {
+      const chabon = new Depredador(
+        Math.random() * this.ancho,
+        Math.random() * this.alto,
+        this
+      );
+      chabon.asignarAceleracion(Math.random() * 20, Math.random() * 2);
+      this.personas.push(chabon);
+      this.depredadores.push(chabon);
     }
   }
 }

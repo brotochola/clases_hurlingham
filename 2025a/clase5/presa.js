@@ -56,7 +56,7 @@ class Presa extends Persona {
     const factor = 0.4;
     const x = Math.cos(angulo) * factor;
     const y = Math.sin(angulo) * factor;
-    this.asignarAceleracion(x, y);
+    this.aplicarAceleracion(x, y);
   }
 
   sacarInformacionDelEntorno() {
@@ -105,7 +105,7 @@ class Presa extends Persona {
     const factor = 0.4;
     const x = Math.cos(angulo) * factor;
     const y = Math.sin(angulo) * factor;
-    this.asignarAceleracion(-x, -y);
+    this.aplicarAceleracion(-x, -y);
   }
 
   verCualEsElDEpredadorMasCercano() {

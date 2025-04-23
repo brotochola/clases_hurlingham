@@ -14,6 +14,8 @@ class Entidad {
     this.velocidadMaxima = 6;
     this.accMax = 0.1;
 
+    this.valorFriccion = 0.93;
+
     this.spritesAnimados = {};
     this.crearContainer();
   }
@@ -28,7 +30,7 @@ class Entidad {
     this.juego.containerPrincipal.addChild(this.container);
   }
 
-  asignarAceleracion(x, y) {
+  aplicarAceleracion(x, y) {
     this.accX += x;
     this.accY += y;
   }
@@ -43,6 +45,8 @@ class Entidad {
     //si no cargo el sprite no se ejecuta nada
     if (!this.yaCargoElSprite) return;
 
+    this.limitarAceleracion();
+
     // this.aplicarGravedad();
 
     // this.asignarFuerzaQueMeLlevaAlMouse();
@@ -50,6 +54,8 @@ class Entidad {
     //sumamos la aceleracion a la velocidad
     this.velX += this.accX;
     this.velY += this.accY;
+
+    this.limitarVelocidad();
 
     // this.limitarVelocidad();
 
@@ -85,7 +91,7 @@ class Entidad {
       this.juego.mouse.y
     );
 
-    this.asignarAceleracion(
+    this.aplicarAceleracion(
       vectorNormalizadoQueApuntaAlMouse.x * 0.5,
       vectorNormalizadoQueApuntaAlMouse.y * 0.5
     );
@@ -101,8 +107,8 @@ class Entidad {
   }
 
   aplicarFriccion() {
-    this.velX *= 0.93;
-    this.velY *= 0.93;
+    this.velX *= this.valorFriccion;
+    this.velY *= this.valorFriccion;
   }
 
   noAtravesarElPiso() {
@@ -112,20 +118,23 @@ class Entidad {
   }
 
   aplicarGravedad() {
-    this.asignarAceleracion(this.juego.gravedad.x, this.juego.gravedad.y);
+    this.aplicarAceleracion(this.juego.gravedad.x, this.juego.gravedad.y);
   }
 
   limitarVelocidad() {
-    if (Math.abs(this.velX) > this.velocidadMaxima) {
-      let coeficiente = 1;
-      if (this.velX < 0) coeficiente = -1;
-      this.velX = this.velocidadMaxima * coeficiente;
-    }
+    // Calcular la magnitud de la velocidad actual (velocidad lineal)
+    const velocidadActual = Math.sqrt(
+      this.velX * this.velX + this.velY * this.velY
+    );
 
-    if (Math.abs(this.velY) > this.velocidadMaxima) {
-      let coeficiente = 1;
-      if (this.velY < 0) coeficiente = -1;
-      this.velY = this.velocidadMaxima * coeficiente;
+    // Solo aplicar limitación si excede la velocidad máxima
+    if (velocidadActual > this.velocidadMaxima) {
+      // Factor de escala para reducir proporcionalmente ambas componentes
+      const factor = this.velocidadMaxima / velocidadActual;
+
+      // Ajustar ambas componentes de manera proporcional
+      this.velX *= factor;
+      this.velY *= factor;
     }
   }
 

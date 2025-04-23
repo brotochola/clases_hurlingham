@@ -6,6 +6,7 @@ class Persona extends Entidad {
   }
 
   cambiarSpriteAnimado(key) {
+    console.log("cambiar sprite", key);
     this.spriteSeleccionado = key;
     //extraemos las keys del objeto spritesAnimados
     const keys = Object.keys(this.spritesAnimados);
@@ -20,30 +21,34 @@ class Persona extends Entidad {
   }
 
   async cargarSpritesAnimados() {
+    //cargo el json
     let json = await PIXI.Assets.load("texture.json");
 
-    const spriteCaminando = new PIXI.AnimatedSprite(json.animations["caminar"]);
-    const spriteParado = new PIXI.AnimatedSprite(json.animations["parado"]);
+    //recorro todas las animaciones q tiene
+    for (let animacion of Object.keys(json.animations)) {
+      //cada animacion ahora esta en la variable animacion:
+      //en el objeto spritesAnimados, creo q una propiedad/valor nuevo, con el nombre de la animacion, y le meto una nueva instancia de PIXI.animatedSprite
+      this.spritesAnimados[animacion] = new PIXI.AnimatedSprite(
+        json.animations[animacion]
+      );
 
-    // spriteCaminando.anchor.set(0.5, 1);
-    // spriteParado.anchor.set(0.5, 1);
+      //q loopee
+      this.spritesAnimados[animacion].loop = true;
+      //y le damos play
+      this.spritesAnimados[animacion].play();
+      //lo metemos en el container de esta entidad/persona
+      this.container.addChild(this.spritesAnimados[animacion]);
 
-    this.spritesAnimados["parado"] = spriteParado;
-    this.spritesAnimados["caminar"] = spriteCaminando;
+      //el punto de anclaje abajo al medio (donde el chabon toca el piso, pq este punto lo usamos para ver quien esta adelante y quien esta atras)
+      this.spritesAnimados[animacion].anchor.set(0.5, 1);
+      //el frame inicial q sea random
+      this.spritesAnimados[animacion].currentFrame = Math.floor(
+        this.spritesAnimados[animacion].totalFrames * Math.random()
+      );
+    }
 
-    this.sprite = spriteCaminando;
+    this.cambiarDeSpriteSegunVelocidad();
 
-    spriteCaminando.animationSpeed = 0.1;
-    spriteCaminando.loop = true;
-    spriteCaminando.play();
-
-    // spriteCaminando.x = this.x;
-    // spriteCaminando.y = this.y;
-
-    this.container.addChild(spriteCaminando);
-
-    spriteCaminando.anchor.set(0.5, 1);
-    spriteCaminando.currentFrame = Math.floor(Math.random() * 8);
     this.yaCargoElSprite = true;
   }
 
@@ -74,17 +79,17 @@ class Persona extends Entidad {
     if (!this.yaCargoElSprite) return;
     super.render();
     this.cambiarVelocidadDelSpriteSegunVelocidadLineal();
-    // this.cambiarDeSpriteSegunVelocidad();
+    this.cambiarDeSpriteSegunVelocidad();
   }
 
   cambiarDeSpriteSegunVelocidad() {
-    if (this.calcularVelocidadLineal() < 0) {
+    if (this.calcularVelocidadLineal() > 0) {
       this.cambiarSpriteAnimado("caminar");
     } else {
       this.cambiarSpriteAnimado("parado");
     }
   }
   cambiarVelocidadDelSpriteSegunVelocidadLineal() {
-    this.sprite.animationSpeed = this.calcularVelocidadLineal() * 0.2;
+    this.sprite.animationSpeed = this.calcularVelocidadLineal() * 0.13;
   }
 }

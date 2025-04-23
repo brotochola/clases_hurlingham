@@ -5,8 +5,9 @@ class Protagonista extends Persona {
     this.container.name = "protagonista";
 
     this.container.tint = 0x0000ff;
-    this.velocidadMaxima = 4.5;
-    this.accMax = 0.66;
+    this.velocidadMaxima = 3;
+    this.accMax = 0.33;
+    this.valorFriccion = 0.95;
   }
 
   update() {
@@ -15,10 +16,6 @@ class Protagonista extends Persona {
     this.sacarInformacionDelEntorno();
 
     this.moverseSegunTeclado();
-
-    this.limitarAceleracion();
-
-    this.limitarVelocidad();
 
     super.update();
 
@@ -30,12 +27,10 @@ class Protagonista extends Persona {
     if (this.x > this.juego.fondo.width) {
       this.x = this.juego.fondo.width;
       this.velX = 0;
-      this.asignarAceleracion(-0.1, 0);
     }
   }
 
   moverseSegunTeclado() {
-    const vel = 92745;
     let accX = 0;
     let accY = 0;
 
@@ -45,19 +40,13 @@ class Protagonista extends Persona {
     if (this.juego.teclado.a) accX = -1;
     if (this.juego.teclado.d) accX = 1;
 
-    // Normalizar para movimiento diagonal
     if (accX !== 0 && accY !== 0) {
       // Si nos movemos en diagonal, normalizar el vector
-      const longitud = Math.sqrt(accX * accX + accY * accY);
-      accX = (accX / longitud) * vel;
-      accY = (accY / longitud) * vel;
-    } else {
-      // Movimiento en línea recta
-      accX *= vel;
-      accY *= vel;
+      accX *= 0.707;
+      accY *= 0.707;
     }
 
-    this.asignarAceleracion(accX, accY);
+    this.aplicarAceleracion(accX, accY);
   }
 
   sacarInformacionDelEntorno() {

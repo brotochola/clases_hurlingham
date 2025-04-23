@@ -152,7 +152,7 @@ class Juego {
         Math.random() * this.alto,
         this
       );
-      chabon.asignarAceleracion(Math.random() * 20, Math.random() * 2);
+      chabon.aplicarAceleracion(Math.random() * 20, Math.random() * 2);
       this.personas.push(chabon);
       this.presas.push(chabon);
     }
@@ -169,7 +169,7 @@ class Juego {
         Math.random() * this.alto,
         this
       );
-      chabon.asignarAceleracion(Math.random() * 20, Math.random() * 2);
+      chabon.aplicarAceleracion(Math.random() * 20, Math.random() * 2);
       this.personas.push(chabon);
       this.depredadores.push(chabon);
     }

@@ -4,6 +4,10 @@ class Depredador extends Persona {
     this.agregarCuadraditoRojo();
 
     this.container.name = "depredador_" + this.id;
+
+    this.velocidadMaxima = 2.8;
+    this.accMax = 0.32;
+    this.valorFriccion = 0.95;
   }
   agregarCuadraditoRojo() {
     this.graphics = new PIXI.Graphics();

@@ -3,6 +3,10 @@ class Presa extends Persona {
     super(x, y, juego);
     // this.agregarCuadraditoVerde();
     this.container.name = "presa_" + this.id;
+
+    this.velocidadMaxima = 3;
+    this.accMax = 0.33;
+    this.valorFriccion = 0.95;
   }
   agregarCuadraditoVerde() {
     this.graphics = new PIXI.Graphics();

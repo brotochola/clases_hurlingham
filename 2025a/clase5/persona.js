@@ -6,7 +6,6 @@ class Persona extends Entidad {
   }
 
   cambiarSpriteAnimado(key) {
-    console.log("cambiar sprite", key);
     this.spriteSeleccionado = key;
     //extraemos las keys del objeto spritesAnimados
     const keys = Object.keys(this.spritesAnimados);
@@ -65,15 +64,6 @@ class Persona extends Entidad {
       this.velY *= -0.99;
     }
   }
-
-  // update() {
-  //   super.update();
-  //   // console.log("update de persona", this.id);
-  //   //si no cargo el sprite no se ejecuta nada
-
-  //   // this.rebotar();
-  //   // this.noAtravesarElPiso();
-  // }
 
   render() {
     if (!this.yaCargoElSprite) return;

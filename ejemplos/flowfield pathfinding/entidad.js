@@ -1,0 +1,110 @@
+class Entidad {
+  constructor(x, y, juego) {
+    this.container = new PIXI.Container();
+    this.juego = juego;
+
+    this.id = generateRandomID(8);
+
+    this.juego.app.stage.addChild(this.container);
+
+    this.x = x;
+    this.y = y;
+
+    this.velocidad = { x: 0, y: 0 };
+    this.acc = { x: 0, y: 0 };
+
+    this.changuiMargenes = 10;
+    this.fuerzaParavolverDeLosBordes = 300;
+
+    // How strongly this entity is influenced by the vector field
+    this.vectorFieldInfluence = 0;
+  }
+
+  aplicarFuerza(x, y) {
+    this.acc.x += x;
+    this.acc.y += y;
+  }
+
+  rebotarContraLosBoredes() {
+    if (this.x < this.changuiMargenes) {
+      //SI ESTOY MAS A LA IZQ Q EL MARGEN IZQ -CHANGUI
+      // LA FUERZA Q SE LE APLICA ES DIRECTAMENTE PROPORCIONAL A LA DISTANCIA A LA Q ESTA
+
+      let fuerza =
+        distancia(this, { x: this.changuiMargenes, y: this.y }) *
+        this.fuerzaParavolverDeLosBordes;
+      this.aplicarFuerza(fuerza, 0);
+    } else if (this.x > window.innerWidth - this.changuiMargenes) {
+      //SI ESTOY MAS A LA DER Q EL MARGEN DERECHO-CHANGUI
+      let fuerza =
+        distancia(this, {
+          x: window.innerWidth - this.changuiMargenes,
+          y: this.y,
+        }) * this.fuerzaParavolverDeLosBordes;
+      this.aplicarFuerza(-fuerza, 0);
+    }
+
+    if (this.y < this.changuiMargenes) {
+      //SI ESTOY MAS ARRIBA Q EL CHANGUI PARA ARRIBA
+      let fuerza =
+        distancia(this, {
+          x: this.x,
+          y: this.changuiMargenes,
+        }) * this.fuerzaParavolverDeLosBordes;
+      this.aplicarFuerza(0, fuerza);
+    } else if (this.y > window.innerHeight - this.changuiMargenes) {
+      //ABAJO
+      let fuerza =
+        distancia(this, {
+          x: this.x,
+          y: window.innerHeight - this.changuiMargenes,
+        }) * this.fuerzaParavolverDeLosBordes;
+      this.aplicarFuerza(0, -fuerza);
+    }
+  }
+
+  // Apply force from the vector field
+  aplicarFuerzaVectorField() {
+    if (this.juego.grid) {
+      const vector = this.juego.grid.getVectorAt(this.x, this.y);
+      if (vector) {
+        this.aplicarFuerza(
+          vector.x * this.vectorFieldInfluence,
+          vector.y * this.vectorFieldInfluence
+        );
+      }
+    }
+  }
+
+  update() {
+    // if(isNaN(this.acc.x)) debugger
+
+    // Apply force from vector field
+
+    this.acc = limitMagnitude(this.acc, this.accMax);
+
+    this.velocidad.x += this.acc.x;
+    this.velocidad.y += this.acc.y;
+
+    this.acc.x = 0;
+    this.acc.y = 0;
+
+    this.velocidad = limitMagnitude(this.velocidad, this.velMax);
+
+    this.rebotarContraLosBoredes();
+
+    this.x += this.velocidad.x;
+    this.y += this.velocidad.y;
+
+    // this.x = (this.x + window.innerWidth) % window.innerWidth;
+    // this.y = (this.y + window.innerHeight) % window.innerHeight;
+  }
+
+  render() {
+    this.angulo = Math.atan2(this.velocidad.y, this.velocidad.x);
+
+    this.container.rotation = this.angulo;
+    this.container.x = this.x;
+    this.container.y = this.y;
+  }
+}

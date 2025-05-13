@@ -1,0 +1,93 @@
+<html>
+<!-- https://github.com/maxkueng/victor/blob/master/build/victor.js -->
+
+<head>
+    <!-- <script src="https://raw.githubusercontent.com/maxkueng/victor/refs/heads/master/build/victor.js"></script> -->
+    <script src="victor.js"></script>
+    <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="entidad.js"></script>
+    <script src="Cell.js"></script>
+    <script src="Grid.js"></script>
+    <script src="animal.js"></script>
+    <!-- <script src="presa.js"></script> -->
+
+    <!-- <script src="depredador.js"></script> -->
+    <script src="juego.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            z-index: 100;
+        }
+
+        #controls p {
+            margin: 5px 0;
+        }
+
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div id="controls">
+        <p>Click anywhere to modify vector field</p>
+        <p>Vector Field Strength: <span id="vectorStrength">0.2</span></p>
+        <input type="range" id="vectorStrengthSlider" min="0" max="1" step="0.1" value="0.2">
+        <button id="toggleGrid">Toggle Grid</button>
+        <button id="resetVectorField">Reset Vector Field</button>
+    </div> -->
+
+    <script>
+        window.factorSeparacion = 0.5
+        window.factorAlineacion = 0.22
+        window.factorCohesion = 0.3
+        window.vision = 100
+        window.vectorFieldInfluence = 3
+        window.factorPerseguirMouse = 0.5
+        window.factorRepulsionDeCeldasBloqueadas = Math.PI
+        window.numeroDeCeldasPAraMirarAlrededor = 1
+
+        let juego = new Juego();
+
+        // Controls
+        document.getElementById('vectorStrengthSlider').addEventListener('input', function (e) {
+            const value = parseFloat(e.target.value);
+            document.getElementById('vectorStrength').textContent = value;
+
+            // Update all entities' vector field influence
+            juego.entidades.forEach(entidad => {
+                entidad.vectorFieldInfluence = value;
+            });
+        });
+
+        document.getElementById('toggleGrid').addEventListener('click', function () {
+            if (juego.grid) {
+                juego.grid.visible = !juego.grid.visible;
+            }
+        });
+
+        document.getElementById('resetVectorField').addEventListener('click', function () {
+            if (juego.grid) {
+                juego.setupVectorField();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -72,7 +72,7 @@ class Entidad {
 
     this.velocidad = limitMagnitude(this.velocidad, this.velMax);
 
-    this.rebotarContraLosBoredes();
+    // this.rebotarContraLosBoredes();
 
     this.x += this.velocidad.x;
     this.y += this.velocidad.y;

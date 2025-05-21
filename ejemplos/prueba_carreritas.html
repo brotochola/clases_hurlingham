@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Carreras con FlowField</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        #gameCanvas {
+            border: 2px solid #444;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #4a8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #5b9;
+        }
+
+        #infoPanel {
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button id="startBtn">Iniciar Carrera</button>
+        <button id="resetBtn">Reiniciar</button>
+    </div>
+    <div id="gameCanvas"></div>
+    <div id="infoPanel">
+        <div id="position">Posición: --</div>
+        <div id="lap">Vuelta: 0</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.1/pixi.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/4.0.1/simplex-noise.min.js"></script> -->
+    <script>
+        class SimplexNoise {
+            constructor() {
+                this.grad3 = [
+                    [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+                    [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+                    [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
+                ];
+                this.p = [];
+                for (let i = 0; i < 256; i++) {
+                    this.p[i] = Math.floor(Math.random() * 256);
+                }
+
+                // To remove the need for index wrapping, double the permutation table length
+                this.perm = new Array(512);
+                this.gradP = new Array(512);
+
+                // This isn't a very good seeding function, but it works ok. It supports 2^16
+                // different seed values.
+                let seed = 0;
+                this.seed(seed);
+            }
+
+            seed(seed) {
+                if (seed > 0 && seed < 1) {
+                    // Scale the seed out
+                    seed *= 65536;
+                }
+
+                seed = Math.floor(seed);
+                if (seed < 256) {
+                    seed |= seed << 8;
+                }
+
+                for (let i = 0; i < 256; i++) {
+                    let v;
+                    if (i & 1) {
+                        v = this.p[i] ^ (seed & 255);
+                    } else {
+                        v = this.p[i] ^ ((seed >> 8) & 255);
+                    }
+
+                    this.perm[i] = this.perm[i + 256] = v;
+                    this.gradP[i] = this.gradP[i + 256] = this.grad3[v % 12];
+                }
+            }
+
+            // 2D simplex noise
+            noise2D(xin, yin) {
+                // Skew the input space to determine which simplex cell we're in
+                const F2 = 0.5 * (Math.sqrt(3) - 1);
+                const G2 = (3 - Math.sqrt(3)) / 6;
+
+                let n0, n1, n2; // Noise contributions from the three corners
+
+                // Skew the input space to determine which simplex cell we're in
+                let s = (xin + yin) * F2; // Hairy factor for 2D
+                let i = Math.floor(xin + s);
+                let j = Math.floor(yin + s);
+                let t = (i + j) * G2;
+                let x0 = xin - i + t; // The x,y distances from the cell origin
+                let y0 = yin - j + t;
+
+                // For the 2D case, the simplex shape is an equilateral triangle.
+                // Determine which simplex we are in.
+                let i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
+                if (x0 > y0) { // lower triangle, XY order: (0,0)->(1,0)->(1,1)
+                    i1 = 1; j1 = 0;
+                } else { // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+                    i1 = 0; j1 = 1;
+                }
+
+                // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
+                // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
+                // c = (3-sqrt(3))/6
+                let x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
+                let y1 = y0 - j1 + G2;
+                let x2 = x0 - 1.0 + 2.0 * G2; // Offsets for last corner in (x,y) unskewed coords
+                let y2 = y0 - 1.0 + 2.0 * G2;
+
+                // Work out the hashed gradient indices of the three simplex corners
+                i &= 255;
+                j &= 255;
+
+                let gi0 = this.gradP[i + this.perm[j]];
+                let gi1 = this.gradP[i + i1 + this.perm[j + j1]];
+                let gi2 = this.gradP[i + 1 + this.perm[j + 1]];
+
+                // Calculate the contribution from the three corners
+                let t0 = 0.5 - x0 * x0 - y0 * y0;
+                if (t0 < 0) {
+                    n0 = 0;
+                } else {
+                    t0 *= t0;
+                    n0 = t0 * t0 * this.dot(gi0, [x0, y0]); // (x,y) of grad3 used for 2D gradient
+                }
+
+                let t1 = 0.5 - x1 * x1 - y1 * y1;
+                if (t1 < 0) {
+                    n1 = 0;
+                } else {
+                    t1 *= t1;
+                    n1 = t1 * t1 * this.dot(gi1, [x1, y1]);
+                }
+
+                let t2 = 0.5 - x2 * x2 - y2 * y2;
+                if (t2 < 0) {
+                    n2 = 0;
+                } else {
+                    t2 *= t2;
+                    n2 = t2 * t2 * this.dot(gi2, [x2, y2]);
+                }
+
+                // Add contributions from each corner to get the final noise value.
+                // The result is scaled to return values in the interval [-1,1].
+                return 70 * (n0 + n1 + n2);
+            }
+
+            // Helper
+            dot(g, x) {
+                return g[0] * x[0] + g[1] * x[1];
+            }
+        }
+        // Configuración del juego
+        const config = {
+            width: window.innerWidth,
+            height: window.innerHeight - 200,
+            carCount: 15,
+            playerCarColor: 0xff0000,
+            aiCarColor: 0x3388ff,
+            carSize: 10,
+            flowFieldResolution: 20,
+            flowFieldStrength: 1.5,
+            trackWidth: 120,
+            separationRadius: 30,
+            separationStrength: 1.2,
+            flowFieldStrengthPlayer: 0.8,
+            flowFieldStrengthAI: 1.0,
+            playerBoostMultiplier: 1.5,
+            checkpointCount: 30,
+            maxAcc: 0.33, // Maximum acceleration per frame
+            maxSpeed: 4
+        };
+
+        // Inicializar la aplicación PIXI
+        const app = new PIXI.Application({
+            width: config.width,
+            height: config.height,
+            backgroundColor: 0x222222,
+            antialias: true
+        });
+
+        document.getElementById('gameCanvas').appendChild(app.view);
+
+        // Variables globales
+        let cars = [];
+        let playerCar;
+        let flowField = [];
+        let raceStarted = false;
+        let trackPath = [];
+        let checkpoints = [];
+        let positions = [];
+        let gameTime = 0;
+
+        // Configuración inicial
+        initializeGame();
+
+        // Función para inicializar el juego
+        function initializeGame() {
+            createTrack();
+            createFlowField();
+            createCars();
+            createCheckpoints();
+            visualizeFlowField(0.3);
+
+            app.ticker.add(gameLoop);
+
+            document.getElementById('startBtn').addEventListener('click', startRace);
+            document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+            app.view.addEventListener('pointermove', handleMouseMove);
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+        }
+
+        // Manejar eventos de teclado
+        let keyState = {
+            ArrowUp: false,
+            ArrowLeft: false,
+            ArrowRight: false,
+            Shift: false
+        };
+
+        function handleKeyDown(e) {
+            if (e.key in keyState) {
+                keyState[e.key] = true;
+            }
+        }
+
+        function handleKeyUp(e) {
+            if (e.key in keyState) {
+                keyState[e.key] = false;
+            }
+        }
+
+        function handleMouseMove(e) {
+            // Para posible implementación de control por mouse
+        }
+
+        // Crear la pista usando noise para un trazado orgánico
+        function createTrack() {
+            const noise = new SimplexNoise();
+            const centerX = config.width / 2;
+            const centerY = config.height / 2;
+            const radius = Math.min(config.width, config.height) * 0.35;
+
+            // Dibujar el camino principal de la pista
+            const trackGraphics = new PIXI.Graphics();
+            trackGraphics.lineStyle(config.trackWidth, 0x333333, 1);
+
+            // Crear puntos del camino usando ruido para deformar un círculo
+            const segments = 200;
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const noiseVal = noise.noise2D(Math.cos(angle), Math.sin(angle)) * 0.2;
+                const r = radius * (1 + noiseVal);
+                const x = centerX + Math.cos(angle) * r;
+                const y = centerY + Math.sin(angle) * r;
+
+                if (i === 0) {
+                    trackGraphics.moveTo(x, y);
+                } else {
+                    trackGraphics.lineTo(x, y);
+                }
+
+                // Guardar puntos del camino para el flowfield
+                if (i < segments) {
+                    trackPath.push({ x, y, angle });
+                }
+            }
+
+            trackGraphics.closePath();
+            app.stage.addChild(trackGraphics);
+
+            // Dibujar líneas de carril
+            const innerTrackGraphics = new PIXI.Graphics();
+            innerTrackGraphics.lineStyle(2, 0xffffff, 0.3);
+
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const noiseVal = noise.noise2D(Math.cos(angle), Math.sin(angle)) * 0.2;
+                const r = radius * (1 + noiseVal) - config.trackWidth * 0.4;
+                const x = centerX + Math.cos(angle) * r;
+                const y = centerY + Math.sin(angle) * r;
+
+                if (i === 0) {
+                    innerTrackGraphics.moveTo(x, y);
+                } else {
+                    innerTrackGraphics.lineTo(x, y);
+                }
+            }
+
+            innerTrackGraphics.closePath();
+            app.stage.addChild(innerTrackGraphics);
+
+            // Línea exterior
+            const outerTrackGraphics = new PIXI.Graphics();
+            outerTrackGraphics.lineStyle(2, 0xffffff, 0.3);
+
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const noiseVal = noise.noise2D(Math.cos(angle), Math.sin(angle)) * 0.2;
+                const r = radius * (1 + noiseVal) + config.trackWidth * 0.4;
+                const x = centerX + Math.cos(angle) * r;
+                const y = centerY + Math.sin(angle) * r;
+
+                if (i === 0) {
+                    outerTrackGraphics.moveTo(x, y);
+                } else {
+                    outerTrackGraphics.lineTo(x, y);
+                }
+            }
+
+            outerTrackGraphics.closePath();
+            app.stage.addChild(outerTrackGraphics);
+
+            // Línea de salida
+            const startLine = new PIXI.Graphics();
+            startLine.lineStyle(5, 0xffffff, 1);
+            const startPoint = trackPath[0];
+            const angle = startPoint.angle;
+            startLine.moveTo(
+                startPoint.x - Math.sin(angle) * config.trackWidth * 0.4,
+                startPoint.y + Math.cos(angle) * config.trackWidth * 0.4
+            );
+            startLine.lineTo(
+                startPoint.x + Math.sin(angle) * config.trackWidth * 0.4,
+                startPoint.y - Math.cos(angle) * config.trackWidth * 0.4
+            );
+            app.stage.addChild(startLine);
+        }
+
+        // Crear el flowfield basado en la geometría de la pista
+        function createFlowField() {
+            const cols = Math.ceil(config.width / config.flowFieldResolution);
+            const rows = Math.ceil(config.height / config.flowFieldResolution);
+
+            for (let i = 0; i < cols; i++) {
+                flowField[i] = [];
+                for (let j = 0; j < rows; j++) {
+                    const x = i * config.flowFieldResolution;
+                    const y = j * config.flowFieldResolution;
+
+                    // Encontrar el punto más cercano en la pista
+                    let closestPoint = null;
+                    let minDist = Infinity;
+
+                    for (const point of trackPath) {
+                        const dist = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestPoint = point;
+                        }
+                    }
+
+                    // Determinar si el punto está dentro o fuera de la pista
+                    const isInsideTrack = minDist < config.trackWidth / 2;
+
+                    let vectorX, vectorY;
+
+                    if (isInsideTrack) {
+                        // Si está dentro de la pista, seguir la tangente
+                        const angle = closestPoint.angle + Math.PI / 2;
+                        vectorX = Math.cos(angle);
+                        vectorY = Math.sin(angle);
+                    } else {
+                        // Si está fuera de la pista, apuntar hacia el punto más cercano
+                        const dx = closestPoint.x - x;
+                        const dy = closestPoint.y - y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+
+                        // Normalizar el vector
+                        vectorX = dx / length;
+                        vectorY = dy / length;
+                    }
+
+                    // Vector de dirección
+                    flowField[i][j] = {
+                        x: vectorX,
+                        y: vectorY
+                    };
+                }
+            }
+        }
+
+        // Visualizar el flowfield para debugging
+        function visualizeFlowField(opacity = 0.2) {
+            const fieldVisualization = new PIXI.Graphics();
+            fieldVisualization.alpha = opacity;
+
+            const cols = Math.ceil(config.width / config.flowFieldResolution);
+            const rows = Math.ceil(config.height / config.flowFieldResolution);
+
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    const x = i * config.flowFieldResolution;
+                    const y = j * config.flowFieldResolution;
+                    const vector = flowField[i][j];
+
+                    // Dibujar flecha para visualizar dirección
+                    fieldVisualization.lineStyle(1, 0x00ff00, 0.7);
+                    fieldVisualization.moveTo(x, y);
+                    fieldVisualization.lineTo(
+                        x + vector.x * config.flowFieldResolution * 0.8,
+                        y + vector.y * config.flowFieldResolution * 0.8
+                    );
+                }
+            }
+
+            app.stage.addChild(fieldVisualization);
+        }
+
+        // Crear los coches
+        function createCars() {
+            cars = [];
+
+            // Crear coche del jugador
+            playerCar = createCar(config.playerCarColor, true);
+            cars.push(playerCar);
+
+            // Crear coches IA
+            for (let i = 1; i < config.carCount; i++) {
+                const aiCar = createCar(config.aiCarColor);
+                cars.push(aiCar);
+            }
+
+            // Colocar los coches en la línea de salida
+            positionCarsAtStart();
+        }
+
+        // Crear un único coche
+        function createCar(color, isPlayer = false) {
+            const car = new PIXI.Graphics();
+
+            // Dibujar el coche (triángulo)
+            car.beginFill(color);
+            car.moveTo(config.carSize, 0);
+            car.lineTo(-config.carSize / 2, -config.carSize / 2);
+            car.lineTo(-config.carSize / 2, config.carSize / 2);
+            car.lineTo(config.carSize, 0);
+            car.endFill();
+
+            app.stage.addChild(car);
+
+            // Propiedades del coche
+            return {
+                sprite: car,
+                position: { x: 0, y: 0 },
+                velocity: { x: 0, y: 0 },
+                acceleration: { x: 0, y: 0 },
+                angle: 0,
+                speed: 0,
+                maxSpeed: config.maxSpeed,
+                isPlayer: isPlayer,
+                lapCount: 0,
+                nextCheckpoint: 0,
+                rank: 0,
+                boosting: false
+            };
+        }
+
+        // Posicionar los coches en la línea de salida
+        function positionCarsAtStart() {
+            const startPoint = trackPath[0];
+            const startAngle = startPoint.angle + Math.PI / 2;
+
+            for (let i = 0; i < cars.length; i++) {
+                const car = cars[i];
+                const offset = Math.random() * config.trackWidth - config.trackWidth / 2;
+
+                car.position.x = startPoint.x + Math.sin(startAngle) * offset;
+                car.position.y = startPoint.y - Math.cos(startAngle) * offset;
+                car.angle = startAngle;
+                car.velocity.x = 0;
+                car.velocity.y = 0;
+                car.acceleration.x = 0;
+                car.acceleration.y = 0;
+                car.speed = 0;
+                car.lapCount = 0;
+                car.nextCheckpoint = 0;
+
+                updateCarSprite(car);
+            }
+        }
+
+        // Crear checkpoints para el sistema de vueltas
+        function createCheckpoints() {
+            checkpoints = [];
+            const checkpointGraphics = new PIXI.Graphics();
+            checkpointGraphics.alpha = 0.3;
+
+            for (let i = 0; i < config.checkpointCount; i++) {
+                const index = Math.floor(i * (trackPath.length / config.checkpointCount));
+                const point = trackPath[index];
+                const angle = point.angle - Math.PI / 2;
+
+                // Crear checkpoint invisible
+                const checkpoint = {
+                    x: point.x,
+                    y: point.y,
+                    angle: angle,
+                    index: i
+                };
+
+                checkpoints.push(checkpoint);
+
+                // Visualizar checkpoints (solo para debug)
+                checkpointGraphics.lineStyle(2, 0xffff00, 0.5);
+                checkpointGraphics.moveTo(
+                    point.x - Math.sin(angle) * config.trackWidth * 0.4,
+                    point.y + Math.cos(angle) * config.trackWidth * 0.4
+                );
+                checkpointGraphics.lineTo(
+                    point.x + Math.sin(angle) * config.trackWidth * 0.4,
+                    point.y - Math.cos(angle) * config.trackWidth * 0.4
+                );
+            }
+
+            app.stage.addChild(checkpointGraphics);
+        }
+
+        // Iniciar la carrera
+        function startRace() {
+            if (!raceStarted) {
+                raceStarted = true;
+                gameTime = 0;
+                document.getElementById('startBtn').textContent = "En Carrera";
+            }
+        }
+
+        // Reiniciar el juego
+        function resetGame() {
+            raceStarted = false;
+            gameTime = 0;
+
+            for (const car of cars) {
+                car.lapCount = 0;
+                car.nextCheckpoint = 0;
+            }
+
+            positionCarsAtStart();
+            document.getElementById('startBtn').textContent = "Iniciar Carrera";
+            document.getElementById('position').textContent = "Posición: --";
+            document.getElementById('lap').textContent = "Vuelta: 0";
+        }
+
+        // Bucle principal del juego
+        function gameLoop(delta) {
+            if (!raceStarted) return;
+
+            gameTime += delta;
+
+            // Actualizar todos los coches
+            for (const car of cars) {
+                if (car.isPlayer) {
+                    updatePlayerCar(car, delta);
+                } else {
+                    updateAICar(car, delta);
+                }
+
+                // Comprobar checkpoints y vueltas
+                checkCarProgress(car);
+            }
+
+            // Calcular separación (evitar colisiones) para todos los coches
+            for (const car of cars) {
+                if (!car.isPlayer) applySeparation(car);
+            }
+
+            // Aplicar físicas y actualizar sprites
+            for (const car of cars) {
+                updateCarPhysics(car, delta);
+                updateCarSprite(car);
+            }
+
+            // Actualizar rangos y posición del jugador
+            updateRankings();
+        }
+
+        // Actualizar el coche del jugador basado en entrada
+        function updatePlayerCar(car, delta) {
+            // Aplicar fuerzas del flowfield reducidas para el jugador (más control manual)
+            const flowFieldForce = getFlowFieldForce(car.position.x, car.position.y);
+
+            car.acceleration.x = 0//flowFieldForce.x * config.flowFieldStrengthPlayer;
+            car.acceleration.y = 0//flowFieldForce.y * config.flowFieldStrengthPlayer;
+
+            // Control del jugador
+            if (keyState.ArrowUp) {
+                car.speed += 0.1;
+            } else {
+                car.speed *= 0.99; // Desaceleración suave
+            }
+
+            // Boost con Shift
+            car.boosting = keyState.Shift;
+            let maxSpeed = car.maxSpeed;
+            if (car.boosting) {
+                maxSpeed *= config.playerBoostMultiplier;
+            }
+
+            // Limitar velocidad
+            car.speed = Math.min(car.speed, maxSpeed);
+
+            // Girar con teclas izquierda/derecha
+            if (keyState.ArrowLeft) {
+                car.angle -= 0.05;
+            }
+            if (keyState.ArrowRight) {
+                car.angle += 0.05;
+            }
+
+            // Convertir ángulo y velocidad a vector
+            car.velocity.x = Math.cos(car.angle) * car.speed;
+            car.velocity.y = Math.sin(car.angle) * car.speed;
+        }
+
+        // Check for obstacles ahead of the car
+        function checkObstaclesAhead(car) {
+            const futureFrame = 30; // pixels to look ahead
+
+
+
+            // Also check a point based on fixed distance
+            const lookAheadDistanceX = car.position.x + Math.cos(car.angle) * futureFrame;
+            const lookAheadDistanceY = car.position.y + Math.sin(car.angle) * futureFrame;
+
+            // Check both points for obstacles
+            let hasObstacle = false;
+            let obstacleCar = null;
+            for (const otherCar of cars) {
+                if (otherCar === car) continue;
+
+
+
+                // Check distance-based look ahead point
+                const dx2 = lookAheadDistanceX - otherCar.position.x;
+                const dy2 = lookAheadDistanceY - otherCar.position.y;
+                const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+                // If either point is too close to another car, return true
+                if (dist2 < config.separationRadius) {
+                    hasObstacle = true;
+                    obstacleCar = otherCar;
+                    break;
+                }
+            }
+
+            // Get current and future flow field vectors
+            const currentFlow = getFlowFieldForce(car.position.x, car.position.y);
+            const futureFlow = getFlowFieldForce(lookAheadDistanceX, lookAheadDistanceY);
+
+            // Calculate angle difference between current and future flow vectors
+            const currentAngle = Math.atan2(currentFlow.y, currentFlow.x);
+            const futureAngle = Math.atan2(futureFlow.y, futureFlow.x);
+
+            // Calculate angle difference
+            let angleDiff = futureAngle - currentAngle;
+            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+
+            // Return obstacle status, obstacle car, and future flow vector
+            return {
+                hasObstacle,
+                obstacleCar,
+                flowAngleDiff: Math.abs(angleDiff),
+                futureFlow
+            };
+        }
+
+        // Find alternative path for passing
+        function findPassingPath(car, obstacleCar) {
+            const lookAheadDistance = 50;
+            const checkDistance = 30; // Distance to check for alternative paths
+
+            // Get current flow direction
+            const currentFlow = getFlowFieldForce(car.position.x, car.position.y);
+            const currentAngle = Math.atan2(currentFlow.y, currentFlow.x);
+
+            // Check left and right paths
+            const leftAngle = currentAngle - Math.PI / 3;
+            const rightAngle = currentAngle + Math.PI / 3;
+
+            // Check points on both sides
+            const leftPoint = {
+                x: car.position.x + Math.cos(leftAngle) * checkDistance,
+                y: car.position.y + Math.sin(leftAngle) * checkDistance
+            };
+
+            const rightPoint = {
+                x: car.position.x + Math.cos(rightAngle) * checkDistance,
+                y: car.position.y + Math.sin(rightAngle) * checkDistance
+            };
+
+            // Check if points are within track bounds
+            const leftFlow = getFlowFieldForce(leftPoint.x, leftPoint.y);
+            const rightFlow = getFlowFieldForce(rightPoint.x, rightPoint.y);
+
+            // Calculate distances to obstacle for both points
+            const leftDist = Math.sqrt(
+                Math.pow(leftPoint.x - obstacleCar.position.x, 2) +
+                Math.pow(leftPoint.y - obstacleCar.position.y, 2)
+            );
+
+            const rightDist = Math.sqrt(
+                Math.pow(rightPoint.x - obstacleCar.position.x, 2) +
+                Math.pow(rightPoint.y - obstacleCar.position.y, 2)
+            );
+
+            // Check if either path is clear and has good flow
+            const leftFlowMagnitude = Math.sqrt(leftFlow.x * leftFlow.x + leftFlow.y * leftFlow.y);
+            const rightFlowMagnitude = Math.sqrt(rightFlow.x * rightFlow.x + rightFlow.y * rightFlow.y);
+
+            // Return the best path (prefer the one with better flow and more distance from obstacle)
+            if (leftFlowMagnitude > 0.5 && leftDist > rightDist) {
+                return { angle: leftAngle, side: 'left' };
+            } else if (rightFlowMagnitude > 0.5 && rightDist > leftDist) {
+                return { angle: rightAngle, side: 'right' };
+            }
+
+            // If no good path found, return null
+            return null;
+        }
+
+        // Actualizar coches IA
+        function updateAICar(car, delta) {
+            // Check for obstacles ahead and get future flow
+            const { hasObstacle, obstacleCar, flowAngleDiff, futureFlow } = checkObstaclesAhead(car);
+
+            // Get current flow field
+            const currentFlow = getFlowFieldForce(car.position.x, car.position.y);
+
+
+
+            const blendedFlow = {
+                x: (currentFlow.x + futureFlow.x) * 0.5,
+                y: (currentFlow.y + futureFlow.y) * 0.5
+            };
+
+            // Apply the blended flow field force
+            car.acceleration.x = blendedFlow.x * config.flowFieldStrengthAI;
+            car.acceleration.y = blendedFlow.y * config.flowFieldStrengthAI;
+
+            // Ajustar velocidad: acelerar en rectas, frenar en curvas y cuando hay obstáculos
+            const flowMagnitude = Math.sqrt(blendedFlow.x ** 2 + blendedFlow.y ** 2);
+
+            let targetAngle;
+
+            if (hasObstacle) {
+                // Try to find a passing path
+                const passingPath = findPassingPath(car, obstacleCar);
+
+
+                if (passingPath) {
+                    // If a good passing path is found, use it
+                    targetAngle = passingPath.angle;
+                    // Maintain speed when passing
+                    car.speed = Math.min(car.speed, car.maxSpeed);
+                } else {
+                    // If no good path found, slow down
+                    car.speed *= 0.95;
+                    targetAngle = Math.atan2(blendedFlow.y, blendedFlow.x);
+                }
+            } else if (flowMagnitude > 0.95) {
+                car.speed += 0.05; // Acelerar en rectas
+                targetAngle = Math.atan2(blendedFlow.y, blendedFlow.x);
+            } else {
+                car.speed *= 0.98; // Frenar un poco en curvas
+                targetAngle = Math.atan2(blendedFlow.y, blendedFlow.x);
+            }
+
+            // Limitar velocidad
+            car.speed = Math.min(car.speed, car.maxSpeed);
+
+            // Calcular la diferencia entre ángulos
+            let angleDiff = targetAngle - car.angle;
+
+            // Normalizar la diferencia al rango [-PI, PI]
+            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+
+            // Girar suavemente hacia el ángulo objetivo
+            // Increase turn rate when anticipating a turn or passing
+            const turnRate = (flowAngleDiff > 0.5 || hasObstacle) ? 0.15 : 0.1;
+            car.angle += angleDiff * turnRate;
+
+            // Actualizar velocidad basada en el ángulo
+            car.velocity.x = Math.cos(car.angle) * car.speed;
+            car.velocity.y = Math.sin(car.angle) * car.speed;
+        }
+
+        // Obtener la fuerza del flowfield en una posición dada
+        function getFlowFieldForce(x, y) {
+            const col = Math.floor(x / config.flowFieldResolution);
+            const row = Math.floor(y / config.flowFieldResolution);
+
+            // Comprobar límites
+            if (col < 0 || col >= flowField.length || row < 0 || !flowField[col] || row >= flowField[col].length) {
+                return { x: 0, y: 0 };
+            }
+
+            return flowField[col][row];
+        }
+
+        // Aplicar la fuerza de separación para evitar colisiones (comportamiento Boids)
+        function applySeparation(car) {
+            let steer = { x: 0, y: 0 };
+            let count = 0;
+
+            for (const otherCar of cars) {
+                if (otherCar === car) continue;
+
+                const dx = car.position.x + car.velocity.x * 3 - otherCar.position.x + otherCar.velocity.x * 2;
+                const dy = car.position.y + car.velocity.y * 3 - otherCar.position.y + otherCar.velocity.y * 2;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < config.separationRadius) {
+                    // Calcular el inverso de la distancia como peso
+                    const weight = 1 / (distance + 0.0001); // Evitar división por cero
+
+                    // Vector de separación ponderado
+                    steer.x += dx * weight;
+                    steer.y += dy * weight;
+                    count++;
+                }
+            }
+
+            if (count > 0) {
+                // Normalizar y escalar el vector de separación
+                const magnitude = Math.sqrt(steer.x ** 2 + steer.y ** 2);
+                if (magnitude > 0) {
+                    steer.x = (steer.x / magnitude) * config.separationStrength;
+                    steer.y = (steer.y / magnitude) * config.separationStrength;
+                }
+
+                // Aplicar separación a la aceleración
+                car.acceleration.x += steer.x;
+                car.acceleration.y += steer.y;
+            }
+        }
+
+        // Actualizar la física del coche
+        function updateCarPhysics(car, delta) {
+            // Aplicar aceleración a velocidad
+            car.velocity.x += car.acceleration.x;
+            car.velocity.y += car.acceleration.y;
+
+            // Limitar la aceleración
+            const accMagnitude = Math.sqrt(car.acceleration.x ** 2 + car.acceleration.y ** 2);
+            if (accMagnitude > config.maxAcc) {
+                const scale = config.maxAcc / accMagnitude;
+                car.acceleration.x *= scale;
+                car.acceleration.y *= scale;
+            }
+
+            // Aplicar velocidad a posición
+            car.position.x += car.velocity.x;
+            car.position.y += car.velocity.y;
+
+            // Determinar ángulo basado en velocidad si no es jugador
+            if (!car.isPlayer) {
+                const speed = Math.sqrt(car.velocity.x ** 2 + car.velocity.y ** 2);
+                if (speed > 0.1) {
+                    car.angle = Math.atan2(car.velocity.y, car.velocity.x);
+                }
+            }
+
+            // Mantener coches dentro de los límites
+            if (car.position.x < 0) car.position.x = 0;
+            if (car.position.x > config.width) car.position.x = config.width;
+            if (car.position.y < 0) car.position.y = 0;
+            if (car.position.y > config.height) car.position.y = config.height;
+
+            // Resetear aceleración
+            car.acceleration.x = 0;
+            car.acceleration.y = 0;
+        }
+
+        // Actualizar el sprite del coche
+        function updateCarSprite(car) {
+            car.sprite.x = car.position.x;
+            car.sprite.y = car.position.y;
+            car.sprite.rotation = car.angle;
+
+            // Destacar visualmente el coche del jugador
+            if (car.isPlayer) {
+                // Efecto visual para el boost
+                if (car.boosting) {
+                    car.sprite.alpha = 0.7 + Math.sin(gameTime * 0.2) * 0.3;
+                    car.sprite.scale.set(1.2);
+                } else {
+                    car.sprite.alpha = 1;
+                    car.sprite.scale.set(1);
+                }
+            }
+        }
+
+        // Comprobar si un coche pasa por un checkpoint/vuelta
+        function checkCarProgress(car) {
+            const nextCheckpoint = checkpoints[car.nextCheckpoint];
+
+            if (!nextCheckpoint) return;
+
+            const dx = car.position.x - nextCheckpoint.x;
+            const dy = car.position.y - nextCheckpoint.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < config.trackWidth / 2) {
+                // Checkpoint alcanzado
+                car.nextCheckpoint = (car.nextCheckpoint + 1) % checkpoints.length;
+
+                // Si completó vuelta
+                if (car.nextCheckpoint === 0) {
+                    car.lapCount++;
+
+                    if (car.isPlayer) {
+                        document.getElementById('lap').textContent = `Vuelta: ${car.lapCount}`;
+                    }
+                }
+            }
+        }
+
+        // Actualizar rankings de los coches
+        function updateRankings() {
+            positions = [...cars].sort((a, b) => {
+                // Ordenar primero por vueltas
+                if (b.lapCount !== a.lapCount) {
+                    return b.lapCount - a.lapCount;
+                }
+
+                // Luego por checkpoints
+                if (b.nextCheckpoint !== a.nextCheckpoint) {
+                    return b.nextCheckpoint - a.nextCheckpoint;
+                }
+
+                // Si están en el mismo checkpoint, ordenar por cercanía al siguiente checkpoint
+                const aCheckpoint = checkpoints[a.nextCheckpoint];
+                const bCheckpoint = checkpoints[b.nextCheckpoint];
+
+                const aDist = Math.sqrt((a.position.x - aCheckpoint.x) ** 2 + (a.position.y - aCheckpoint.y) ** 2);
+                const bDist = Math.sqrt((b.position.x - bCheckpoint.x) ** 2 + (b.position.y - bCheckpoint.y) ** 2);
+
+                return aDist - bDist;
+            });
+
+            // Asignar posición
+            for (let i = 0; i < positions.length; i++) {
+                positions[i].rank = i + 1;
+
+                if (positions[i].isPlayer) {
+                    document.getElementById('position').textContent = `Posición: ${i + 1} / ${cars.length}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -7,11 +7,12 @@ class Grilla {
 
     this.celdas = {};
 
+    this.initGrilla();
+  }
+  initGrilla() {
     for (let x = 0; x < this.celdaALoAncho; x++) {
       for (let y = 0; y < this.celdaALoAlto; y++) {
         const celda = new Celda(this.juego, this.anchoCelda, x, y);
-        const hash = this.obtenerHashDePosicion(x, y);
-        this.celdas[hash] = celda;
       }
     }
   }
@@ -21,11 +22,21 @@ class Grilla {
   }
 
   obtenerCeldaEnPosicion(x, y) {
-    const nuevaX = Math.abs(Math.floor(x / this.anchoCelda));
-    const nuevaY = Math.abs(Math.floor(y / this.anchoCelda));
+    const nuevaX = Math.floor(x / this.anchoCelda);
+    const nuevaY = Math.floor(y / this.anchoCelda);
     const hash = this.obtenerHashDePosicion(nuevaX, nuevaY);
 
-    const celda = this.celdas[hash];
+    let celda = this.celdas[hash];
+
+    if (!celda) {
+      // console.log("nueva celda", nuevaX, nuevaY);
+      celda = this.celdas[hash] = new Celda(
+        this.juego,
+        this.anchoCelda,
+        nuevaX,
+        nuevaY
+      );
+    }
 
     return celda;
   }

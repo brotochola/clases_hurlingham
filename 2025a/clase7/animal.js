@@ -28,7 +28,7 @@ class Animal extends Entidad {
     };
     this.animalesCerca = [];
 
-    this.vision = window.vision ?? 100;
+    this.vision = window.vision;
 
     this.crearGrafico();
 
@@ -71,11 +71,11 @@ class Animal extends Entidad {
 
       if (this == otroAnimal) continue;
 
-      // let dist = distancia(this, this.juego.entidades[i]);
+      let dist = distancia(this, this.juego.entidades[i]);
 
-      // if (dist < this.vision) {
-      this.animalesCerca.push(this.juego.entidades[i]);
-      // }
+      if (dist < this.vision) {
+        this.animalesCerca.push(this.juego.entidades[i]);
+      }
     }
 
     //estan mas cerca:
@@ -96,6 +96,7 @@ class Animal extends Entidad {
     if (this.animalesCerca.length > 0) {
       //promedio de aniamles muy cerca
       for (const animalCerca of this.animalesMuyCerca) {
+        if (!animalCerca) continue;
         this.promedioPosAnimalesMuyCerca.x += animalCerca.x;
         this.promedioPosAnimalesMuyCerca.y += animalCerca.y;
       }
@@ -108,6 +109,7 @@ class Animal extends Entidad {
     if (this.animalesCerca.length == 0) return;
 
     for (const animalCerca of this.animalesCerca) {
+      if (!animalCerca) continue;
       this.promedioDePosicionDeMisAmigos.x += animalCerca.x;
       this.promedioDePosicionDeMisAmigos.y += animalCerca.y;
 

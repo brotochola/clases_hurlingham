@@ -13,6 +13,8 @@ class Grilla {
     for (let x = 0; x < this.celdaALoAncho; x++) {
       for (let y = 0; y < this.celdaALoAlto; y++) {
         const celda = new Celda(this.juego, this.anchoCelda, x, y);
+        const hash = this.obtenerHashDePosicion(x, y);
+        this.celdas[hash] = celda;
       }
     }
   }

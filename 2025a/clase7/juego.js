@@ -32,7 +32,7 @@ class Juego {
 
       this.app.stage.addChild(this.graficoDebug);
 
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 1000; i++) {
         this.agregarAnimal(500, 500, this);
       }
     });

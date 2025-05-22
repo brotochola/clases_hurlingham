@@ -65,18 +65,16 @@ class Juego {
 
       // Actualizar caja de selección si estamos seleccionando
       if (this.isSelecting && this.selectionBox) {
-        const width = this.mouse.x - this.selectionStart.x;
-        const height = this.mouse.y - this.selectionStart.y;
+        const width = Math.abs(this.mouse.x - this.selectionStart.x);
+        const height = Math.abs(this.mouse.y - this.selectionStart.y);
+
+        const startX = Math.min(this.selectionStart.x, this.mouse.x);
+        const startY = Math.min(this.selectionStart.y, this.mouse.y);
 
         this.selectionBox.clear();
         this.selectionBox.lineStyle(2, 0xffffff, 1);
         this.selectionBox.beginFill(0xffffff, 0.2);
-        this.selectionBox.drawRect(
-          this.selectionStart.x,
-          this.selectionStart.y,
-          width,
-          height
-        );
+        this.selectionBox.drawRect(startX, startY, width, height);
         this.selectionBox.endFill();
       }
     };

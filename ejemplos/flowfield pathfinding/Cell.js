@@ -26,6 +26,8 @@ class Cell {
     this.centerX = this.x + this.width / 2;
     this.centerY = this.y + this.height / 2;
     this.blocked = Math.random() > 0.8;
+
+    this.blockedByPeople = false;
   }
 
   /**

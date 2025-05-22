@@ -13,7 +13,7 @@ class Animal extends Entidad {
     super(x, y, juego);
 
     this.lado = 10;
-
+    this.llego = false;
     this.velMax = 3;
     this.accMax = 0.6;
 
@@ -295,15 +295,13 @@ class Animal extends Entidad {
       this.currentVectorField &&
       distancia(this, this.target) < this.juego.grid.cellSize
     ) {
-      // // this.quitarTarget();
-      // this.velocidad.x *= 0.2;
-      // this.velocidad.y *= 0.2;
-      // this.acc.x *= 0.2;
-      // this.acc.y *= 0.2;
+      this.llego = true;
+    } else {
+      this.llego = false;
     }
 
     //s tiene target...
-    if (this.target) {
+    if (this.target && !this.llego) {
       this.irHaciaElTarget();
     }
 
@@ -354,6 +352,7 @@ class Animal extends Entidad {
   asignarTarget(que) {
     if (!que || !que.x || !que.y) return;
     this.target = que;
+    this.llego = false;
     const vectorField = this.juego.grid.obtenerVectorField(que.x, que.y);
     this.currentVectorField = vectorField;
   }

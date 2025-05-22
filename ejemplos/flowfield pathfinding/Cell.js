@@ -25,7 +25,7 @@ class Cell {
     // Punto central de la celda
     this.centerX = this.x + this.width / 2;
     this.centerY = this.y + this.height / 2;
-    this.blocked = Math.random() > 0.8;
+    this.blocked = Math.random() > 0.7;
 
     this.blockedByPeople = false;
   }

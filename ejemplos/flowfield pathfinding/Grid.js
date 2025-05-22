@@ -340,9 +340,7 @@ class Grid {
           1
         );
       });
-
-      //QUIERO Q SI TENGA DIAGONALES EL FLOWFIELD
-      neighbors = allNeighbors;
+      //NO USO DIAGONALES PORQ IGUAL ESTOY USANDO UN PROMEDIO DE LOS VECTORES DE LAS CELDAS VECINAS
 
       for (const neighbor of neighbors) {
         const neighborIndex = this.getCellIndex(neighbor.col, neighbor.row);

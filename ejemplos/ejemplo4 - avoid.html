@@ -18,82 +18,196 @@
     <canvas id="boidCanvas"></canvas>
 
     <script>
+        // Configuración inicial del canvas y contexto
         const canvas = document.getElementById('boidCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
+        // Posición inicial del mouse en el centro de la pantalla
         const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
 
         class Boid {
             constructor() {
-                this.position = { x: canvas.width / 2, y: canvas.height / 2 };
+                // Inicialización del boid con posición aleatoria en el canvas
+                this.position = { x: Math.random() * canvas.width, y: Math.random() * canvas.height };
+                // Velocidad inicial
                 this.velocity = { x: 2, y: 2 };
+                // Aceleración inicial (comienza sin aceleración)
                 this.acceleration = { x: 0, y: 0 };
+                // Velocidad máxima que puede alcanzar el boid
                 this.maxSpeed = 6;
+                // Fuerza máxima que puede aplicarse al boid
                 this.maxForce = 1
+                // Radio del boid para dibujo y cálculos de colisión
                 this.radius = 10;
             }
 
             follow(target) {
+                // Este método hace que el boid siga un objetivo (el cursor del mouse)
+
+                // Calcula el vector deseado hacia el objetivo
                 const desired = {
                     x: target.x - this.position.x,
                     y: target.y - this.position.y
                 };
+                // Calcula la distancia al objetivo
                 const distance = Math.sqrt(desired.x ** 2 + desired.y ** 2);
                 if (distance > 0) {
+                    // Normaliza el vector deseado (convertirlo en vector unitario)
                     desired.x /= distance;
                     desired.y /= distance;
+                    // Escala el vector deseado a la velocidad máxima
                     desired.x *= this.maxSpeed;
                     desired.y *= this.maxSpeed;
                 }
 
+                // Calcula la fuerza de dirección (steering force)
+                // Es la diferencia entre la velocidad deseada y la velocidad actual
                 const steer = {
                     x: desired.x - this.velocity.x,
                     y: desired.y - this.velocity.y
                 };
+                // Limita la fuerza de dirección a la fuerza máxima permitida
                 steer.x = Math.min(Math.max(steer.x, -this.maxForce), this.maxForce);
                 steer.y = Math.min(Math.max(steer.y, -this.maxForce), this.maxForce);
 
+                // Distancia mínima para aplicar la reducción de fuerza
+                const minDistance = 600
+
+                // Si el boid está cerca del objetivo, reduce la fuerza proporcionalmente
+                // Esto hace que se desacelere a medida que se acerca al objetivo
+                if (distance < minDistance) {
+                    steer.x *= (distance / minDistance)
+                    steer.y *= (distance / minDistance)
+                }
+
+                // Aplica la fuerza de dirección a la aceleración
                 this.acceleration.x += steer.x;
                 this.acceleration.y += steer.y;
             }
 
+
             avoid(obstacles) {
+                // Este método hace que el boid evite obstáculos
+
                 for (const obstacle of obstacles) {
-                    const distX = obstacle.x - (this.position.x+this.velocity.x*4);
-                    const distY = obstacle.y - (this.position.y+this.velocity.y*4);
+                    // Calcula la distancia al obstáculo considerando la posición futura del boid
+                    // (4 unidades adelante en la dirección de su velocidad actual)
+                    const distX = obstacle.x - (this.position.x + this.velocity.x * 4);
+                    const distY = obstacle.y - (this.position.y + this.velocity.y * 4);
                     const distance = Math.sqrt(distX ** 2 + distY ** 2);
-                    if (distance < (obstacle.radius + this.radius) * 1.1 ) {
-                        console.log("colision", obstacle.x)
+
+                    // Si el boid está demasiado cerca del obstáculo (110% de la suma de radios)
+                    if (distance < (obstacle.radius + this.radius) * 1.1) {
+                        // console.log("colision", obstacle.x)
+
+                        // Crea una fuerza de evasión en dirección opuesta al obstáculo
                         const avoidForce = {
                             x: -distX / distance,
                             y: -distY / distance
                         };
+
+                        // Amplifica la fuerza de evasión (el doble de la fuerza máxima)
                         avoidForce.x *= this.maxForce * 2
                         avoidForce.y *= this.maxForce * 2
 
+                        // Aplica la fuerza de evasión a la aceleración
                         this.acceleration.x += avoidForce.x
                         this.acceleration.y += avoidForce.y
                     }
                 }
             }
 
+            separate(boids) {
+                // Este método implementa el comportamiento de separación entre boids
+                // Hace que los boids mantengan una distancia mínima entre sí
+
+                // Distancia deseada de separación (3 veces el radio del boid)
+                const desiredSeparation = this.radius * 3;
+                let steerX = 0;
+                let steerY = 0;
+                let count = 0;
+
+                // Revisa todos los otros boids
+                for (const other of boids) {
+                    if (other !== this) {
+                        // Calcula la distancia al otro boid
+                        const distX = this.position.x - other.position.x;
+                        const distY = this.position.y - other.position.y;
+                        const distance = Math.sqrt(distX ** 2 + distY ** 2);
+
+                        // Si está dentro de la distancia de separación deseada
+                        if (distance < desiredSeparation) {
+                            // Calcula el vector de repulsión normalizado
+                            let repulseX = distX / distance;
+                            let repulseY = distY / distance;
+
+                            // Pondera por distancia (los boids más cercanos tienen mayor repulsión)
+                            repulseX /= distance;
+                            repulseY /= distance;
+
+                            // Acumula las fuerzas de repulsión
+                            steerX += repulseX;
+                            steerY += repulseY;
+                            count++;
+                        }
+                    }
+                }
+
+                // Si hay algún boid cercano
+                if (count > 0) {
+                    // Calcula el promedio de las fuerzas de repulsión
+                    steerX /= count;
+                    steerY /= count;
+
+                    // Escala a la velocidad máxima
+                    const magnitude = Math.sqrt(steerX ** 2 + steerY ** 2);
+                    if (magnitude > 0) {
+                        steerX = (steerX / magnitude) * this.maxSpeed;
+                        steerY = (steerY / magnitude) * this.maxSpeed;
+
+                        // Aplica la fuerza de dirección (diferencia entre velocidad deseada y actual)
+                        steerX = Math.min(Math.max(steerX - this.velocity.x, -this.maxForce), this.maxForce);
+                        steerY = Math.min(Math.max(steerY - this.velocity.y, -this.maxForce), this.maxForce);
+                    }
+
+                    // Aplica la fuerza de separación a la aceleración
+                    this.acceleration.x += steerX;
+                    this.acceleration.y += steerY;
+                }
+            }
+
             update() {
+                // Este método actualiza la posición y velocidad del boid en cada frame
+
+                // Limita la aceleración a la fuerza máxima
+                this.acceleration.x = Math.min(Math.max(this.acceleration.x, -this.maxForce), this.maxForce);
+                this.acceleration.y = Math.min(Math.max(this.acceleration.y, -this.maxForce), this.maxForce);
+
+                // Aplica la aceleración a la velocidad
                 this.velocity.x += this.acceleration.x;
                 this.velocity.y += this.acceleration.y;
 
+                // Limita la velocidad al máximo permitido
                 this.velocity.x = Math.min(Math.max(this.velocity.x, -this.maxSpeed), this.maxSpeed);
                 this.velocity.y = Math.min(Math.max(this.velocity.y, -this.maxSpeed), this.maxSpeed);
 
+                // Aplica fricción (desaceleración gradual)
+                this.velocity.x *= 0.9
+                this.velocity.y *= 0.9
+
+                // Actualiza la posición según la velocidad
                 this.position.x += this.velocity.x;
                 this.position.y += this.velocity.y;
 
+                // Reinicia la aceleración para el próximo frame
                 this.acceleration.x = 0;
                 this.acceleration.y = 0;
             }
 
             draw() {
+                // Este método dibuja el boid en el canvas como un círculo blanco
                 ctx.beginPath();
                 ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = '#ecf0f1';
@@ -104,19 +218,30 @@
             }
         }
 
+        // Creación de obstáculos aleatorios
         const obstacles = []
         for (let i = 0; i < 30; i++) {
-            obstacles.push({ x: canvas.width * Math.random(), y: canvas.height * Math.random(), radius: 10 + 60 * Math.random() })
+            obstacles.push({
+                x: canvas.width * Math.random(),  // Posición X aleatoria
+                y: canvas.height * Math.random(), // Posición Y aleatoria
+                radius: 10 + 60 * Math.random()   // Radio aleatorio entre 10 y 70
+            })
         }
 
+        // Creación de la bandada de boids
+        const boids = []
+        for (let i = 0; i < 10; i++) {
+            const boid = new Boid();
+            boids.push(boid);
+        }
 
-        const boid = new Boid();
-
+        // Evento para seguir la posición del mouse
         canvas.addEventListener('mousemove', (event) => {
             mouse.x = event.clientX;
             mouse.y = event.clientY;
         });
 
+        // Función para dibujar todos los obstáculos
         function drawObstacles() {
             for (const obstacle of obstacles) {
                 ctx.beginPath();
@@ -127,19 +252,28 @@
             }
         }
 
+        // Función principal de animación que se ejecuta en cada frame
         function animate() {
+            // Limpia el canvas entero
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            boid.follow(mouse);
-            boid.avoid(obstacles);
-            boid.update();
-            boid.draw();
+            // Actualiza y dibuja cada boid
+            for (const boid of boids) {
+                boid.follow(mouse);     // Aplica comportamiento de seguimiento al mouse
+                boid.avoid(obstacles);   // Aplica comportamiento de evasión de obstáculos
+                boid.separate(boids);    // Aplica comportamiento de separación entre boids
+                boid.update();           // Actualiza posición y velocidad
+                boid.draw();             // Dibuja el boid
+            }
 
+            // Dibuja todos los obstáculos
             drawObstacles();
 
+            // Programa el siguiente frame de animación
             requestAnimationFrame(animate);
         }
 
+        // Inicia el bucle de animación
         animate();
     </script>
 </body>

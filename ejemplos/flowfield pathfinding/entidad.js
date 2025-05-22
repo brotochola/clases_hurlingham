@@ -122,9 +122,23 @@ class Entidad {
     this.velocidad = limitMagnitude(this.velocidad, this.velMax);
 
     this.rebotarContraLosBoredes();
+    this.actualizarPosicionConLaVelocidad();
+  }
+  actualizarPosicionConLaVelocidad() {
+    const nextX = this.x + this.velocidad.x;
+    const nextY = this.y + this.velocidad.y;
 
-    this.x += this.velocidad.x;
-    this.y += this.velocidad.y;
+    // Check X movement
+    const nextCellX = this.juego.grid.getCellAt(nextX, this.y);
+    if (!nextCellX || !nextCellX.blocked) {
+      this.x = nextX;
+    }
+
+    // Check Y movement
+    const nextCellY = this.juego.grid.getCellAt(this.x, nextY);
+    if (!nextCellY || !nextCellY.blocked) {
+      this.y = nextY;
+    }
   }
 
   /**

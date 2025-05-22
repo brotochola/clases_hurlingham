@@ -238,9 +238,7 @@ class Animal extends Entidad {
           // Calcular distancia
           const distance = Math.hypot(dx, dy);
           const maxDistance =
-            this.juego.grid.cellSize *
-            this.numeroDeCeldasPAraMirarAlrededor *
-            0.66;
+            this.juego.grid.cellSize * this.numeroDeCeldasPAraMirarAlrededor;
 
           // Omitir si estamos demasiado lejos o a distancia cero
           if (distance === 0 || distance > maxDistance) continue;
@@ -335,13 +333,62 @@ class Animal extends Entidad {
   }
 
   /**
+   * Obtiene el vector promedio de una celda y sus vecinas del campo vectorial actual
+   * @param {number} cellX - Coordenada X de la celda
+   * @param {number} cellY - Coordenada Y de la celda
+   * @returns {Object} Vector promedio normalizado {x, y}
+   */
+  obtenerVectorPromedio(cellX, cellY) {
+    if (!this.currentVectorField) return { x: 0, y: 0 };
+
+    let sumX = 0;
+    let sumY = 0;
+    let count = 0;
+
+    // Iterar sobre la celda central y sus 8 vecinas
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const newX = cellX + dx;
+        const newY = cellY + dy;
+
+        // Verificar que las coordenadas estén dentro del campo vectorial
+        if (
+          newX >= 0 &&
+          newX < this.currentVectorField[0].length &&
+          newY >= 0 &&
+          newY < this.currentVectorField.length
+        ) {
+          const vector = this.currentVectorField[newY][newX];
+          if (vector) {
+            sumX += vector.x;
+            sumY += vector.y;
+            count++;
+          }
+        }
+      }
+    }
+
+    if (count === 0) return { x: 0, y: 0 };
+
+    // Calcular el promedio
+    const avgX = sumX / count;
+    const avgY = sumY / count;
+
+    const finalVector = {
+      x: avgX,
+      y: avgY,
+    };
+    return normalizeVector(finalVector);
+  }
+
+  /**
    * Aplica una fuerza para moverse hacia el objetivo asignado usando el campo vectorial
    */
   irHaciaElTarget() {
     if (this.currentVectorField && this.target) {
       const cellX = Math.floor(this.x / this.juego.grid.cellSize);
       const cellY = Math.floor(this.y / this.juego.grid.cellSize);
-      const vector = this.currentVectorField[cellY][cellX];
+      const vector = this.obtenerVectorPromedio(cellX, cellY);
       if (vector) {
         const distanciaAlTarget = distancia(this, this.target);
         const umbral =

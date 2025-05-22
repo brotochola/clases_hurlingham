@@ -293,7 +293,7 @@ class Animal extends Entidad {
     if (
       this.target &&
       this.currentVectorField &&
-      distancia(this, this.target) < this.juego.grid.cellSize
+      distancia(this, this.target) < this.juego.grid.cellSize * 2
     ) {
       this.llego = true;
     } else {

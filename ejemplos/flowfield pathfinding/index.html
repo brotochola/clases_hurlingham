@@ -65,28 +65,28 @@
 
         let juego = new Juego();
 
-        // Controls
-        document.getElementById('vectorStrengthSlider').addEventListener('input', function (e) {
-            const value = parseFloat(e.target.value);
-            document.getElementById('vectorStrength').textContent = value;
+        // // Controls
+        // document.getElementById('vectorStrengthSlider').addEventListener('input', function (e) {
+        //     const value = parseFloat(e.target.value);
+        //     document.getElementById('vectorStrength').textContent = value;
 
-            // Update all entities' vector field influence
-            juego.entidades.forEach(entidad => {
-                entidad.vectorFieldInfluence = value;
-            });
-        });
+        //     // Update all entities' vector field influence
+        //     juego.entidades.forEach(entidad => {
+        //         entidad.vectorFieldInfluence = value;
+        //     });
+        // });
 
-        document.getElementById('toggleGrid').addEventListener('click', function () {
-            if (juego.grid) {
-                juego.grid.visible = !juego.grid.visible;
-            }
-        });
+        // document.getElementById('toggleGrid').addEventListener('click', function () {
+        //     if (juego.grid) {
+        //         juego.grid.visible = !juego.grid.visible;
+        //     }
+        // });
 
-        document.getElementById('resetVectorField').addEventListener('click', function () {
-            if (juego.grid) {
-                juego.setupVectorField();
-            }
-        });
+        // document.getElementById('resetVectorField').addEventListener('click', function () {
+        //     if (juego.grid) {
+        //         juego.setupVectorField();
+        //     }
+        // });
     </script>
 </body>
 

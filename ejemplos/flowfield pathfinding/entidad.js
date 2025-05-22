@@ -1,4 +1,13 @@
+/**
+ * Clase base para todas las entidades del juego
+ */
 class Entidad {
+  /**
+   * Constructor de la entidad
+   * @param {number} x - Posición inicial en X
+   * @param {number} y - Posición inicial en Y
+   * @param {Object} juego - Referencia al juego principal
+   */
   constructor(x, y, juego) {
     this.container = new PIXI.Container();
     this.juego = juego;
@@ -16,15 +25,23 @@ class Entidad {
     this.changuiMargenes = 10;
     this.fuerzaParavolverDeLosBordes = 300;
 
-    // How strongly this entity is influenced by the vector field
+    // Qué tan fuertemente esta entidad es influenciada por el campo vectorial
     this.vectorFieldInfluence = 0;
   }
 
+  /**
+   * Aplica una fuerza a la entidad
+   * @param {number} x - Componente X de la fuerza
+   * @param {number} y - Componente Y de la fuerza
+   */
   aplicarFuerza(x, y) {
     this.acc.x += x;
     this.acc.y += y;
   }
 
+  /**
+   * Hace que la entidad rebote contra los bordes de la pantalla
+   */
   rebotarContraLosBoredes() {
     if (this.x < this.changuiMargenes) {
       //SI ESTOY MAS A LA IZQ Q EL MARGEN IZQ -CHANGUI
@@ -63,7 +80,9 @@ class Entidad {
     }
   }
 
-  // Apply force from the vector field
+  /**
+   * Aplica una fuerza basada en el campo vectorial actual
+   */
   aplicarFuerzaVectorField() {
     if (this.juego.grid) {
       const vector = this.juego.grid.getVectorAt(this.x, this.y);
@@ -75,16 +94,27 @@ class Entidad {
       }
     }
   }
+  getAcc() {
+    return Math.hypot(this.acc.x, this.acc.y);
+  }
 
+  getVelocidad() {
+    return Math.hypot(this.velocidad.x, this.velocidad.y);
+  }
+
+  /**
+   * Actualiza la posición y velocidad de la entidad
+   */
   update() {
-    // if(isNaN(this.acc.x)) debugger
-
-    // Apply force from vector field
-
     this.acc = limitMagnitude(this.acc, this.accMax);
 
     this.velocidad.x += this.acc.x;
     this.velocidad.y += this.acc.y;
+
+    if (this.getVelocidad() < this.accMax * 0.9) {
+      this.velocidad.x = 0;
+      this.velocidad.y = 0;
+    }
 
     this.acc.x = 0;
     this.acc.y = 0;
@@ -95,11 +125,11 @@ class Entidad {
 
     this.x += this.velocidad.x;
     this.y += this.velocidad.y;
-
-    // this.x = (this.x + window.innerWidth) % window.innerWidth;
-    // this.y = (this.y + window.innerHeight) % window.innerHeight;
   }
 
+  /**
+   * Renderiza la entidad en pantalla
+   */
   render() {
     this.angulo = Math.atan2(this.velocidad.y, this.velocidad.x);
 

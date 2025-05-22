@@ -1,4 +1,10 @@
+/**
+ * Clase principal que maneja el juego, las entidades y la interfaz de usuario
+ */
 class Juego {
+  /**
+   * Constructor del juego
+   */
   constructor() {
     this.app = new PIXI.Application();
     this.contadorDeFrame = 0;
@@ -35,10 +41,10 @@ class Juego {
 
       this.app.stage.addChild(this.graficoDebug);
 
-      // Initialize the grid system
-      this.grid = new Grid(this, 50); // 50px cell size
+      // Inicializar el sistema de cuadrícula
+      this.grid = new Grid(this, 50); // Tamaño de celda 50px
 
-      // Set up initial vector field - radial pattern
+      // Configurar campo vectorial inicial - patrón radial
       this.setupVectorField();
 
       for (let i = 0; i < 100; i++) {
@@ -50,11 +56,14 @@ class Juego {
     });
   }
 
+  /**
+   * Configura los listeners de eventos del ratón
+   */
   ponerListeners() {
     window.onmousemove = (e) => {
       this.mouse = { x: e.x, y: e.y };
 
-      // Update selection box if we're currently selecting
+      // Actualizar caja de selección si estamos seleccionando
       if (this.isSelecting && this.selectionBox) {
         const width = this.mouse.x - this.selectionStart.x;
         const height = this.mouse.y - this.selectionStart.y;
@@ -72,90 +81,115 @@ class Juego {
       }
     };
 
-    // Mouse click to modify vector field
+    // Clic con ratón para modificar campo vectorial
     window.oncontextmenu = (e) => {
-      e.preventDefault(); // Prevent the default context menu
-      if (this.grid) {
-        this.updateVectorFieldBasedOnPoint(e.x, e.y);
+      e.preventDefault(); // Prevenir el menú contextual predeterminado
+
+      const cell = this.grid.getCellAt(e.x, e.y);
+
+      if (this.selectedEntities.length > 0) {
+        // Asignar el objetivo a las entidades previamente seleccionadas
+        for (let entidad of this.selectedEntities) {
+          entidad.asignarTarget(cell);
+        }
       }
     };
 
-    // Add mousedown event for selection
+    // Añadir evento mousedown para selección
     window.onmousedown = (e) => {
-      // Only proceed with selection if it's the left mouse button (button 0)
+      // Solo proceder con selección si es el botón izquierdo del ratón (botón 0)
       if (e.button !== 0) {
         return;
       }
-      // Start selection
+      // Iniciar selección
       this.selectionStart = { x: e.x, y: e.y };
       this.isSelecting = true;
 
-      // Create selection box if it doesn't exist
+      // Crear caja de selección si no existe
       if (!this.selectionBox) {
         this.selectionBox = new PIXI.Graphics();
         this.app.stage.addChild(this.selectionBox);
       }
 
-      // Clear the selection box
+      // Limpiar la caja de selección
       this.selectionBox.clear();
-
-      // Clear previously selected entities
-      this.selectedEntities = [];
     };
 
-    // Add mouseup event to complete selection
+    // Añadir evento mouseup para completar selección
     window.onmouseup = (e) => {
       if (this.isSelecting) {
-        // Calculate selection rectangle
+        // Calcular rectángulo de selección
         const x1 = Math.min(this.selectionStart.x, this.mouse.x);
         const y1 = Math.min(this.selectionStart.y, this.mouse.y);
         const x2 = Math.max(this.selectionStart.x, this.mouse.x);
         const y2 = Math.max(this.selectionStart.y, this.mouse.y);
 
-        // Find entities inside the selection rectangle
+        // Guardar las entidades seleccionadas anteriormente
+        const prevSelectedEntities = [...this.selectedEntities];
+
+        console.log("prevSelectedEntities", prevSelectedEntities);
+
+        // Encontrar entidades dentro del rectángulo de selección
         this.selectedEntities = this.entidades.filter((entity) => {
           return (
             entity.x >= x1 && entity.x <= x2 && entity.y >= y1 && entity.y <= y2
           );
         });
 
-        console.log(`Selected ${this.selectedEntities.length} entities`);
+        // Llamar heSidoSeleccionado en las entidades recién seleccionadas
+        this.selectedEntities.forEach((entidad) => {
+          entidad.heSidoSeleccionado();
+        });
 
-        // Remove the selection box from display
+        console.log("selectedEntities", this.selectedEntities);
+        // Encontrar entidades que estaban seleccionadas y ahora no
+        prevSelectedEntities.forEach((entidad) => {
+          if (!this.selectedEntities.includes(entidad)) {
+            // Esta entidad ha sido deseleccionada
+
+            entidad.heSidoDesSeleccionado();
+          }
+        });
+
+        console.log(`Seleccionadas ${this.selectedEntities.length} entidades`);
+
+        // Eliminar la caja de selección de la pantalla
         if (this.selectionBox) {
           this.selectionBox.clear();
         }
 
-        // End selection process
+        // Finalizar proceso de selección
         this.isSelecting = false;
       }
     };
   }
 
-  // Setup initial vector field
+  /**
+   * Configura el campo vectorial inicial
+   */
   setupVectorField() {
     if (!this.grid) return;
 
     const centerX = this.ancho / 2;
     const centerY = this.alto / 2;
 
-    // Create a circular/radial field
+    // Crear un campo circular/radial
     for (let row = 0; row < this.grid.rows; row++) {
       for (let col = 0; col < this.grid.cols; col++) {
         const cellCenterX = col * this.grid.cellSize + this.grid.cellSize / 2;
         const cellCenterY = row * this.grid.cellSize + this.grid.cellSize / 2;
 
-        // Vector pointing away from center
+        // Vector apuntando desde el centro
         const dx = cellCenterX - centerX;
         const dy = cellCenterY - centerY;
 
-        // Normalize the vector
+        // Normalizar el vector
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist > 0) {
           const normalizedX = dx / dist;
           const normalizedY = dy / dist;
 
-          // Make the vector strength inversely proportional to distance
+          // Hacer que la fuerza del vector sea inversamente proporcional a la distancia
           const strength = Math.min(1.0, 100 / dist);
 
           this.grid.setVector(col, row, {
@@ -166,175 +200,35 @@ class Juego {
       }
     }
   }
-  // Update vector field to create a pathfinding flow toward the clicked point
-  updateVectorFieldBasedOnPoint(pointX, pointY) {
-    if (!this.grid) return;
 
-    // Find the cell containing the click point
-    const targetCol = Math.floor(pointX / this.grid.cellSize);
-    const targetRow = Math.floor(pointY / this.grid.cellSize);
-    const targetCellIndex = this.grid.getCellIndex(targetCol, targetRow);
-
-    if (targetCellIndex === -1) return;
-
-    // Initialize distance and previous arrays for Dijkstra's algorithm
-    const distances = new Array(this.grid.cells.length).fill(Infinity);
-    const previous = new Array(this.grid.cells.length).fill(null);
-    const visited = new Array(this.grid.cells.length).fill(false);
-
-    // Priority queue implemented as array for simplicity
-    // Each element is [cellIndex, distance]
-    const queue = [];
-
-    // Start with target cell (we're calculating paths FROM the target TO all other cells)
-    distances[targetCellIndex] = 0;
-    queue.push([targetCellIndex, 0]);
-
-    // Dijkstra's algorithm
-    while (queue.length > 0) {
-      // Sort queue to get the cell with minimum distance
-      queue.sort((a, b) => a[1] - b[1]);
-
-      // Get the cell with minimum distance
-      const [currentCellIndex, currentDistance] = queue.shift();
-
-      // Skip if we've already processed this cell
-      if (visited[currentCellIndex]) continue;
-
-      // Mark as visited
-      visited[currentCellIndex] = true;
-
-      const currentCell = this.grid.cells[currentCellIndex];
-
-      // Skip blocked cells
-      if (currentCell.blocked) continue;
-
-      // Get all neighbors
-      // Get only orthogonal neighbors (no diagonals)
-      const allNeighbors = currentCell.getNeighbors();
-      const neighbors = allNeighbors;
-      //  const neighbors = allNeighbors.filter(
-      //   (neighbor) =>
-      //     (neighbor.col === currentCell.col ||
-      //       neighbor.row === currentCell.row) &&
-      //     !(
-      //       neighbor.col === currentCell.col && neighbor.row === currentCell.row
-      //     )
-      // );
-
-      for (const neighbor of neighbors) {
-        const neighborIndex = this.grid.getCellIndex(
-          neighbor.col,
-          neighbor.row
-        );
-
-        // Skip invalid or blocked neighbors
-        if (neighborIndex === -1 || neighbor.blocked || visited[neighborIndex])
-          continue;
-
-        // Calculate distance (using Euclidean distance between cell centers)
-        const dx = neighbor.centerX - currentCell.centerX;
-        const dy = neighbor.centerY - currentCell.centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        // Calculate new potential distance
-        const newDistance = distances[currentCellIndex] + distance;
-
-        // If we found a shorter path, update the distance and previous cell
-        if (newDistance < distances[neighborIndex]) {
-          distances[neighborIndex] = newDistance;
-          previous[neighborIndex] = currentCellIndex;
-
-          // Add to queue for processing
-          queue.push([neighborIndex, newDistance]);
-        }
-      }
-    }
-
-    // Now create vector field based on the shortest paths
-    for (let i = 0; i < this.grid.cells.length; i++) {
-      const cell = this.grid.cells[i];
-
-      // Skip blocked cells
-      if (cell.blocked) {
-        this.grid.setVector(cell.col, cell.row, { x: 0, y: 0 });
-        continue;
-      }
-
-      // Skip cells with no path to target
-      if (previous[i] === null && i !== targetCellIndex) {
-        // Set a small random vector
-        this.grid.setVector(cell.col, cell.row, {
-          x: (Math.random() - 0.5) * 0.1,
-          y: (Math.random() - 0.5) * 0.1,
-        });
-        continue;
-      }
-
-      // For the target cell itself, create a small random vector
-      if (i === targetCellIndex) {
-        this.grid.setVector(cell.col, cell.row, {
-          x: (Math.random() - 0.5) * 0.1,
-          y: (Math.random() - 0.5) * 0.1,
-        });
-        continue;
-      }
-
-      // Get the next cell in the path to the target
-      const nextCellIndex = previous[i];
-      const nextCell = this.grid.cells[nextCellIndex];
-
-      // Calculate vector direction toward the next cell
-      const dx = nextCell.centerX - cell.centerX;
-      const dy = nextCell.centerY - cell.centerY;
-
-      // Normalize the vector
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > 0) {
-        const normalizedX = dx / dist;
-        const normalizedY = dy / dist;
-
-        // Set vector strength inversely proportional to distance from target
-        // but with a minimum value to keep movement going
-        const distanceToTarget = distances[i];
-        const strength = Math.max(
-          0.5,
-          Math.min(2.0, 200 / (distanceToTarget + 1))
-        );
-
-        this.grid.setVector(cell.col, cell.row, {
-          x: normalizedX * strength,
-          y: normalizedY * strength,
-        });
-      }
-    }
-  }
-
+  /**
+   * Bucle principal del juego
+   */
   gameLoop() {
     this.contadorDeFrame++;
 
     this.graficoDebug.clear();
 
-    // Render the grid for debugging (only call once)
+    // Renderizar la cuadrícula para depuración (llamar solo una vez)
     if (this.grid) {
       this.grid.render(this.graficoDebug);
     }
 
     for (let entidad of this.entidades) {
-      // Store old position for spatial hashing update
+      // Almacenar posición antigua para la actualización de hashing espacial
       const oldX = entidad.x;
       const oldY = entidad.y;
 
       entidad.update();
 
-      // Update entity in grid
+      // Actualizar entidad en la cuadrícula
       if (this.grid) {
         this.grid.updateEntity(entidad, oldX, oldY);
       }
     }
 
     for (let entidad of this.entidades) {
-      // Change color to yellow if the entity is selected
+      // Cambiar color a amarillo si la entidad está seleccionada
       if (this.selectedEntities.includes(entidad) && entidad.grafico) {
         entidad.grafico.clear();
         entidad.grafico
@@ -345,7 +239,7 @@ class Juego {
         entidad.grafico.fill &&
         !this.selectedEntities.includes(entidad)
       ) {
-        // Reset to original color if not selected
+        // Restablecer al color original si no está seleccionada
         entidad.grafico.clear();
         entidad.grafico
           .rect(0, 0, entidad.lado, entidad.lado / 2)
@@ -367,11 +261,16 @@ class Juego {
   //   this.depredadores.push(depre);
   // }
 
+  /**
+   * Agrega un animal al juego en la posición especificada
+   * @param {number} x - Coordenada X del animal
+   * @param {number} y - Coordenada Y del animal
+   */
   agregarAnimal(x, y) {
     let animal = new Animal(x, y, this);
     this.entidades.push(animal);
 
-    // Add to spatial grid
+    // Añadir a la cuadrícula espacial
     if (this.grid) {
       this.grid.addEntity(animal);
     }

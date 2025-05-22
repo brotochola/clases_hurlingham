@@ -1,4 +1,14 @@
+/**
+ * Clase que representa un animal en el mundo del juego
+ * Hereda de la clase Entidad
+ */
 class Animal extends Entidad {
+  /**
+   * Constructor de la clase Animal
+   * @param {number} x - Posición inicial en el eje X
+   * @param {number} y - Posición inicial en el eje Y
+   * @param {Object} juego - Referencia al juego principal
+   */
   constructor(x, y, juego) {
     super(x, y, juego);
 
@@ -6,6 +16,8 @@ class Animal extends Entidad {
 
     this.velMax = 3;
     this.accMax = 0.6;
+
+    this.numeroDeLaSuerte = Math.floor(Math.random() * 20);
 
     this.velocidad = {
       x: 0, // Math.random() - 0.5,
@@ -34,15 +46,18 @@ class Animal extends Entidad {
 
     this.modoDebug = false;
 
-    // Reference to the current cell containing this animal
+    // Referencia a la celda actual que contiene este animal
     this.cell = null;
 
-    // How strongly this entity is influenced by the vector field
+    // Qué tan fuertemente esta entidad es influenciada por el campo vectorial
     this.vectorFieldInfluence = window.vectorFieldInfluence ?? 1.66;
     this.numeroDeCeldasPAraMirarAlrededor =
       window.numeroDeCeldasPAraMirarAlrededor ?? 0.5;
   }
 
+  /**
+   * Crea la representación gráfica del animal
+   */
   crearGrafico() {
     this.grafico = new PIXI.Graphics()
       .rect(0, 0, this.lado, this.lado / 2)
@@ -50,6 +65,9 @@ class Animal extends Entidad {
     this.container.addChild(this.grafico);
   }
 
+  /**
+   * Busca otros animales cercanos y calcula sus posiciones promedio
+   */
   mirarAlrededor() {
     this.promedioDePosicionDeMisAmigos = {
       x: 0,
@@ -68,45 +86,31 @@ class Animal extends Entidad {
 
     this.animalesCerca = [];
 
-    // Use spatial grid if available
-    if (this.juego.grid && this.cell) {
-      // Get entities from neighboring cells
-      const nearbyEntities = this.cell.getEntitiesInNeighborhood();
+    // Usar cuadrícula espacial si está disponible
+    if (!this.juego.grid || !this.cell) return;
+    // Obtener entidades de celdas vecinas
+    const nearbyEntities = this.cell.getEntitiesInNeighborhood();
 
-      for (const otroAnimal of nearbyEntities) {
-        if (this == otroAnimal) continue;
+    for (const otroAnimal of nearbyEntities) {
+      if (this == otroAnimal) continue;
 
-        let dist = distancia(this, otroAnimal);
+      let dist = distancia(this, otroAnimal);
 
-        if (dist < this.vision) {
-          this.animalesCerca.push(otroAnimal);
-        }
-      }
-    } else {
-      // Fallback to checking all entities if grid isn't available
-      for (let i = 0; i < this.juego.entidades.length; i++) {
-        const otroAnimal = this.juego.entidades[i];
-
-        if (this == otroAnimal) continue;
-
-        let dist = distancia(this, this.juego.entidades[i]);
-
-        if (dist < this.vision) {
-          this.animalesCerca.push(this.juego.entidades[i]);
-        }
+      if (dist < this.vision) {
+        this.animalesCerca.push(otroAnimal);
       }
     }
 
     //estan mas cerca:
     this.animalesMuyCerca = [];
 
-    // Use entities we already found to check for very close ones
+    // Usar entidades que ya encontramos para verificar las muy cercanas
     for (const otroAnimal of this.animalesCerca) {
       if (this == otroAnimal) continue;
 
       let dist = distancia(this, otroAnimal);
 
-      if (dist < this.lado * 2) {
+      if (dist < this.juego.grid.cellSize * 0.5) {
         this.animalesMuyCerca.push(otroAnimal);
       }
     }
@@ -139,6 +143,9 @@ class Animal extends Entidad {
     this.promedioDeVelDeMisAmigos.y /= this.animalesCerca.length;
   }
 
+  /**
+   * Aplica una fuerza hacia la posición promedio de amigos cercanos (cohesión)
+   */
   irHaciaMisAmigos() {
     const dx = this.promedioDePosicionDeMisAmigos.x - this.x;
     const dy = this.promedioDePosicionDeMisAmigos.y - this.y;
@@ -152,6 +159,9 @@ class Animal extends Entidad {
     }
   }
 
+  /**
+   * Aplica una fuerza para alinear la velocidad con la de los amigos cercanos
+   */
   alinearmeConMisAmigos() {
     const dx = this.promedioDePosicionDeMisAmigos.x - this.x;
     const dy = this.promedioDePosicionDeMisAmigos.y - this.y;
@@ -164,6 +174,9 @@ class Animal extends Entidad {
     }
   }
 
+  /**
+   * Aplica una fuerza para alejarse de animales demasiado cercanos (separación)
+   */
   separarmeDeLosQueEstanBastanteCerca() {
     const dx = this.promedioPosAnimalesMuyCerca.x - this.x;
     const dy = this.promedioPosAnimalesMuyCerca.y - this.y;
@@ -177,14 +190,18 @@ class Animal extends Entidad {
       );
     }
   }
+
+  /**
+   * Aplica una fuerza para alejarse de celdas bloqueadas en la cuadrícula
+   */
   repelerDeCeldasBloqueadas() {
     if (!this.juego.grid || !this.cell) return;
 
-    // Get the current cell's column and row
+    // Obtener la columna y fila de la celda actual
     const currentCol = Math.floor(this.x / this.juego.grid.cellSize);
     const currentRow = Math.floor(this.y / this.juego.grid.cellSize);
 
-    // Check cells in a 3-cell radius around the current position
+    // Verificar celdas en un radio de 3 celdas alrededor de la posición actual
     const cellRadius = this.numeroDeCeldasPAraMirarAlrededor;
 
     for (let rowOffset = -cellRadius; rowOffset <= cellRadius; rowOffset++) {
@@ -192,7 +209,7 @@ class Animal extends Entidad {
         const checkCol = currentCol + colOffset;
         const checkRow = currentRow + rowOffset;
 
-        // Skip if outside grid bounds
+        // Omitir si está fuera de los límites de la cuadrícula
         if (
           checkCol < 0 ||
           checkCol >= this.juego.grid.cols ||
@@ -202,22 +219,22 @@ class Animal extends Entidad {
           continue;
         }
 
-        // Get the cell at this position
+        // Obtener la celda en esta posición
         const cellIndex = this.juego.grid.getCellIndex(checkCol, checkRow);
         if (cellIndex === -1) continue;
 
         const cell = this.juego.grid.cells[cellIndex];
 
-        // If the cell is blocked, apply repulsion force immediately
+        // Si la celda está bloqueada, aplicar fuerza de repulsión inmediatamente
         if (cell && cell.blocked) {
-          // Vector pointing from blocked cell to animal
+          // Vector que apunta desde la celda bloqueada hacia el animal
           const dx = this.x - cell.centerX;
           const dy = this.y - cell.centerY;
 
-          // Calculate distance
+          // Calcular distancia
           const distance = Math.hypot(dx, dy);
 
-          // Skip if we're too far away or at distance zero
+          // Omitir si estamos demasiado lejos o a distancia cero
           if (
             distance === 0 ||
             distance >
@@ -225,7 +242,7 @@ class Animal extends Entidad {
           )
             continue;
 
-          // Calculate repulsion force (stronger when closer)
+          // Calcular fuerza de repulsión (más fuerte cuando está más cerca)
           const repulsionStrength =
             (window.factorRepulsionDeCeldasBloqueadas ?? 1.5) *
             (1 -
@@ -233,7 +250,7 @@ class Animal extends Entidad {
                 (this.juego.grid.cellSize *
                   this.numeroDeCeldasPAraMirarAlrededor));
 
-          // Apply normalized force
+          // Aplicar fuerza normalizada
           this.aplicarFuerza(
             (dx / distance) * repulsionStrength,
             (dy / distance) * repulsionStrength
@@ -243,6 +260,21 @@ class Animal extends Entidad {
     }
   }
 
+  /**
+   * Método llamado cuando este animal es seleccionado
+   */
+  heSidoSeleccionado() {
+    // this.quitarTarget();
+  }
+
+  /**
+   * Método llamado cuando este animal es deseleccionado
+   */
+  heSidoDesSeleccionado() {}
+
+  /**
+   * Actualiza el estado del animal en cada frame
+   */
   update() {
     super.update();
 
@@ -250,18 +282,93 @@ class Animal extends Entidad {
     // this.irHaciaMisAmigos();
     // this.alinearmeConMisAmigos();
 
-    if (this.juego.selectedEntities.includes(this)) {
-      this.aplicarFuerzaVectorField();
+    this.estoySeleccionado = this.juego.selectedEntities.includes(this);
+    if (this.estoySeleccionado) {
+      // this.aplicarFuerzaVectorField();
     } else {
-      this.perseguirMouse();
+      // if (!this.target) this.queHacerSiNoTengoTarget();
+    }
+
+    //si llego..
+    if (
+      this.target &&
+      this.currentVectorField &&
+      distancia(this, this.target) < this.juego.grid.cellSize
+    ) {
+      // // this.quitarTarget();
+      // this.velocidad.x *= 0.2;
+      // this.velocidad.y *= 0.2;
+      // this.acc.x *= 0.2;
+      // this.acc.y *= 0.2;
+    }
+
+    //s tiene target...
+    if (this.target) {
+      this.irHaciaElTarget();
     }
 
     this.separarmeDeLosQueEstanBastanteCerca();
     this.repelerDeCeldasBloqueadas();
 
-    this.velocidad.x *= 0.9;
-    this.velocidad.y *= 0.9;
+    this.velocidad.x *= 0.8;
+    this.velocidad.y *= 0.8;
   }
+
+  /**
+   * Determina qué hacer cuando el animal no tiene un objetivo asignado
+   */
+  queHacerSiNoTengoTarget() {
+    // this.perseguirMouse();
+    if (this.juego.contadorDeFrame % 300 == this.numeroDeLaSuerte) {
+      const targetCell = this.juego.grid.getCellAt(
+        Math.random() * this.juego.ancho,
+        Math.random() * this.juego.alto
+      );
+      this.asignarTarget(targetCell);
+    }
+
+    this.irHaciaElTarget();
+  }
+
+  /**
+   * Aplica una fuerza para moverse hacia el objetivo asignado usando el campo vectorial
+   */
+  irHaciaElTarget() {
+    if (this.currentVectorField && this.target) {
+      const cellX = Math.floor(this.x / this.juego.grid.cellSize);
+      const cellY = Math.floor(this.y / this.juego.grid.cellSize);
+      const vector = this.currentVectorField[cellY][cellX];
+      if (vector) {
+        this.aplicarFuerza(
+          vector.x * this.vectorFieldInfluence,
+          vector.y * this.vectorFieldInfluence
+        );
+      }
+    }
+  }
+
+  /**
+   * Asigna un nuevo objetivo al animal y calcula su campo vectorial
+   * @param {Object} que - El objetivo al que dirigirse
+   */
+  asignarTarget(que) {
+    if (!que || !que.x || !que.y) return;
+    this.target = que;
+    const vectorField = this.juego.grid.obtenerVectorField(que.x, que.y);
+    this.currentVectorField = vectorField;
+  }
+
+  /**
+   * Elimina el objetivo actual del animal
+   */
+  quitarTarget() {
+    this.target = null;
+    this.currentVectorField = null;
+  }
+
+  /**
+   * Aplica una fuerza para perseguir al cursor del ratón
+   */
   perseguirMouse() {
     const dx = this.juego.mouse.x - this.x;
     const dy = this.juego.mouse.y - this.y;
@@ -273,6 +380,9 @@ class Animal extends Entidad {
     }
   }
 
+  /**
+   * Renderiza el animal y sus elementos de depuración si están activados
+   */
   render() {
     super.render();
 

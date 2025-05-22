@@ -330,10 +330,19 @@ class Grid {
       // Omitir celdas bloqueadas
       if (currentCell.blocked) continue;
 
-      // Obtener todos los vecinos
-      // Obtener solo vecinos ortogonales (sin diagonales)
       const allNeighbors = currentCell.getNeighbors();
-      const neighbors = allNeighbors;
+      // Filtrar vecinos diagonales
+      let neighbors = allNeighbors.filter((neighbor) => {
+        // Solo permitir vecinos ortogonales (arriba, abajo, izquierda, derecha)
+        return (
+          Math.abs(neighbor.col - currentCell.col) +
+            Math.abs(neighbor.row - currentCell.row) ===
+          1
+        );
+      });
+
+      //QUIERO Q SI TENGA DIAGONALES EL FLOWFIELD
+      neighbors = allNeighbors;
 
       for (const neighbor of neighbors) {
         const neighborIndex = this.getCellIndex(neighbor.col, neighbor.row);

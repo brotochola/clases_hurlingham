@@ -17,6 +17,8 @@ class Animal extends Entidad {
     this.velMax = 3;
     this.accMax = 0.6;
 
+    this.cantidadDeCeldasDeChanguiParaLlegar = 2;
+
     this.numeroDeLaSuerte = Math.floor(Math.random() * 20);
 
     this.velocidad = {
@@ -110,7 +112,7 @@ class Animal extends Entidad {
 
       let dist = distancia(this, otroAnimal);
 
-      if (dist < this.juego.grid.cellSize * 0.5) {
+      if (dist < this.lado * 2) {
         this.animalesMuyCerca.push(otroAnimal);
       }
     }
@@ -178,15 +180,17 @@ class Animal extends Entidad {
    * Aplica una fuerza para alejarse de animales demasiado cercanos (separación)
    */
   separarmeDeLosQueEstanBastanteCerca() {
+    if (this.animalesMuyCerca.length == 0) return;
     const dx = this.promedioPosAnimalesMuyCerca.x - this.x;
     const dy = this.promedioPosAnimalesMuyCerca.y - this.y;
-    const distancia = Math.hypot(dx, dy); // o Math.sqrt(dx*dx + dy*dy)
-    // const factor = 0.1;
+    const distancia = Math.hypot(dx, dy);
 
     if (distancia > 0) {
+      // La fuerza es inversamente proporcional a la distancia
+      const fuerza = window.factorSeparacion / distancia;
       this.aplicarFuerza(
-        -(dx / distancia) * window.factorSeparacion,
-        -(dy / distancia) * window.factorSeparacion
+        -(dx / distancia) * fuerza,
+        -(dy / distancia) * fuerza
       );
     }
   }
@@ -233,22 +237,20 @@ class Animal extends Entidad {
 
           // Calcular distancia
           const distance = Math.hypot(dx, dy);
+          const maxDistance =
+            this.juego.grid.cellSize *
+            this.numeroDeCeldasPAraMirarAlrededor *
+            0.66;
 
           // Omitir si estamos demasiado lejos o a distancia cero
-          if (
-            distance === 0 ||
-            distance >
-              this.juego.grid.cellSize * this.numeroDeCeldasPAraMirarAlrededor
-          )
-            continue;
+          if (distance === 0 || distance > maxDistance) continue;
 
           // Calcular fuerza de repulsión (más fuerte cuando está más cerca)
+          // Usamos una función inversa cuadrática para que la fuerza aumente más rápidamente al acercarse
+
           const repulsionStrength =
             (window.factorRepulsionDeCeldasBloqueadas ?? 1.5) *
-            (1 -
-              distance /
-                (this.juego.grid.cellSize *
-                  this.numeroDeCeldasPAraMirarAlrededor));
+            Math.pow(maxDistance / (distance + 1), 2);
 
           // Aplicar fuerza normalizada
           this.aplicarFuerza(
@@ -279,6 +281,7 @@ class Animal extends Entidad {
     super.update();
 
     this.mirarAlrededor();
+    this.separarmeDeLosQueEstanBastanteCerca();
     // this.irHaciaMisAmigos();
     // this.alinearmeConMisAmigos();
 
@@ -293,23 +296,26 @@ class Animal extends Entidad {
     if (
       this.target &&
       this.currentVectorField &&
-      distancia(this, this.target) < this.juego.grid.cellSize * 2
+      distancia(this, this.target) <
+        this.juego.grid.cellSize *
+          this.cantidadDeCeldasDeChanguiParaLlegar *
+          0.5
     ) {
       this.llego = true;
+      this.quitarTarget();
     } else {
       this.llego = false;
     }
 
     //s tiene target...
-    if (this.target && !this.llego) {
+    if (this.target) {
       this.irHaciaElTarget();
     }
 
-    this.separarmeDeLosQueEstanBastanteCerca();
     this.repelerDeCeldasBloqueadas();
 
-    this.velocidad.x *= 0.8;
-    this.velocidad.y *= 0.8;
+    this.velocidad.x *= 0.7;
+    this.velocidad.y *= 0.7;
   }
 
   /**
@@ -337,9 +343,18 @@ class Animal extends Entidad {
       const cellY = Math.floor(this.y / this.juego.grid.cellSize);
       const vector = this.currentVectorField[cellY][cellX];
       if (vector) {
+        const distanciaAlTarget = distancia(this, this.target);
+        const umbral =
+          this.juego.grid.cellSize * this.cantidadDeCeldasDeChanguiParaLlegar; // o el valor que prefieras
+
+        let escala = 1;
+        if (distanciaAlTarget < umbral) {
+          escala = distanciaAlTarget / umbral; // se va reduciendo hasta 0
+        }
+
         this.aplicarFuerza(
-          vector.x * this.vectorFieldInfluence,
-          vector.y * this.vectorFieldInfluence
+          vector.x * this.vectorFieldInfluence * escala,
+          vector.y * this.vectorFieldInfluence * escala
         );
       }
     }
@@ -363,6 +378,8 @@ class Animal extends Entidad {
   quitarTarget() {
     this.target = null;
     this.currentVectorField = null;
+    this.velocidad.x = 0;
+    this.velocidad.y = 0;
   }
 
   /**

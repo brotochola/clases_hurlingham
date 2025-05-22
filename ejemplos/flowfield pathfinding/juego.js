@@ -47,7 +47,7 @@ class Juego {
       // Configurar campo vectorial inicial - patrón radial
       this.setupVectorField();
 
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 1000; i++) {
         this.agregarAnimal(
           randomGaussBounded(this.ancho / 2, this.ancho / 2),
           randomGaussBounded(this.alto / 2, this.alto / 2)

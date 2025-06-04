@@ -11,6 +11,11 @@ class Obstaculo extends Entidad {
     this.innerContainer.addChild(this.grafico);
   }
 
+  serializar() {
+    const obj = super.serializar();
+    obj.radio = this.radio;
+    return obj;
+  }
   // update() {
   //   // console.log(this.x,this.y)
   //   super.update();

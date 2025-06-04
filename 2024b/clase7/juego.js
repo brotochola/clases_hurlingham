@@ -29,12 +29,22 @@ class Juego {
   }
 
   cargarNivel(url) {
+    for (let ent of this.entidades) {
+      this.contenedorPrincipal.removeChild(ent.container);
+    }
+
+    this.entidades = [];
+    this.obstaculos = [];
+    this.presas = [];
+    this.depredadores = [];
+    ///
     fetch(url).then((e) => {
       e.json().then((data) => {
         this.nivel = data;
 
         for (let i = 0; i < this.nivel.entidades.length; i++) {
           let enti = this.nivel.entidades[i];
+
           if (enti.tipo.toLowerCase() == "presa") {
             this.agregarPresa(enti);
           } else if (enti.tipo.toLowerCase() == "obstaculo") {
@@ -47,11 +57,19 @@ class Juego {
     });
   }
 
-  guardarNivel() {
+  guardarNivel(nombreDelNivel) {
     let nivel = { entidades: [] };
-    for (let e of this.entidades) {
-      nivel.entidades.push(e.serializar());
+    for (let entidad of this.entidades) {
+      nivel.entidades.push(entidad.serializar());
     }
+
+    // localStorage[nombreDelNivel] = JSON.stringify(nivel);
+
+    console.log(JSON.stringify(nivel));
+  }
+
+  cargarNivelDelLocalStorage(nombre) {
+    const nivel = JSON.parse(localStorage[nombre]);
 
     console.log(nivel);
   }

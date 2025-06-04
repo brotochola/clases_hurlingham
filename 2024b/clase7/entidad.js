@@ -1,6 +1,7 @@
 class Entidad {
   constructor(obj) {
     const { x, y, vel, id, juego } = obj;
+
     this.container = new PIXI.Container();
     this.container.name = "containerDeCadaEntidad";
     this.innerContainer = new PIXI.Container();
@@ -114,9 +115,9 @@ class Entidad {
   }
 
   aplicarFuerza(x, y) {
-    if(isNaN(x) || isNaN(y)) {
-      console.warn("la fuerza plicada esta mal")
-      return
+    if (isNaN(x) || isNaN(y)) {
+      console.warn("la fuerza plicada esta mal");
+      return;
     }
     this.acc.x += x;
     this.acc.y += y;

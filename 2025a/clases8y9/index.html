@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FSM Game with Physics</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 300px;
+        }
+
+        .controls {}
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+    </style>
+    <script type="module" src="main.js"></script>
+</head>
+<body>
+    <!-- <div class="info">
+        <h3>FSM Game with Physics</h3>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>BaseEntity with Victor.js physics</li>
+            <li>Newton's physics: acceleration → velocity → position</li>
+            <li>Friction and max speed limits</li>
+            <li>Enemy AI with Finite State Machine</li>
+            <li>PixiJS v8 rendering</li>
+            <li>Resource entities (Trees & Gold Mines)</li>
+        </ul>
+        <p><strong>Entity Types & Colors:</strong></p>
+        <ul>
+            <li>🟩 <strong>Enemies:</strong></li>
+            <li>&nbsp;&nbsp;🟢 Green: Idle/Default</li>
+            <li>&nbsp;&nbsp;🔴 Red: Attacking</li>
+            <li>&nbsp;&nbsp;🟡 Yellow: Fleeing</li>
+            <li>&nbsp;&nbsp;🔵 Blue: Carrying Resources</li>
+            <li>&nbsp;&nbsp;🟤 Brown: Working</li>
+            <li>&nbsp;&nbsp;⚫ Gray: Dead</li>
+            <li>🟡 <strong>Gold Mines:</strong> Yellow circles</li>
+            <li>🟢 <strong>Trees:</strong> Green circles with brown trunks</li>
+        </ul>
+        <p><strong>Resource Indicators:</strong></p>
+        <ul>
+            <li>Resource bars show remaining wood/gold</li>
+            <li>Green outline: Active miners/choppers</li>
+            <li>Orange outline: Active choppers</li>
+        </ul>
+    </div> -->
+    <!-- 
+    <div class="controls"
+        style="position: fixed; bottom: 0; left: 0; background: rgba(0,0,0,0.7); padding: 10px; width: 100%;">
+        <h4 style="color: white; margin: 0 0 10px 0;">Debug Controls</h4>
+        <button onclick="window.game?.spawnNPCs(1,1)">Add npc team 1</button>
+        <button onclick="window.game?.spawnNPCs(1,2)">Add npc team 2</button>
+        <button onclick="window.game?.spawnGoldMines(1)">Add Gold Mine</button>
+        <button onclick="window.game?.spawnTrees(1)">Add Tree</button>
+        <button onclick="window.game?.spawnHomes(1,1)">Add Home team 1</button>
+        <button onclick="window.game?.spawnHomes(1,2)">Add Home team 2</button>
+        <br>
+        <button onclick="window.enemy?.recieveDamage(0.3)">Damage Enemy</button>
+        <button onclick="console.log(window.game?.entities)">Log Entities</button>
+        <button onclick="console.log('Trees:', window.game?.getEntitiesByType('Tree').map(t => t.getInfo()))">Log
+            Trees</button>
+        <button onclick="console.log('Mines:', window.game?.getEntitiesByType('GoldMine').map(g => g.getInfo()))">Log
+            Mines</button>
+    </div> -->
+</body>
+</html>

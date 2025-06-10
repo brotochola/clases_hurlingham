@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pixi Animación con Flechas</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            margin: auto;
+            background: #111;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cargar PIXI.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.js"></script>
+
+    <!-- Cargar nuestras clases de animación -->
+    <script src="animated-character.js"></script>
+
+    <script type="module">
+        /**
+         * CONFIGURACIÓN Y INICIALIZACIÓN DEL JUEGO
+         * =========================================
+         * 
+         * Este script inicializa la aplicación PIXI.js, carga todas las animaciones
+         * y configura los controles del personaje.
+         */
+
+        // === CREAR LA APLICACIÓN PIXI.JS ===
+
+        const app = new PIXI.Application();
+        await app.init({ width: 512, height: 256, background: '#111' });
+        document.body.appendChild(app.view);
+
+        // === CONFIGURACIÓN DEL SPRITESHEET ===
+
+        const frameW = 64;  // Ancho de cada frame individual
+        const frameH = 64;  // Alto de cada frame individual
+        const directions = ['up', 'left', 'down', 'right'];  // Orden de las direcciones
+
+        // === INICIALIZAR SISTEMA DE ASSETS ===
+
+        await PIXI.Assets.init();
+
+        // === CONFIGURACIÓN DE ANIMACIONES ===
+
+        // Cada animación tiene una velocidad de reproducción personalizada
+        const animationConfigs = {
+            'run': { speed: 0.15 },         // Correr - velocidad media
+            'walk': { speed: 0.1 },         // Caminar - más lento
+            'idle': { speed: 0.08 },        // Inactivo - muy lento
+            'combat_idle': { speed: 0.1 },  // Posición de combate
+            'jump': { speed: 0.2 },         // Saltar - rápido
+            'climb': { speed: 0.12 },       // Trepar - medio
+            'sit': { speed: 0.05 },         // Sentarse - muy lento
+            'hurt': { speed: 0.15 },        // Herido - medio
+            'emote': { speed: 0.1 },        // Emoción - medio
+            'slash': { speed: 0.2 },        // Ataque con espada - rápido
+            'halfslash': { speed: 0.18 },   // Medio ataque - rápido
+            'backslash': { speed: 0.2 },    // Ataque reverso - rápido
+            'thrust': { speed: 0.2 },       // Estocada - rápido
+            'shoot': { speed: 0.15 },       // Disparar - medio
+            'spellcast': { speed: 0.12 }    // Lanzar hechizo - medio-lento
+        };
+
+        // === CREAR EL PERSONAJE CON ANIMACIONES ===
+
+        // const result = await AnimatedCharacter.CreateCharacterWithManyAnimations(
+        //     animationConfigs,
+        //     frameW,
+        //     frameH,
+        //     directions
+        // );
+
+        const result = await AnimatedCharacter.CreateCharacterFromMegaSpritesheet(
+            'chica2.png',
+            frameW,
+            frameH,
+            animationConfigs,
+            directions
+        );
+
+
+
+        const character = result.character;
+        const loadResults = result.loadResults;
+
+        window.character = character; // Hacer accesible globalmente para debug
+
+        // === MOSTRAR RESULTADOS DE CARGA ===
+        console.log('📊 Resultados de carga:', loadResults);
+
+        // === POSICIONAR EL PERSONAJE ===
+
+        character.x = app.screen.width / 2;   // Centrar horizontalmente
+        character.y = app.screen.height / 2;  // Centrar verticalmente
+        // character.setScale(0.5);            // Opcional: hacer más pequeño
+        app.stage.addChild(character);
+
+        // === CONFIGURAR CONTROLES ===
+
+        window.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                // === CONTROLES DE MOVIMIENTO ===
+                case 'ArrowUp':
+                    character.changeDirection('up');
+                    break;
+                case 'ArrowDown':
+                    character.changeDirection('down');
+                    break;
+                case 'ArrowLeft':
+                    character.changeDirection('left');
+                    break;
+                case 'ArrowRight':
+                    character.changeDirection('right');
+                    break;
+
+
+            }
+        });
+
+        // === MOSTRAR AYUDA EN CONSOLA ===
+
+        setTimeout(() => {
+            console.log('=== PERSONAJE ANIMADO CARGADO ===');
+            console.log('Available animations:', character.getAvailableAnimations());
+            console.log('');
+            console.log('=== CONTROLES ===');
+            console.log('🏃 Movimiento: Flechas del teclado');
+            console.log('');
+            console.log('🎭 Animaciones (números):');
+            console.log('1: idle     2: walk     3: run      4: jump     5: combat_idle');
+            console.log('6: slash    7: thrust   8: shoot    9: spellcast 0: sit');
+            console.log('');
+            console.log('🎭 Animaciones (letras):');
+            console.log('h: hurt     e: emote    c: climb');
+            console.log('');
+            console.log('💡 Tip: Usa character.changeAnimation("nombre") en la consola para más control');
+        }, 1000);
+
+
+        function createUI() {
+            for (let anim of Object.keys(AnimatedCharacter.bigSpriteAnimationConfigs)) {
+                const button = document.createElement('button');
+                button.textContent = anim;
+                button.addEventListener('click', () => {
+                    character.changeAnimation(anim);
+                });
+                document.body.appendChild(button);
+            }
+        }
+
+        createUI()
+
+    </script>
+</body>
+</html>

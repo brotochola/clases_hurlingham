@@ -68,7 +68,7 @@ export class NPC extends BaseEntity {
     // Physics properties specific to Enemy
     this.maxSpeed = 2.5;
     this.maxAcceleration = 0.23;
-    this.friction = 0.9;
+    this.friction = 0.99;
     this.minSpeedToShowWalkAnimation = 0.5;
 
     this.ready = false;
@@ -84,8 +84,8 @@ export class NPC extends BaseEntity {
 
   crearCirculitoEnMatter() {
     this.body = Matter.Bodies.circle(this.x, this.y, 10, {
-      friction: 1,
-      frictionAir: 0.5,
+      friction: this.friction,
+      frictionAir: this.friction,
       mass: 0.15,
     });
 
@@ -304,6 +304,12 @@ export class NPC extends BaseEntity {
   onUpdateIdle(frameNumber) {
     //STATE:
     // Check if enemy is nearby - switch to angry/fearful
+    if (this.body) {
+      Matter.Body.setVelocity(this.body, {
+        x: this.body.velocity.x * 0.5,
+        y: this.body.velocity.y * 0.5,
+      });
+    }
   }
 
   onUpdateGoingToGoldMine() {
@@ -322,18 +328,27 @@ export class NPC extends BaseEntity {
     }
   }
 
+  makeMeFace(x, y) {
+    this.angle = this.angleTo(x, y);
+  }
+
   onUpdateChoppingTree() {
     this.woodInInventory += this.closestTree.chopWood(0.03);
+    this.moveTowards(this.closestTree.x, this.closestTree.y, 0.5);
+    //le sobreescribo el angulo
+    this.makeMeFace(this.closestTree.x, this.closestTree.y);
   }
 
   onUpdateMiningGold() {
     this.goldInInventory += this.closestGoldMine.mineGold(0.1);
+    this.moveTowards(this.closestGoldMine.x, this.closestGoldMine.y, 0.5);
+    this.makeMeFace(this.closestGoldMine.x, this.closestGoldMine.y);
   }
 
   onUpdateTakingResourcesBackToBase() {
     // Use physics-based movement towards the home base entity
     if (this.homeBase) {
-      this.moveTowards(this.homeBase.x, this.homeBase.y, 0.1);
+      this.moveTowards(this.homeBase.x, this.homeBase.y, 1);
     }
   }
 
@@ -354,6 +369,7 @@ export class NPC extends BaseEntity {
 
   onUpdateAttacking() {
     this.closestEnemy.recieveDamage(this.strength);
+    this.makeMeFace(this.closestEnemy.x, this.closestEnemy.y);
   }
 
   onUpdateDead(frameNumber) {

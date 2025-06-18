@@ -8,11 +8,14 @@ import { UI } from "./ui.js";
 export class Game {
   constructor(width = 800, height = 600) {
     window.PIXI = PIXI;
+    this.mouse = {};
+    this.keyboard = {};
     this.width = width;
     this.height = height;
     this.entities = [];
     this.trees = [];
     this.npcs = [];
+    this.poolDeNPCs = [];
     this.goldMines = [];
     this.homes = [];
     this.isRunning = false;
@@ -66,10 +69,43 @@ export class Game {
   }
 
   addListeners() {
+    window.onkeydown = (event) => {
+      if (!this.keyboard) this.keyboard = {};
+      this.keyboard[event.key] = true;
+
+      if (event.key === "Escape") {
+        this.ui.bajar();
+      }
+      if (event.key === "1") {
+        this.spawnNPCs(1, 1, this.mouse.x, this.mouse.y);
+      }
+      if (event.key === "2") {
+        this.spawnNPCs(1, 2, this.mouse.x, this.mouse.y);
+      }
+      if (event.key === "t") {
+        this.spawnTrees(1, this.mouse.x, this.mouse.y);
+      }
+    };
+
+    window.onkeyup = (event) => {
+      if (!this.keyboard) this.keyboard = {};
+      delete this.keyboard[event.key];
+    };
+
+    this.app.canvas.onmousemove = (event) => {
+      this.mouse = { x: event.x, y: event.y };
+      if (this.keyboard && this.keyboard["1"]) {
+        this.spawnNPCs(1, 1, event.x, event.y);
+      } else if (this.keyboard && this.keyboard["2"]) {
+        this.spawnNPCs(1, 2, event.x, event.y);
+      }
+    };
+
     this.app.canvas.onmousedown = (event) => {
       const entity = this.getEntityAtPosition(event.x, event.y);
       this.unselectAllEntities();
       if (entity) {
+        console.log(entity);
         entity.selected = true;
         this.ui.mostrarDataDeEntidad(entity);
         // console.log(entity);
@@ -162,11 +198,11 @@ export class Game {
     });
   }
 
-  spawnNPCs(count = 1, team = 1) {
+  spawnNPCs(count = 1, team = 1, x, y) {
     for (let i = 0; i < count; i++) {
       const npc = new NPC(
-        Math.random() * this.width,
-        Math.random() * this.height,
+        x || Math.random() * this.width,
+        y || Math.random() * this.height,
         this,
         team
       );
@@ -184,11 +220,12 @@ export class Game {
     }
   }
 
-  spawnTrees(count = 3) {
+  spawnTrees(count = 3, x, y) {
+    console.log("spawnTrees", x, y);
     for (let i = 0; i < count; i++) {
       const tree = new Tree(
-        Math.random() * this.width,
-        Math.random() * this.height,
+        x || Math.random() * this.width,
+        y || Math.random() * this.height,
         this
       );
     }
@@ -201,7 +238,7 @@ export class Game {
   }
 
   spawnTestLevel() {
-    this.spawnNPCs(10, 1);
+    this.spawnNPCs(1, 1);
 
     this.spawnGoldMines(1);
     this.spawnTrees(1);

@@ -13,7 +13,7 @@ export class GoldMine extends BaseEntity {
     this.isActive = true; // Whether this mine can be used
     this.minersCount = 0; // How many entities are currently mining
     this.maxMiners = 3; // Maximum concurrent miners
-
+    this.minGoldToBeMined = 10;
     // Visual properties
     this.size = 30; // Size for rendering
     this.type = "goldMine";
@@ -51,7 +51,9 @@ export class GoldMine extends BaseEntity {
   // Check if this mine can be mined
   canBeMined() {
     return (
-      this.isActive && this.goldAmount > 0 && this.minersCount < this.maxMiners
+      this.isActive &&
+      this.goldAmount > this.minGoldToBeMined &&
+      this.minersCount < this.maxMiners
     );
   }
 

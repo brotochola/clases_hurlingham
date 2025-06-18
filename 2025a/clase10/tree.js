@@ -6,10 +6,11 @@ export class Tree extends BaseEntity {
     super(x, y, game);
 
     // Tree specific properties
-    this.woodAmount = Math.random() * 40 + 10; // Total wood available
-    this.maxWoodAmount = 50; // Maximum wood capacity
+    this.maxWoodAmount = 200; // Maximum wood capacity
+    this.woodAmount = Math.random() * this.maxWoodAmount + 1; // Total wood available
+
     this.choppingRate = 0.15; // Wood per second when being chopped
-    this.growthRate = 0.001; // Wood regeneration per second
+    this.growthRate = 0.0001; // Wood regeneration per second
     this.isAlive = true; // Whether this tree can be chopped
     this.choppers = []; // How many entities are currently chopping
     this.maxChoppers = 2; // Maximum concurrent choppers
@@ -26,6 +27,7 @@ export class Tree extends BaseEntity {
 
     this.game.trees.push(this);
     this.createSprite();
+    this.crearCirculitoEnMatter(true, this.size);
   }
 
   createSprite() {
@@ -34,7 +36,11 @@ export class Tree extends BaseEntity {
   }
 
   // Chop wood from this tree
-  chopWood(amount = this.choppingRate) {
+  chopWood(amount = this.choppingRate, who) {
+    if (!this.choppers.includes(who)) {
+      this.choppers.push(who);
+    }
+
     if (!this.isAlive || this.woodAmount <= 0) {
       return 0;
     }
@@ -59,19 +65,11 @@ export class Tree extends BaseEntity {
     // Count how many NPCs are currently chopping this tree
     // const choppersCount = this.countCurrentChoppers();
 
-    return this.isAlive && this.woodAmount > 0;
-  }
-
-  // Count how many NPCs are currently chopping this tree
-  countCurrentChoppers() {
-    if (!this.game || !this.game.npcs) {
-      return 0;
-    }
-
-    return this.game.npcs.filter(
-      (npc) =>
-        this.calculateDistance(npc.x, npc.y) < this.size * 2 && npc.health > 0
-    ).length;
+    return (
+      this.isAlive &&
+      this.woodAmount > 0 &&
+      this.choppers.length < this.maxChoppers
+    );
   }
 
   // Get the percentage of wood remaining
@@ -89,6 +87,10 @@ export class Tree extends BaseEntity {
     return this.isAlive && this.woodAmount >= this.maxWoodAmount * 0.8;
   }
 
+  removeMeFromChoppers(who) {
+    this.choppers = this.choppers.filter((chopper) => chopper !== who);
+  }
+
   // Update the tree (growth, etc.)
   update(frameNumber) {
     // Regrow wood slowly if not at max capacity
@@ -103,7 +105,13 @@ export class Tree extends BaseEntity {
     // Come back to life if we have enough wood again
     if (this.woodAmount > this.maxWoodAmount * 0.1) {
       this.isAlive = true;
+      this.body.isSensor = false;
+    } else {
+      this.isAlive = false;
+      this.body.isSensor = true;
     }
+
+    if (!this.canBeChopped()) this.choppers = [];
 
     // Update physics (though trees shouldn't move)
     this.updatePhysics();
@@ -174,12 +182,6 @@ export class Tree extends BaseEntity {
         barHeight
       );
       graphics.endFill();
-    }
-
-    const choppersCount = this.countCurrentChoppers();
-    if (choppersCount > 0) {
-      graphics.lineStyle(2, 0xff6600);
-      graphics.drawCircle(0, 0, this.size / 2 + 2);
     }
   }
 }

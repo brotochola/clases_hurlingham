@@ -273,3 +273,32 @@ export function generateName() {
 
   return `${firstName} ${surname}`;
 }
+
+function calcularDistanciaAlCuadrado(x1, y1, x2, y2) {
+  return (x1 - x2) ** 2 + (y1 - y2) ** 2;
+}
+
+function calcularDistancia(x1, y1, x2, y2) {
+  return Math.sqrt(calcularDistanciaAlCuadrado(x1, y1, x2, y2));
+}
+
+function compararDistancias(objOrigen, ObjDestino1, ObjDestino2) {
+  const distancia1 = calcularDistanciaAlCuadrado(
+    objOrigen.x,
+    objOrigen.y,
+    ObjDestino1.x,
+    ObjDestino1.y
+  );
+  const distancia2 = calcularDistanciaAlCuadrado(
+    objOrigen.x,
+    objOrigen.y,
+    ObjDestino2.x,
+    ObjDestino2.y
+  );
+
+  if (distancia1 < distancia2) {
+    return ObjDestino1;
+  } else {
+    return ObjDestino2;
+  }
+}

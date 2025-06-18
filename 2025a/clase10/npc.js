@@ -1,3 +1,4 @@
+import Victor from "https://cdn.skypack.dev/victor";
 import { FSM } from "./fsm.js";
 import { BaseEntity } from "./baseEntity.js";
 import { AnimatedCharacter } from "./pixijs-animated-character-class/animated-character.js";
@@ -34,6 +35,10 @@ export class NPC extends BaseEntity {
 
   constructor(x, y, game, team = "team1") {
     super(x, y, game);
+    this.dni = Math.floor(Math.random() * 100000000);
+    this.ultimoDigitoDelDNI = this.dni
+      .toString()
+      .substring(this.dni.toString().length - 1);
 
     this.team = team; // Team identifier for enemy detection
     this.direction = NPC.SPRITES_DIRECTIONS.down;
@@ -56,6 +61,8 @@ export class NPC extends BaseEntity {
     this.visionRange = 450;
 
     this.enemiesCloseToMe = [];
+    this.treesCloseToMe = [];
+    this.goldMinesCloseToMe = [];
 
     // Death timer for delayed removal
     this.deathTimer = null;
@@ -68,7 +75,7 @@ export class NPC extends BaseEntity {
     // Physics properties specific to Enemy
     this.maxSpeed = 2.5;
     this.maxAcceleration = 0.23;
-    this.friction = 0.99;
+    this.friction = 0.2;
     this.minSpeedToShowWalkAnimation = 0.5;
 
     this.ready = false;
@@ -80,18 +87,6 @@ export class NPC extends BaseEntity {
     this.crearCirculitoEnMatter();
 
     this.game.npcs.push(this);
-  }
-
-  crearCirculitoEnMatter() {
-    this.body = Matter.Bodies.circle(this.x, this.y, 10, {
-      friction: this.friction,
-      frictionAir: this.friction,
-      mass: 0.15,
-    });
-
-    this.body.owner = this;
-
-    Matter.Composite.add(this.game.engine.world, [this.body]);
   }
 
   addHealthBar() {
@@ -110,6 +105,8 @@ export class NPC extends BaseEntity {
     );
     this.animatedCharacter = result.character;
     this.container.addChild(result.character);
+
+    this.animatedCharacter.changeAnimation(NPC.ANIMATED_SPRITES.idle);
     // this.animatedCharacter.scale.set(0.5);
     this.ready = true;
   }
@@ -162,7 +159,7 @@ export class NPC extends BaseEntity {
             // console.log("on enter chopping tree", this.id);
           },
           onExit: (nextState) => {
-            // console.log("on exit chopping tree", this.id);
+            if (this.closestTree) this.closestTree.removeMeFromChoppers(this);
           },
           onUpdate: this.onUpdateChoppingTree.bind(this),
           transitions: {
@@ -315,7 +312,7 @@ export class NPC extends BaseEntity {
   onUpdateGoingToGoldMine() {
     // Use physics-based movement towards gold mine
     if (this.closestGoldMine) {
-      this.moveTowards(this.closestGoldMine.x, this.closestGoldMine.y, 0.5);
+      this.moveTowards(this.closestGoldMine.x, this.closestGoldMine.y, 0.8);
     }
   }
 
@@ -324,8 +321,10 @@ export class NPC extends BaseEntity {
 
     // Use physics-based movement towards tree
     if (this.closestTree) {
-      this.moveTowards(this.closestTree.x, this.closestTree.y, 0.5);
+      this.moveTowards(this.closestTree.x, this.closestTree.y, 0.8);
     }
+
+    this.avoidTreesCloseToMe(0.3);
   }
 
   makeMeFace(x, y) {
@@ -333,7 +332,8 @@ export class NPC extends BaseEntity {
   }
 
   onUpdateChoppingTree() {
-    this.woodInInventory += this.closestTree.chopWood(0.03);
+    this.woodInInventory += this.closestTree.chopWood(0.1, this);
+
     this.moveTowards(this.closestTree.x, this.closestTree.y, 0.5);
     //le sobreescribo el angulo
     this.makeMeFace(this.closestTree.x, this.closestTree.y);
@@ -358,13 +358,15 @@ export class NPC extends BaseEntity {
       this.moveTowards(this.homeBase.x, this.homeBase.y, 0.8);
     }
     this.avoidEnemiesCloseToMe(0.7);
+    this.avoidTreesCloseToMe(0.9);
   }
 
   onUpdateGoingToEnemy() {
     // Use physics-based movement towards enemy
     if (this.closestEnemy) {
-      this.moveTowards(this.closestEnemy.x, this.closestEnemy.y, 0.7);
+      this.moveTowards(this.closestEnemy.x, this.closestEnemy.y, 2.7);
     }
+    this.avoidTreesCloseToMe(1);
   }
 
   onUpdateAttacking() {
@@ -397,6 +399,7 @@ export class NPC extends BaseEntity {
   }
 
   lookAround() {
+    // console.log("looking around");
     // Update all environmental awareness properties
     this.updateClosestEnemyInfo();
     this.updateClosestResourceInfo();
@@ -440,6 +443,7 @@ export class NPC extends BaseEntity {
   updateClosestGoldMineInfo() {
     // Get gold mines array from game
     const goldMines = this.game?.goldMines || [];
+    this.goldMinesCloseToMe = [];
 
     let closestGoldMine = null;
     let shortestDistance = Infinity;
@@ -454,6 +458,7 @@ export class NPC extends BaseEntity {
       ) {
         shortestDistance = distance;
         closestGoldMine = goldMine;
+        this.goldMinesCloseToMe.push(goldMine);
       }
     });
 
@@ -466,6 +471,7 @@ export class NPC extends BaseEntity {
   updateClosestTreeInfo() {
     // Get trees array from game
     const trees = this.game?.trees || [];
+    this.treesCloseToMe = [];
 
     let closestTree = null;
     let shortestDistance = Infinity;
@@ -480,6 +486,8 @@ export class NPC extends BaseEntity {
       ) {
         shortestDistance = distance;
         closestTree = tree;
+        if (distance < this.minDistanceToInteract)
+          this.treesCloseToMe.push(tree);
       }
     });
 
@@ -567,6 +575,37 @@ export class NPC extends BaseEntity {
     }
   }
 
+  avoidTreesCloseToMe(factor = 2) {
+    if (this.treesCloseToMe.length == 0) return;
+    let avgX = 0;
+    let avgY = 0;
+
+    // Calculate average position of nearby enemies
+    this.treesCloseToMe.forEach((tree) => {
+      avgX += tree.x;
+      avgY += tree.y;
+    });
+
+    avgX /= this.treesCloseToMe.length;
+    avgY /= this.treesCloseToMe.length;
+
+    // Calculate direction vector from average position to this NPC
+    const dx = this.x - avgX;
+    const dy = this.y - avgY;
+
+    // Normalize the direction vector
+    const length = Math.sqrt(dx * dx + dy * dy);
+    if (length > 0) {
+      const normalizedDx = dx / length;
+      const normalizedDy = dy / length;
+
+      this.applyForce({
+        x: normalizedDx * factor,
+        y: normalizedDy * factor,
+      });
+    }
+  }
+
   updateNearbyEnemiesCount() {
     // Get all NPCs from game and filter by different team
     const allNPCs = this.game?.npcs || [];
@@ -624,7 +663,22 @@ export class NPC extends BaseEntity {
     }
     return direction;
   }
+  // Move towards a target position
+  moveTowards(targetX, targetY, force = 1) {
+    const target = new Victor(targetX, targetY);
 
+    const direction = target.clone().subtract(this.position).normalize();
+    const moveForce = direction.multiplyScalar(force);
+    const distance = this.distanceTo(targetX, targetY);
+    const distanceToStop = this.minDistanceToInteract * 2;
+    if (distance < distanceToStop) {
+      // Calculate arrival force based on distance
+      const arrivalFactor = Math.min(distance / distanceToStop, 1);
+      moveForce.multiplyScalar(arrivalFactor);
+    }
+
+    this.applyForce(moveForce);
+  }
   calculateSpriteAction() {
     // Determine animated sprite based on current FSM state
     let animatedSprite;
@@ -718,13 +772,15 @@ export class NPC extends BaseEntity {
     this.updatePhysics();
 
     // Look around to update environmental awareness
-    this.lookAround();
+
+    if (frameNumber % 10 == this.ultimoDigitoDelDNI) this.lookAround();
 
     //separation (apply before FSM so it doesn't get overridden)
     if (!this.dead) this.separation();
 
     this.updateStats();
 
+    // if (frameNumber % 10 == this.ultimoDigitoDelDNI)
     this.fsm.update(frameNumber);
 
     // this.render();
@@ -782,9 +838,5 @@ export class NPC extends BaseEntity {
         y: separationForceY * factor,
       });
     }
-  }
-
-  estoyColisionandoCon(conQuien) {
-    this.conQuienEstoyColisionando = conQuien;
   }
 }

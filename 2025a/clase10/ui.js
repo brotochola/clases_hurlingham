@@ -1,3 +1,4 @@
+import { NPC } from "./npc.js";
 import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
 export class UI {
   constructor(game) {
@@ -39,7 +40,9 @@ export class UI {
     this.container.addChild(bgSprite);
   }
   mostrarDataDeEntidad(entity) {
-    this.mostrandoEntidad = entity;
+    if (entity instanceof NPC) {
+      this.mostrandoEntidad = entity;
+    }
   }
 
   cambiarNombre(nombre) {

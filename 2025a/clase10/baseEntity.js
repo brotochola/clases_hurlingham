@@ -38,7 +38,6 @@ export class BaseEntity {
         this.addToGame();
       }, 0);
     }
-    this.crearCirculitoEnMatter(true);
   }
 
   // Add this entity to the game
@@ -170,24 +169,8 @@ export class BaseEntity {
     Matter.Body.applyForce(this.body, this.body.position, nuevaFuerzaAjustada);
   }
 
-  // Move towards a target position
-  moveTowards(targetX, targetY, force = 1) {
-    const target = new Victor(targetX, targetY);
-
-    const direction = target.clone().subtract(this.position).normalize();
-    const moveForce = direction.multiplyScalar(force);
-    const distance = this.distanceTo(targetX, targetY);
-    if (distance < 100) {
-      // Calculate arrival force based on distance
-      const arrivalFactor = Math.min(distance / 100, 1);
-      moveForce.multiplyScalar(arrivalFactor);
-    }
-
-    this.applyForce(moveForce);
-  }
-
-  crearCirculitoEnMatter(isStatic = false) {
-    this.body = Matter.Bodies.circle(this.x, this.y, 10, {
+  crearCirculitoEnMatter(isStatic = false, radius = 10) {
+    this.body = Matter.Bodies.circle(this.x, this.y, radius, {
       friction: this.friction,
       frictionAir: this.friction,
       isStatic: isStatic,

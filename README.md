@@ -87,6 +87,12 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
   5. **LocalStorage**: Almacenamiento local en el navegador.
 - **Uso de ChatGPT para Generación de Código**: Introducción al uso de herramientas de inteligencia artificial como ChatGPT para asistencia en la programación.
 
+Material:
+
+- https://www.youtube.com/watch?v=8GTaO9XhA5M&ab_channel=ProgramadorX
+- https://www.youtube.com/watch?v=bBB-dMgeisk&ab_channel=Parzibyte
+- Gameloop, delta time: https://www.youtube.com/watch?v=yGhfUcPjXuE&ab_channel=JonasTyroller
+
 --
 
 2. **PixiJS y Carga de Imágenes**
@@ -99,24 +105,36 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
    - **NPM y Servidores Locales**: Instalación y uso de algun paquete de Node para levantar un servidor local.
 
 --
+Material:
 
-3. **Movimiento del Personaje con Teclado y/o Mouse**
-   - **Uso de Spritesheets**: Introducción al uso de spritesheets para animar el personaje.
-   - **Herramientas Externas para el manejo de SpriteSheets**
-   - **Animación Esqueletal vs. Secuencia de frames**
-   - **Eventos en JavaScript**: Captura y manejo de eventos de teclado y mouse.
-   - **Gestión de Input**: Almacenamiento y procesamiento de la entrada del usuario dentro de la estructura del juego.
-   - **Asignación de Velocidad al Protagonista**: Implementación de movimiento basado en la entrada del usuario.
+- https://pixijs.com/
+- https://www.youtube.com/watch?v=qvBdQf4RSjQ&ab_channel=SamuelAsherRivello
+- https://www.youtube.com/watch?v=lHD-o7J9CX4&ab_channel=SamuelAsherRivello
+- https://www.youtube.com/watch?v=NiapDp6dT8w&ab_channel=CodesandTags
 
---
-
-4. **Entidades en Posiciones y Movimientos**
+3. **Entidades, Posiciones y Vectores**
    - **Creación de Clase Entidad**: Estructuración del código en una clase genérica de la cual heredan los demás tipos de objetos
    - **Desarrollo de Clases para Personajes y Objetos**: Creación de clases específicas para el protagonista, NPCs, y objetos estáticos como árboles o edificios.
    - **Física Básica**: Implementación de conceptos de física newtoniana, como posición, velocidad, aceleración y fuerza.
    - **Manejo de Vectores**: Introducción y aplicación de vectores para manejar posiciones y movimientos.
    - **Update vs Render**: Cálculo de posiciones y representación en pantalla.
    - **Comportamientos de Persecución y Evasión**: Implementación de comportamientos como ‘perseguir’ y ‘escapar’.
+
+--
+Material:
+
+- Clases, herencias: https://www.youtube.com/watch?v=C86JvqET61A&ab_channel=jonmircha
+- Vectores: https://www.youtube.com/watch?v=MkWhanqZfag&ab_channel=EsCiencia
+- Varios conceptos matematicos q usamos todo el tiempo: https://www.youtube.com/watch?v=DPfxjQ6sqrc&ab_channel=javidx9
+- Comportamientos de persecución y evasión: https://www.youtube.com/watch?v=Q4MU7pkDYmQ&t=438s&ab_channel=TheCodingTrain
+
+4. **Movimiento del Personaje con Teclado y/o Mouse**
+   - **Uso de Spritesheets**: Introducción al uso de spritesheets para animar el personaje.
+   - **Herramientas Externas para el manejo de SpriteSheets**
+   - **Animación Esqueletal vs. Secuencia de frames**
+   - **Eventos en JavaScript**: Captura y manejo de eventos de teclado y mouse.
+   - **Gestión de Input**: Almacenamiento y procesamiento de la entrada del usuario dentro de la estructura del juego.
+   - **Asignación de Velocidad al Protagonista**: Implementación de movimiento basado en la entrada del usuario.
 
 --
 

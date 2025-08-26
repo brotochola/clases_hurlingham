@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+    <title>Flowfield Editor with Boids</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        #instructions h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+
+        #instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        #instructions .mode-indicator {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="instructions">
+        <h3>Flowfield Editor & Boids Simulator</h3>
+        <div class="mode-indicator" id="modeIndicator">Modo: Editor (Presiona ESPACIO para cambiar)</div>
+        <ul>
+            <li><strong>ESPACIO:</strong> Cambiar entre Editor/Simulación</li>
+            <li><strong>G:</strong> Mostrar/ocultar grilla</li>
+            <li><strong>S:</strong> Guardar flowfield</li>
+            <li><strong>L:</strong> Cargar flowfield</li>
+            <li><strong>C:</strong> Limpiar flowfield</li>
+            <li><strong>R:</strong> Generar flowfield aleatorio</li>
+            <li><strong>X:</strong> Eliminar todos los boids</li>
+            <li><strong>B:</strong> Agregar 10 boids en el cursor</li>
+        </ul>
+        <div style="margin-top: 10px; font-size: 11px; color: #ccc;">
+            <strong>Modo Editor:</strong> Arrastra el mouse para dibujar vectores<br>
+            <strong>Modo Simulación:</strong> Click para agregar 1 boid, B para agregar 10
+        </div>
+    </div>
+    <script>
+        // Estado del sistema
+        let isMousePressed = false;
+        let grosorDelMouse = 2;
+        let lastMouse;
+        let width = 1280;
+        let height = 720;
+        let currentMousePos = { x: width / 2, y: height / 2 }; // Posición actual del mouse
+        let showGrid = true;
+        let isSimulationMode = false; // false = editor, true = simulation
+
+        // Configuración
+
+        const resolution = 20;
+        const numBoids = 50; // Empezar con pocos boids
+
+        // Variables globales
+        const boids = [];
+        let flowfield = [];
+
+        // Funciones de guardado/carga
+        function guardarFlowField() {
+            const nombre = prompt("Ingresa un nombre para guardar el flowfield:");
+            if (nombre && nombre.trim()) {
+                localStorage.setItem(`flowfield_${nombre.trim()}`, JSON.stringify(flowfield));
+                console.log(`Flowfield guardado como: flowfield_${nombre.trim()}`);
+            }
+        }
+
+        function cargarFlowField() {
+            const nombre = prompt("Ingresa el nombre del flowfield a cargar:");
+            if (nombre && nombre.trim()) {
+                const data = localStorage.getItem(`flowfield_${nombre.trim()}`);
+                if (data) {
+                    const loadedFlowfield = JSON.parse(data);
+                    for (let i = 0; i < flowfield.length && i < loadedFlowfield.length; i++) {
+                        flowfield[i].set(loadedFlowfield[i].x, loadedFlowfield[i].y);
+                    }
+                    drawFlowfield();
+                    console.log(`Flowfield cargado: flowfield_${nombre.trim()}`);
+                } else {
+                    console.log("No se encontró un flowfield con ese nombre");
+                }
+            }
+        }
+
+        // Configuración de PixiJS
+        const app = new PIXI.Application({
+            width: width,
+            height: height,
+            backgroundColor: isSimulationMode ? 0x1099bb : 0xffffff
+        });
+        document.body.appendChild(app.view);
+
+        const cols = Math.floor(app.screen.width / resolution);
+        const rows = Math.floor(app.screen.height / resolution);
+
+        // Contenedores de gráficos
+        const graphics = new PIXI.Graphics();
+        app.stage.addChild(graphics);
+
+        // Clase Boid
+        class Boid {
+            constructor(x, y) {
+                this.sprite = new PIXI.Graphics();
+                this.sprite.beginFill(this.getRandomColor());
+                this.sprite.drawCircle(0, 0, 4);
+                this.sprite.endFill();
+                this.sprite.x = x;
+                this.sprite.y = y;
+                app.stage.addChild(this.sprite);
+
+                this.velocity = new PIXI.Point(Math.random() * 2 - 1, Math.random() * 2 - 1);
+                this.acceleration = new PIXI.Point(0, 0);
+                this.maxSpeed = 1 + Math.random();
+                this.maxForce = 0.05;
+            }
+
+            getRandomColor() {
+                return Math.floor(Math.random() * 0xffffff);
+            }
+
+            applyForce(force) {
+                if (!force) return;
+                this.acceleration.x += force.x;
+                this.acceleration.y += force.y;
+            }
+
+            separation(boids) {
+                const desiredSeparation = 16;
+                let steer = new PIXI.Point(0, 0);
+                let count = 0;
+
+                boids.forEach(other => {
+                    const d = this.distance(other);
+                    if (d > 0 && d < desiredSeparation) {
+                        const diff = new PIXI.Point(this.sprite.x - other.sprite.x, this.sprite.y - other.sprite.y);
+                        const mag = Math.sqrt(diff.x * diff.x + diff.y * diff.y);
+                        if (mag > 0) {
+                            diff.x /= mag;
+                            diff.y /= mag;
+                            steer.x += diff.x;
+                            steer.y += diff.y;
+                            count++;
+                        }
+                    }
+                });
+
+                let strength = 1.5;
+
+                if (count > 0) {
+                    steer.x /= count;
+                    steer.y /= count;
+                    const mag = Math.sqrt(steer.x * steer.x + steer.y * steer.y);
+                    if (mag > 0) {
+                        steer.x /= mag;
+                        steer.y /= mag;
+                        steer.x *= this.maxSpeed;
+                        steer.y *= this.maxSpeed;
+                        steer.x -= this.velocity.x;
+                        steer.y -= this.velocity.y;
+                        steer.x = Math.max(-this.maxForce, Math.min(this.maxForce, steer.x)) * strength;
+                        steer.y = Math.max(-this.maxForce, Math.min(this.maxForce, steer.y)) * strength;
+                    }
+                }
+
+                this.applyForce(steer);
+            }
+
+            followFlowfield(flowfield) {
+                const col = Math.floor(this.sprite.x / resolution);
+                const row = Math.floor(this.sprite.y / resolution);
+                const index = col + row * cols;
+                const force = flowfield[index];
+                let strength = 1;
+                if (force) {
+                    this.applyForce({ x: force.x * strength, y: force.y * strength });
+                }
+            }
+
+            distance(other) {
+                return Math.sqrt(
+                    (this.sprite.x - other.sprite.x) * (this.sprite.x - other.sprite.x) +
+                    (this.sprite.y - other.sprite.y) * (this.sprite.y - other.sprite.y)
+                );
+            }
+
+            update() {
+                this.velocity.x += this.acceleration.x;
+                this.velocity.y += this.acceleration.y;
+                this.velocity.x = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.velocity.x));
+                this.velocity.y = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.velocity.y));
+
+                this.velocity.x *= 0.98;
+                this.velocity.y *= 0.98;
+
+                this.sprite.x += this.velocity.x;
+                this.sprite.y += this.velocity.y;
+
+                this.acceleration.x = 0;
+                this.acceleration.y = 0;
+
+                // Wrap around screen
+                this.sprite.x = (this.sprite.x + width) % width;
+                this.sprite.y = (this.sprite.y + height) % height;
+            }
+
+            setVisible(visible) {
+                this.sprite.visible = visible;
+            }
+        }
+
+        // Funciones del flowfield
+        function createFlowfield() {
+            flowfield = [];
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    flowfield.push(new PIXI.Point(0, 0));
+                }
+            }
+        }
+
+        function createRandomFlowfield() {
+            let startingRandomNum = Math.random() * Math.PI;
+            console.log("Generando flowfield aleatorio con semilla:", startingRandomNum);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const index = x + y * cols;
+                    let angle = Math.sin((x * -y) * 0.015) + startingRandomNum;
+                    const vector = new PIXI.Point(Math.cos(angle), Math.sin(angle));
+                    flowfield[index] = vector;
+                }
+            }
+            drawFlowfield();
+        }
+
+        function drawFlowfield() {
+            graphics.clear();
+
+            // Dibujar la grilla si está habilitada y en modo editor
+            if (showGrid && !isSimulationMode) {
+                graphics.lineStyle(1, 0xcccccc, 0.5);
+                // Líneas verticales
+                for (let x = 0; x <= cols; x++) {
+                    const px = x * resolution;
+                    graphics.moveTo(px, 0);
+                    graphics.lineTo(px, rows * resolution);
+                }
+                // Líneas horizontales
+                for (let y = 0; y <= rows; y++) {
+                    const py = y * resolution;
+                    graphics.moveTo(0, py);
+                    graphics.lineTo(cols * resolution, py);
+                }
+            }
+
+            // Dibujar los vectores del flowfield
+            if (!isSimulationMode || showGrid) {
+                graphics.lineStyle(2, isSimulationMode ? 0xffffff : 0x000000, isSimulationMode ? 0.3 : 1);
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const index = x + y * cols;
+                        const vector = flowfield[index];
+                        const px = x * resolution + resolution / 2;
+                        const py = y * resolution + resolution / 2;
+
+                        // Dibujar el vector solo si tiene magnitud
+                        if (vector.x !== 0 || vector.y !== 0) {
+                            graphics.moveTo(px, py);
+                            graphics.lineTo(px + vector.x * 10, py + vector.y * 10);
+                        }
+                    }
+                }
+            }
+        }
+
+        function updateFlowfield(mouseX, mouseY) {
+            if (!lastMouse) lastMouse = { x: mouseX, y: mouseY };
+            let mouseVel = { x: mouseX - lastMouse.x, y: mouseY - lastMouse.y };
+            let cuantoPatras = 15;
+            const cuantoPalante = 10
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const index = x + y * cols;
+                    const vector = flowfield[index];
+                    const px = x * resolution;
+                    const py = y * resolution;
+
+                    // Solo cambiar los vectores cerca del mouse
+                    const distance = Math.hypot((mouseX - mouseVel.x * cuantoPatras) - px, (mouseY - mouseVel.y * cuantoPatras) - py);
+                    if (distance <= resolution * grosorDelMouse) {
+                        const angle = Math.atan2(mouseY - py, mouseX - px)
+                        let lowerDistance = distance * 0.03;
+                        const newVector = new PIXI.Point(Math.cos(angle) * lowerDistance, Math.sin(angle) * lowerDistance);
+                        vector.set((newVector.x + mouseVel.x) * 0.33, (newVector.y + mouseVel.y) * 0.33);
+                    }
+
+
+                }
+            }
+
+
+
+
+
+        }
+
+        // Función para agregar un boid
+        function addBoid(x, y) {
+            const boid = new Boid(x, y);
+            boid.setVisible(isSimulationMode);
+            boids.push(boid);
+            console.log(`Boid agregado en (${Math.round(x)}, ${Math.round(y)}). Total: ${boids.length}`);
+        }
+
+        // Función para eliminar todos los boids
+        function clearAllBoids() {
+            boids.forEach(boid => {
+                app.stage.removeChild(boid.sprite);
+            });
+            boids.length = 0;
+            console.log('Todos los boids eliminados');
+        }
+
+        // Función para agregar múltiples boids en la posición del mouse
+        function addBoidsAtMouse(count = 10) {
+            for (let i = 0; i < count; i++) {
+                // Agregar un poco de dispersión aleatoria alrededor del mouse
+                const spread = 30; // Radio de dispersión
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * spread;
+                const x = currentMousePos.x + Math.cos(angle) * distance;
+                const y = currentMousePos.y + Math.sin(angle) * distance;
+
+                // Asegurar que los boids estén dentro de los límites
+                const clampedX = Math.max(0, Math.min(width, x));
+                const clampedY = Math.max(0, Math.min(height, y));
+
+                addBoid(clampedX, clampedY);
+            }
+            console.log(`${count} boids agregados en mouse (${Math.round(currentMousePos.x)}, ${Math.round(currentMousePos.y)}). Total: ${boids.length}`);
+        }
+
+        // Funciones de modo
+        function switchMode() {
+            isSimulationMode = !isSimulationMode;
+
+            // Cambiar color de fondo
+            app.renderer.backgroundColor = isSimulationMode ? 0x1099bb : 0xffffff;
+
+            // Mostrar/ocultar boids
+            boids.forEach(boid => boid.setVisible(isSimulationMode));
+
+            // Actualizar UI
+            const modeIndicator = document.getElementById('modeIndicator');
+            modeIndicator.textContent = `Modo: ${isSimulationMode ? 'Simulación' : 'Editor'} (Presiona ESPACIO para cambiar)`;
+
+            // Redibujar flowfield
+            drawFlowfield();
+
+            console.log(`Cambiado a modo: ${isSimulationMode ? 'Simulación' : 'Editor'}`);
+        }
+
+        // Eventos del mouse
+        app.view.addEventListener('mousedown', (e) => {
+            if (!isSimulationMode) {
+                // Modo editor: activar dibujo
+                isMousePressed = true;
+            }
+        });
+
+        app.view.addEventListener('mouseup', (e) => {
+            if (isSimulationMode) {
+                // Modo simulación: agregar boid en la posición del click
+                const rect = app.view.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                addBoid(mouseX, mouseY);
+            }
+            isMousePressed = false;
+        });
+
+        app.view.addEventListener('mousemove', (e) => {
+            // Siempre actualizar la posición del mouse
+            const rect = app.view.getBoundingClientRect();
+            currentMousePos.x = e.clientX - rect.left;
+            currentMousePos.y = e.clientY - rect.top;
+
+            if (isMousePressed && !isSimulationMode) {
+                // Solo en modo editor: dibujar flowfield
+                updateFlowfield(currentMousePos.x, currentMousePos.y);
+                drawFlowfield();
+                lastMouse = { x: currentMousePos.x, y: currentMousePos.y };
+            }
+        });
+
+        // Eventos del teclado
+        document.addEventListener('keydown', (e) => {
+            switch (e.key.toLowerCase()) {
+                case ' ':
+                    e.preventDefault();
+                    switchMode();
+                    break;
+                case 'g':
+                    showGrid = !showGrid;
+                    drawFlowfield();
+                    console.log(`Grilla ${showGrid ? 'activada' : 'desactivada'}`);
+                    break;
+                case 's':
+                    guardarFlowField();
+                    break;
+                case 'l':
+                    cargarFlowField();
+                    break;
+                case 'c':
+                    // Limpiar flowfield
+                    for (let i = 0; i < flowfield.length; i++) {
+                        flowfield[i].set(0, 0);
+                    }
+                    drawFlowfield();
+                    console.log('Flowfield limpiado');
+                    break;
+                case 'r':
+                    createRandomFlowfield();
+                    break;
+                case 'x':
+                    clearAllBoids();
+                    break;
+                case 'b':
+                    addBoidsAtMouse(10);
+                    break;
+            }
+        });
+
+        // Inicialización
+        function setup() {
+            // Crear flowfield vacío
+            createFlowfield();
+
+            // Crear boids (inicialmente ocultos)
+            for (let i = 0; i < numBoids; i++) {
+                const boid = new Boid(Math.random() * app.screen.width, Math.random() * app.screen.height);
+                boid.setVisible(false);
+                boids.push(boid);
+            }
+
+            // Loop de animación
+            app.ticker.add(() => {
+                if (isSimulationMode) {
+                    boids.forEach(boid => {
+                        boid.followFlowfield(flowfield);
+                        boid.separation(boids);
+                        boid.update();
+                    });
+                }
+            });
+
+            // Dibujar estado inicial
+            drawFlowfield();
+        }
+
+        setup();
+    </script>
+</body>
+
+</html>

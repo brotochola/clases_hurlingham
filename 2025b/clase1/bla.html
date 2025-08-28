@@ -1,0 +1,95 @@
+<button id="boton">un boton</button>
+
+
+
+
+
+<script>
+
+    let a = 1;
+    let b = "pepo"
+
+
+    function sumar(a, b) {
+        return a + b
+    }
+
+    //arrays, arreglos, listas, etc
+    let unArray = [1, 2, 56, 76, "sds"]
+
+    let unObjeto = { altura: 123, nombre: "juanito" }
+
+    const unaVariableConstante = 12837
+
+
+    class Persona {
+
+        constructor(nombre) {
+            if (typeof nombre == "string" && nombre != "") {
+                this.nombre = nombre
+            } else {
+                console.log("# el nombre esta mal")
+            }
+        }
+
+        establecerEdad(edad) {
+            if (!isNaN(edad)) this.edad = edad
+            else console.warn("che todo mal")
+
+            return edad
+        }
+
+        atajarError() {
+            try {
+                bla = 1
+
+
+            } catch (error) {
+                console.log("error", error)
+            }
+
+
+
+        }
+    }
+
+
+
+    //////
+
+    let contador = 0
+    let tiempo = 0
+
+    let deltaTime = 0
+    let tiempoActual = 0
+    let fps = 60
+    let tiempoEntreFrames = 1000 / fps
+    const boton = document.querySelector("#boton")
+
+    let nombre = prompt("pone un nombre")
+    localStorage.miNombre = nombre
+
+    const gameLoop = function () {
+
+        contador++
+        deltaTime = performance.now() - tiempoActual
+        tiempoActual = performance.now()
+        // console.log("gameloop", contador, deltaTime)
+
+
+        boton.style.marginLeft = Math.sin(contador * 0.01) * 100 + 100
+        boton.style.marginTop = Math.cos(contador * 0.01) * 100 + 100
+
+
+
+
+        requestAnimationFrame(gameLoop)
+    }
+
+
+    gameLoop()
+
+
+
+
+</script>

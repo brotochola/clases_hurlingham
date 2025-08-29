@@ -22,7 +22,7 @@ ideas para juegos:
 -estrategia en tiempo real
 
 vistas:
--isometrica
+-isometrica/topdown
 -de costado
 -desde arriba
 

@@ -28,11 +28,11 @@ Organizados en grupos de dos personas, los estudiantes deberán desarrollar y pr
 El juego desarrollado deberá incluir, como mínimo, los siguientes aspectos técnicos:
 
 - **Input del Usuario**: Interacción a través de mouse y/o teclado.
-- **Spatial Hashing**: Optimización espacial para manejar grandes cantidades de personajes.
+- **Serialización**: Capacidad de guardar y cargar algun aspecto del juego (high score, niveles, partidas, etc)
 - **Spritesheets**: Uso de múltiples spritesheets por personaje.
-- **Algoritmo Boids**: Implementación del algoritmo Boids (o variantes del mismo) para la simulación de comportamiento grupal.
+- **Algoritmo Boids o similar**: Implementación del algoritmo Boids (o variantes del mismo) para la simulación de comportamiento grupal.
 - **Movimiento de Cámara**: Movimiento suave de cámara utilizando interpolación lineal (Lerp).
-- **Finite State Machine (FSM)**: Implementación de una máquina de estados finitos para gestionar las transiciones y comportamientos de los personajes.
+- **Finite State Machine (FSM)**: Implementación de una máquina de estados finitos para gestionar comportamientos y animaciones de los personajes.
 
 **Elementos Opcionales:**
 
@@ -41,7 +41,7 @@ El juego puede también incorporar uno o más de los siguientes elementos opcion
 - **Perlin Noise**: Aplicación del ruido Perlin en algún aspecto del juego.
 - **Técnicas de Optimización Algorítmica**: Aplicación de optimizaciones avanzadas en el algoritmo o simulación.
 - **Motor de Física 2D**: Implementación de un motor de física como MatterJS, Box2D, PlanckJS, entre otros.
-- **Serialización**: Capacidad de guardar y cargar partidas.
+- **Spatial Hashing**: Optimización espacial para manejar grandes cantidades de personajes.
 - **Flowfield**: Implementación de campos de flujo para guiar el movimiento de los personajes.
 - **Path Finding**: Algoritmos de búsqueda de caminos, como A\* o similares.
 
@@ -104,13 +104,14 @@ Material:
    - **WebServer**: introducción a servidores web y NodeJS
    - **NPM y Servidores Locales**: Instalación y uso de algun paquete de Node para levantar un servidor local.
 
---
 Material:
 
 - https://pixijs.com/
 - https://www.youtube.com/watch?v=qvBdQf4RSjQ&ab_channel=SamuelAsherRivello
 - https://www.youtube.com/watch?v=lHD-o7J9CX4&ab_channel=SamuelAsherRivello
 - https://www.youtube.com/watch?v=NiapDp6dT8w&ab_channel=CodesandTags
+
+--
 
 3. **Entidades, Posiciones y Vectores**
    - **Creación de Clase Entidad**: Estructuración del código en una clase genérica de la cual heredan los demás tipos de objetos
@@ -120,13 +121,14 @@ Material:
    - **Update vs Render**: Cálculo de posiciones y representación en pantalla.
    - **Comportamientos de Persecución y Evasión**: Implementación de comportamientos como ‘perseguir’ y ‘escapar’.
 
---
 Material:
 
 - Clases, herencias: https://www.youtube.com/watch?v=C86JvqET61A&ab_channel=jonmircha
 - Vectores: https://www.youtube.com/watch?v=MkWhanqZfag&ab_channel=EsCiencia
 - Varios conceptos matematicos q usamos todo el tiempo: https://www.youtube.com/watch?v=DPfxjQ6sqrc&ab_channel=javidx9
 - Comportamientos de persecución y evasión: https://www.youtube.com/watch?v=Q4MU7pkDYmQ&t=438s&ab_channel=TheCodingTrain
+
+--
 
 4. **Movimiento del Personaje con Teclado y/o Mouse**
    - **Uso de Spritesheets**: Introducción al uso de spritesheets para animar el personaje.
@@ -135,6 +137,15 @@ Material:
    - **Eventos en JavaScript**: Captura y manejo de eventos de teclado y mouse.
    - **Gestión de Input**: Almacenamiento y procesamiento de la entrada del usuario dentro de la estructura del juego.
    - **Asignación de Velocidad al Protagonista**: Implementación de movimiento basado en la entrada del usuario.
+
+Material:
+
+- Spritesheets: https://www.youtube.com/watch?v=E5N8Ipd1ZTA&ab_channel=WaelYasmina
+- Free texture packer: https://free-tex-packer.com/app/
+- Eventos de teclado en JS: https://www.youtube.com/watch?v=cP-_beFbz_Q&ab_channel=DowerChin
+- Eventos de Mouse en PIXIJS: https://www.youtube.com/watch?v=4MR2D41KQ1E&ab_channel=DowerChin
+- Universal Sprite Creator: https://www.youtube.com/watch?v=dTBbJ6qDY8o&ab_channel=Gamefromscratch
+- PIXI.AnimatedSprite: https://api.pixijs.io/@pixi/sprite-animated/PIXI/AnimatedSprite.html
 
 --
 
@@ -150,6 +161,11 @@ Material:
      3. **Cohesión**: Mantener a los NPCs agrupados.
    - **Uso del zIndex**: Control de la superposición de los elementos gráficos en pantalla.
 
+Material:
+
+- Boids: https://www.youtube.com/watch?v=bqtqltqcQhw&ab_channel=SebastianLague
+- Boids paso a paso: https://www.youtube.com/watch?v=mhjuuHl6qHM&ab_channel=TheCodingTrain
+
 --
 
 6. **Movimiento de Cámara \+ Interpolación Lineal**
@@ -162,31 +178,32 @@ Material:
 
 --
 
-7. **Grid y Tiles: Spatial Hashing**
-   - **Problemas con el Cálculo del Teorema de Pitágoras en Múltiples Objetos**: Análisis de las dificultades y limitaciones que surgen al calcular la distancia entre muchos objetos utilizando el teorema de Pitágoras, especialmente en términos de rendimiento computacional en juegos con numerosos elementos móviles. Big O Notation.
-   - **Spatial Hashing: Funcionamiento Detallado**: Exploración en detalle del concepto de Spatial Hashing, una técnica que divide el espacio en celdas y asigna objetos a estas celdas para reducir el número de cálculos necesarios.
-
---
-
-8. **Finite State Machine (FSM)**
+7. **Finite State Machine (FSM)**
    - **Introducción a las Finite State Machines (FSM)**: Explicación de los conceptos básicos de una FSM y cómo se utilizan para gestionar comportamientos complejos en videojuegos.
    - **Estados, acciones y sprites**
    - **Cambio de Estado** según variables propias y del entorno de cada NPC, y toma de decisiones según estado.
 
 --
 
-9. **Sistema de Animación**
+8. **Sistema de Animación**
    - **Entorno \-\> Estado \-\> Acción \-\> Selección de Sprite**: Según el estado proporcionado por la FSM, las propias variables del NPC y de su entorno, el sistema de animación selecciona y muestra la secuencia de imágenes o sprites adecuados para representar el comportamiento del NPC en ese estado.
 
 --
 
-10. **Colisiones y Motor de Física 2D**
+9. **Colisiones y Motor de Física 2D**
 
 - **Colisiones sin motor de física**
 - **Motores de física 2D**:
   1.  Introducción a motores como Matter.js y Box2D.
   2.  Integración básica de MatterJS con PixiJS.
   3.  Ejemplos de uso: simulación de gravedad, rebotes, fricción, etc.
+
+--
+
+10. **Grid y Tiles: Spatial Hashing**
+
+- **Problemas con el Cálculo del Teorema de Pitágoras en Múltiples Objetos**: Análisis de las dificultades y limitaciones que surgen al calcular la distancia entre muchos objetos utilizando el teorema de Pitágoras, especialmente en términos de rendimiento computacional en juegos con numerosos elementos móviles. Big O Notation.
+- **Spatial Hashing: Funcionamiento Detallado**: Exploración en detalle del concepto de Spatial Hashing, una técnica que divide el espacio en celdas y asigna objetos a estas celdas para reducir el número de cálculos necesarios.
 
 --
 

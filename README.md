@@ -13,9 +13,10 @@ A lo largo del curso, los estudiantes adquirirán las habilidades necesarias par
 
 Organizados en grupos de dos personas, los estudiantes deberán desarrollar y presentar, en la fecha del segundo parcial, un videojuego 2D que cumpla con los siguientes requisitos:
 
-1. **Cantidad de Personajes**: El juego debe incluir al menos 50 NPCs -non-playable characters- que implementen el algoritmo Boids o una variación similar. Es decir, evaluar el entorno, cambiar de estado, establecer un objetivo fijo o móvil y moverse hacia el mismo.
-2. **Interactividad**: El usuario debe tener la capacidad de interactuar con el juego en tiempo real mediante el uso del mouse y/o teclado.
-3. **Ejemplos de Juegos**: Algunas posibles ideas incluyen:
+1. **Setup**: Juego 2D desarrollado con javascript o typescript, usando PixiJS como herramienta principal de renderizado. Publicado en Github Pages.
+2. **Cantidad de Personajes**: El juego debe incluir al menos 50 NPCs -non-playable characters- que implementen el algoritmo Boids o una variación similar. Es decir, evaluar el entorno, cambiar de estado, establecer un objetivo fijo o móvil y moverse hacia el mismo.
+3. **Interactividad**: El usuario debe tener la capacidad de interactuar con el juego en tiempo real mediante el uso del mouse y/o teclado.
+4. **Ejemplos de Juegos**: Algunas posibles ideas incluyen:
    - Juego de matar hordas de zombis.
    - Un perro que arrea ganado.
    - Simulador de pesca.
@@ -306,3 +307,4 @@ Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8
 Diferentes Métodos para simular física: https://www.youtube.com/watch?v=-GWTDhOQU6M
 Animación Esquelética: https://www.youtube.com/watch?v=sq6mnix8eAg
 Dual Grid System: https://www.youtube.com/watch?v=jEWFSv3ivTg
+

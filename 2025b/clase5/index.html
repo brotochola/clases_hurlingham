@@ -1,0 +1,104 @@
+<html>
+
+<head>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+
+        html {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+
+    <script src="utils.js"></script>
+
+    <!-- importamos pixi -->
+    <script src="pixi.js"></script>
+    <script src="animated-character.js"></script>
+    <!-- importamos la clase juego -->
+    <script src="juego.js"></script>
+    <script src="gameObject.js"></script>
+    <script src="entidadEstatica.js"></script>
+    <script src="arbol.js"></script>
+    <script src="auto.js"></script>
+    <!-- y cada conejito -->
+    <script src="persona.js"></script>
+    <script src="protagonista.js"></script>
+    <script src="enemigo.js"></script>
+    <script src="amigo.js"></script>
+
+</head>
+
+<body>
+    <script>
+
+
+
+        // todo empieza aca (Entry Point).
+        // creamos una instancia de la clase juego
+        const juego = new Juego()
+
+
+    </script>
+
+</body>
+
+
+
+<!-- 
+
+* El usuario maneja al lider de una pandilla. los demas miembros de la pandilla son NPCs
+* Hay 10 pandillas y el protagonista pertenece a una de ellas, aunq tiene un sombrero diferente
+* La idea de las pandilla y todo eso esta basada en la peli The Warriors de 1979
+* Voy a usar https://pflat.itch.io/lpc-character-generator para generar a los personajes de cada pandilla
+
+* Personajes:
+    * Protagonista / lider de pandilla
+        * se maneja con el mouse indicando el objetivo a seguir
+        * al hacer click en un civil, e ir el lider hacia él, le roba plata
+        * si un policia u otro miembro de pandilla le pega, responde
+    * todos los miembros de todas las pandillas, menos el lider:
+        * segun su propiedad coraje (>0.5), van a pegarse con otros miembros de pandillas
+        * segun su propiedad coraje, se alejan de los policias ignorando la posicion del lider, o se pegan (>0.75 le pegan a la poli)
+        
+        *** Miembros de mi pandilla (amigos)
+            * siempre siguen al lider        
+        *** Miembros de otras pandillas (enemigos)
+    * policias
+        * tmb se mueven en grupo
+        * si ve a un miembro de pandilla robandole a un civil va a pegarle
+        * pasando el mouse por encima de cada policia se ve el precio para comprarlo (random), y cuando lo compras, se va para otro lado, y olvida lo que pasó 
+        * patrullando, yendo a buscar al q robó para pegarle
+
+    * civiles
+        * tienen objetivos random para ir de un lugar a otro
+        * tienen una cantidad de plata
+        * al hacerles click el lider va y cuando llega le roba plata (el unico q roba es el lider). La plata se acumula y se usa para comprar policias y power ups
+        * estados: todo bien, me robaron y me voy corriendo
+
+* Mecanicas:
+    * Los miembros de tu pandilla te siguen
+    * Segun propiedades de cada miembro de tu pandilla, tendran mas o menos coraje para ir a pegarle a otros miembros de otras pandillas, o bien, quedarse mas cerca del lider (protagonista), y solo responder si alguien les pega a ellos
+    * los miembros de pandillas enemigas, tmb se pelean entre si, y andan en grupo
+    * agregar para todos los personajes globitos con emojis :D
+    * cuando un miembro de una pandilla enemiga, no tiene a ningun aliado cerca, y tiene menos de 25% de vida, y tiene a miembros de otra pandilla cerca, se convierte.
+
+
+-
+
+
+-->
+
+
+</html>

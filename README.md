@@ -206,6 +206,10 @@ Material:
 - **Problemas con el Cálculo del Teorema de Pitágoras en Múltiples Objetos**: Análisis de las dificultades y limitaciones que surgen al calcular la distancia entre muchos objetos utilizando el teorema de Pitágoras, especialmente en términos de rendimiento computacional en juegos con numerosos elementos móviles. Big O Notation.
 - **Spatial Hashing: Funcionamiento Detallado**: Exploración en detalle del concepto de Spatial Hashing, una técnica que divide el espacio en celdas y asigna objetos a estas celdas para reducir el número de cálculos necesarios.
 
+- https://www.youtube.com/watch?v=i0OHeCj7SOw
+- https://www.youtube.com/watch?v=sx4IIQL0x7c
+- https://www.youtube.com/watch?v=D2M8jTtKi44
+
 --
 
 11. **Optimización**
@@ -307,4 +311,6 @@ Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8
 Diferentes Métodos para simular física: https://www.youtube.com/watch?v=-GWTDhOQU6M
 Animación Esquelética: https://www.youtube.com/watch?v=sq6mnix8eAg
 Dual Grid System: https://www.youtube.com/watch?v=jEWFSv3ivTg
+
+
 

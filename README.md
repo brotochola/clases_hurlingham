@@ -90,6 +90,7 @@ El curso está estructurado en 12 clases, cada una con un enfoque específico. A
 
 Material:
 
+- Introducción al desarrollo de juegos web: https://www.youtube.com/watch?v=HLgNTrhWuIk
 - https://www.youtube.com/watch?v=8GTaO9XhA5M&ab_channel=ProgramadorX
 - https://www.youtube.com/watch?v=bBB-dMgeisk&ab_channel=Parzibyte
 - Gameloop, delta time: https://www.youtube.com/watch?v=yGhfUcPjXuE&ab_channel=JonasTyroller
@@ -184,6 +185,7 @@ Material:
    - **Estados, acciones y sprites**
    - **Cambio de Estado** según variables propias y del entorno de cada NPC, y toma de decisiones según estado.
 
+https://www.youtube.com/watch?v=9lt_nDBiHLY
 --
 
 8. **Sistema de Animación**
@@ -311,6 +313,8 @@ Filtros en PixiJS: https://www.youtube.com/watch?v=WAoDOM8PSw8
 Diferentes Métodos para simular física: https://www.youtube.com/watch?v=-GWTDhOQU6M
 Animación Esquelética: https://www.youtube.com/watch?v=sq6mnix8eAg
 Dual Grid System: https://www.youtube.com/watch?v=jEWFSv3ivTg
+
+
 
 
 

@@ -1,0 +1,102 @@
+<html>
+
+<h1>holis kashdg agsid </h1>
+<h2>adoufhdosufhodfs </h2>
+<h3>h3</h3>
+
+
+
+
+
+
+
+<img id="autito" src="auto5.png">
+
+<button id="boton">haceme click</button>
+
+
+
+
+<script>
+    let unaVariable = 123;
+
+    let nombre = "pepito"
+
+    let unArrayDenumeros = [1, 3, 54, 5, 44, 4, 34, 34, 334]
+
+    let persona = { nombre: "juan", edad: 94, altura: 177 }
+
+
+    if (persona.edad > 18) {
+        console.log("tiene mas de 18")
+    } else {
+        console.log("no")
+    }
+
+
+    // document.querySelector("#autito").style.position = "fixed"
+    // document.querySelector("#autito").style.left = "200px"
+
+    // let elementoAutito = document.querySelector("#autito")
+    // console.log("a ver el autito", elementoAutito)
+    // elementoAutito.style.left = "200px"
+
+
+    class Persona {
+        constructor(nombre, edad) {
+            this.nombre = nombre;
+            this.edad = edad;
+        }
+
+        cumplirAños() {
+            this.edad++
+        }
+    }
+
+    let juanito = new Persona("juanito", 19)
+
+    let contador = 0
+
+    //////////
+
+    let autito = document.querySelector("#autito")
+    autito.style.position = "absolute"
+    autito.style.left = "500px"
+
+
+    let milisegundosAEsperarParaVolverALlamarALaFuncion = 1000 / 60
+
+
+    function daleGas() {
+        contador = contador + 1
+        console.log(contador, performance.now())
+        autito.style.top = 100 * Math.sin(contador * 0.1) + 200 + "px"
+        autito.style.left = 100 * Math.cos(contador * 0.1) + 200 + "px"
+
+        setTimeout(daleGas, milisegundosAEsperarParaVolverALlamarALaFuncion)
+    }
+
+
+
+    let boton = document.querySelector("#boton")
+    boton.onclick = daleGas
+    // boton.onmouseenter = daleGas
+
+
+    // let autito = document.querySelector("#autito")
+    // autito.onmousemove = daleGas
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+</html>

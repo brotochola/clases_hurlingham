@@ -8,12 +8,7 @@ class Grid {
     this.showFlowField = false;
 
     // Set default noise frequencies (higher = more detailed/frequent changes)
-    this.noiseFrequencies = {
-      soilFertility: noiseFrequencies.soilFertility,
-      height: noiseFrequencies.height, // Lower frequency for larger terrain features
-      temperature: noiseFrequencies.temperature, // Higher frequency for more varied temperature zones
-      ...noiseFrequencies, // Allow overriding any of the above
-    };
+    this.noiseFrequencies = noiseFrequencies;
 
     // Create noise generators for different properties
     this.soilNoiseGenerator = new PerlinNoise(123);

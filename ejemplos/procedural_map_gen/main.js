@@ -44,6 +44,7 @@ function createDemoEntities() {
 
   // Create a player using the new Player class
   const player = new Player(0, 0, game);
+  window.player = player;
 
   // Add player to the game's entities Set so it gets updated
 

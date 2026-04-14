@@ -229,7 +229,10 @@ https://www.youtube.com/watch?v=9lt_nDBiHLY
       2.  Ejemplo de una lookup table para distancias entre celdas en una grid.
       3.  Comparación de rendimiento entre cálculos en tiempo real y distancias precalculadas.
 
+https://www.youtube.com/watch?v=E_ZROz5nejw
 --
+
+
 
 12. ### **Cordova, ElectronJS, Itch.io, PWAs.**
 

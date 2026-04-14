@@ -1,0 +1,174 @@
+<html>
+
+<head>
+
+    <style>
+        body {
+            margin: 0px
+        }
+    </style>
+
+
+
+
+    <script src="pixi.js"></script>
+    <script src="clases/conejito.js"></script>
+
+
+
+
+
+</head>
+
+
+
+<body>
+    <script>
+
+
+
+        let pixiApp;
+
+        let texture;
+        let pixiInicializado = false
+
+        let numeroFrame = 0
+        let duracionFrame = 16
+        let fps = 60
+
+
+        const cantidadTotalDeConejito = 1000
+
+        let arrayDeConejitos = []
+
+
+        let ahora = 0
+
+
+
+        async function arrancar() {
+            if (pixiInicializado) {
+                console.log("no podes arrancar pixi de nuevo")
+                return
+            }
+
+            console.log("arrancando")
+            pixiApp = new PIXI.Application();
+            console.log("app de pixi creada", pixiApp)
+            const opcionesDePixi = {
+                background: "#ffff00",
+                width: window.innerWidth,
+                height: window.innerHeight,
+            };
+            console.log(opcionesDePixi)
+            await pixiApp.init(opcionesDePixi);
+
+
+            window.__PIXI_APP__ = pixiApp
+
+
+            console.log("pixi app inicializada")
+            //agregamos el elementos canvas creado por pixi en el documento html
+            document.body.appendChild(pixiApp.canvas);
+            pixiInicializado = true
+
+            cargarYPonerImagen()
+
+
+
+        }
+
+
+        async function cargarYPonerImagen() {
+
+            texture = await PIXI.Assets.load('bunny.png');
+
+            console.log("texture", texture)
+
+
+            const separacionEnX = 34
+            const separacionEnY = 60
+
+
+
+            for (let i = 0; i < cantidadTotalDeConejito; i++) {
+                // const spriteDeConejitoTemporal = new PIXI.Sprite(texture);
+
+                //definimos coord x
+                const coordenadaXDeEsteConejito = window.innerWidth / 2
+                //definimos y
+                const coordenadaYDeEsteConejito = window.innerHeight / 2
+
+
+
+                const instanciaDeConejito = new Conejito(coordenadaXDeEsteConejito, coordenadaYDeEsteConejito, texture, i)
+
+                //la agregamos al array de conejitos
+                arrayDeConejitos.push(instanciaDeConejito)
+
+
+                //agregamos este sprite al stage
+                pixiApp.stage.addChild(instanciaDeConejito.sprite);
+            }
+
+
+
+
+            arrancarGameLoop()
+        }
+
+
+
+
+
+        function arrancarGameLoop() {
+
+            const nuevoAhora = performance.now()
+            const duracionFrame = nuevoAhora - ahora
+            const fps = 1000 / duracionFrame
+
+            // console.log(fps)
+
+            ahora = nuevoAhora
+
+
+            for (let i = 0; i < arrayDeConejitos.length; i++) {
+                const conejito = arrayDeConejitos[i]
+                conejito.moverse()
+            }
+
+            requestAnimationFrame(arrancarGameLoop)
+        }
+
+
+        function verCuantoConejitosEstanFueraDeLaPantalla() {
+            let arr = []
+
+
+            for (let i = 0; i < arrayDeConejitos.length; i++) {
+                const conejito = arrayDeConejitos[i]
+
+                if (conejito.sprite.x < 0 || conejito.sprite.x > window.innerWidth || conejito.sprite.y < 0 || conejito.sprite.y > window.innerHeight) {
+                    arr.push(conejito)
+                }
+            }
+
+
+            return arr
+
+
+        }
+
+
+
+        arrancar()
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

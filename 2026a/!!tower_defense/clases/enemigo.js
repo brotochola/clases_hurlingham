@@ -10,6 +10,8 @@ class Enemigo extends Persona {
 
     this.targetX = juego.centroUrbano.posicion.x;
     this.targetY = juego.centroUrbano.posicion.y;
+
+    juego.enemigos.push(this);
   }
 }
 

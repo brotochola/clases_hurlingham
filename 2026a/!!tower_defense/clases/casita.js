@@ -2,10 +2,11 @@ class Casita extends GameObject {
   constructor(x, y, juego) {
     super(x, y, juego);
 
-    this.id = juego.casitas.length;
     this.tipo = "casita";
     this.radio = 30;
     this.estatico = true;
+
+    juego.casitas.push(this);
   }
 
   inicializarSprite(textura, escala = 1) {

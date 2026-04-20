@@ -10,13 +10,16 @@ class Persona extends GameObject {
   constructor(x, y, juego, opciones = {}) {
     super(x, y, juego);
 
+    juego.personas.push(this);
+    this.nombre = generateName();
+
     this.juego = juego;
     this.dataJson = juego.assetsCivil;
     this.distanciaParaLlegar = 50;
     this.rapidezWalk = 2;
     this.rapidezRun = 4;
 
-    this.aceleracionParaCorrer = 0.44;
+    this.aceleracionParaCorrer = 0.3;
 
     this.vida = opciones.vida ?? 1;
 
@@ -46,7 +49,7 @@ class Persona extends GameObject {
   crearSpriteAnimado(frames, nombre, opciones = {}) {
     const spriteAnimado = new PIXI.AnimatedSprite(frames);
 
-    spriteAnimado.name = nombre;
+    spriteAnimado.label = nombre;
     spriteAnimado.visible = false;
     spriteAnimado.loop = opciones.loop ?? true;
     spriteAnimado.animationSpeed = opciones.animationSpeed ?? 0.12;
@@ -70,7 +73,7 @@ class Persona extends GameObject {
 
     const sprite = new PIXI.AnimatedSprite(frames);
 
-    sprite.name = "splat";
+    sprite.label = "splat";
     sprite.visible = false;
     sprite.loop = false;
     sprite.alpha = 0.8;
@@ -280,6 +283,7 @@ class Persona extends GameObject {
     this.velocidadLineal = 0;
     this.targetX = null;
     this.targetY = null;
+    this.sacameDeLosArrays();
   }
 
   setearTarget(targetX, targetY) {

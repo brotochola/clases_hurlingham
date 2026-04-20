@@ -1,5 +1,5 @@
-const MUNDO_ANCHO = 3000;
-const MUNDO_ALTO = 2000;
+const MUNDO_ANCHO = 7000;
+const MUNDO_ALTO = 4000;
 const CAMARA_VELOCIDAD = 6;
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 2.0;
@@ -26,9 +26,15 @@ class Juego {
     this.assetsCivil = null;
     this.assetsSplat = null;
     this.texturas = {};
+
+    //un array para cada tipo de gameObject
     this.gameObjects = [];
     this.enemigos = [];
+    this.torres = [];
+    this.centrosUrbanos = [];
+    this.personas = [];
     this.casitas = [];
+
     this.pixiInicializado = false;
     this.teclas = {};
 
@@ -44,6 +50,7 @@ class Juego {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
     this.onWheel = this.onWheel.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
     this.onVisibilityChange = this.onVisibilityChange.bind(this);
     this.onWindowBlur = this.onWindowBlur.bind(this);
     this.onWindowFocus = this.onWindowFocus.bind(this);
@@ -119,6 +126,7 @@ class Juego {
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
     window.addEventListener("wheel", this.onWheel, { passive: false });
+    window.addEventListener("mousemove", this.onMouseMove);
     document.addEventListener("visibilitychange", this.onVisibilityChange);
     window.addEventListener("blur", this.onWindowBlur);
     window.addEventListener("focus", this.onWindowFocus);
@@ -168,7 +176,6 @@ class Juego {
   }
 
   agregarGameObject(gameObject) {
-    this.gameObjects.push(gameObject);
     this.mundo.addChild(gameObject.container);
     gameObject.render();
 
@@ -178,7 +185,6 @@ class Juego {
   spawnEnemigo(x, y, opciones = {}) {
     const enemigo = new Enemigo(x, y, this, opciones);
 
-    this.enemigos.push(enemigo);
     return this.agregarGameObject(enemigo);
   }
 
@@ -192,7 +198,6 @@ class Juego {
   spawnTorre(x, y, tipo = 1) {
     const torre = new Torre(x, y, this, tipo);
 
-    this.casitas.push(torre);
     return this.agregarGameObject(torre);
   }
 
@@ -252,6 +257,16 @@ class Juego {
       this.ui.cancelarColocacion();
       return;
     }
+  }
+
+  onMouseMove(event) {
+    if (!this.teclas["1"]) return;
+
+    const zoom = this.mundo.scale.x;
+    const mundoX = (event.clientX - this.mundo.x) / zoom;
+    const mundoY = (event.clientY - this.mundo.y) / zoom;
+
+    this.spawnEnemigo(mundoX, mundoY);
   }
 
   pausa() {
@@ -348,6 +363,12 @@ class Juego {
     }
 
     this.rafId = requestAnimationFrame(this.gameloop);
+  }
+
+  getEnemigosCerca(x, y, radio) {
+    return this.enemigos.filter((enemigo) => {
+      return distancia(x, y, enemigo.posicion.x, enemigo.posicion.y) < radio;
+    });
   }
 }
 

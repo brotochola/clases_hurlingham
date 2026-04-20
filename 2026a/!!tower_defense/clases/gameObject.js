@@ -1,7 +1,9 @@
 class GameObject {
   constructor(x, y, juego) {
+    this.id = juego.gameObjects.length;
     this.juego = juego;
     this.container = new PIXI.Container();
+    this.container.label = this.constructor.name;
     this.container.sortableChildren = true;
     this.posicion = {
       x: x,
@@ -21,6 +23,24 @@ class GameObject {
     this.estatico = false;
     this.velocidadMaxima = 10;
     this.friccion = 1;
+    juego.gameObjects.push(this);
+  }
+
+  sacameDeLosArrays() {
+    this.juego.casitas = this.juego.casitas.filter((casita) => casita !== this);
+    this.juego.torres = this.juego.torres.filter((torre) => torre !== this);
+    this.juego.centrosUrbanos = this.juego.centrosUrbanos.filter(
+      (centroUrbano) => centroUrbano !== this,
+    );
+    this.juego.personas = this.juego.personas.filter(
+      (persona) => persona !== this,
+    );
+    this.juego.enemigos = this.juego.enemigos.filter(
+      (enemigo) => enemigo !== this,
+    );
+    this.juego.gameObjects = this.juego.gameObjects.filter(
+      (gameObject) => gameObject !== this,
+    );
   }
 
   configurarOrigen(displayObject) {
@@ -70,7 +90,8 @@ class GameObject {
   }
 
   limitarVelocidad() {
-    const velCuad = this.velocidad.x * this.velocidad.x + this.velocidad.y * this.velocidad.y;
+    const velCuad =
+      this.velocidad.x * this.velocidad.x + this.velocidad.y * this.velocidad.y;
     if (velCuad > this.velocidadMaxima * this.velocidadMaxima) {
       const factor = this.velocidadMaxima / Math.sqrt(velCuad);
       this.velocidad.x *= factor;

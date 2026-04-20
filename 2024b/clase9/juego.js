@@ -12,6 +12,14 @@ class Juego {
       .init({
         width: this.canvasWidth,
         height: this.canvasHeight,
+        pixelArt: true,
+        antialias: false,
+        resolution: 1,
+        autoDensity: true,
+        powerPreference: "high-performance",
+        backgroundAlpha: 0,
+        antialias: false,
+        resolution: 1,
         resizeTo: window,
         backgroundColor: 0x1099bb,
       })
@@ -61,12 +69,12 @@ class Juego {
 
   ponerSangreDondeEstabaUnChaboncito(chaboncito) {
     let splatDeSangre = new PIXI.AnimatedSprite(
-      this.jsonDelSplatDeSangre.animations["splat"]
+      this.jsonDelSplatDeSangre.animations["splat"],
     );
 
     let angulo = Math.atan2(
       this.player.container.y - chaboncito.sprite.y,
-      this.player.container.x - chaboncito.sprite.x
+      this.player.container.x - chaboncito.sprite.x,
     );
     splatDeSangre.rotation = angulo;
 
@@ -107,8 +115,8 @@ class Juego {
           Math.random() * window.innerHeight,
           this.app,
           i,
-          this
-        )
+          this,
+        ),
       );
     }
   }
@@ -159,8 +167,8 @@ class Juego {
         new Pasto(
           Math.random() * this.canvasWidth,
           Math.random() * this.canvasHeight,
-          this
-        )
+          this,
+        ),
       );
     }
   }
@@ -200,8 +208,8 @@ class Juego {
         new Piedra(
           Math.random() * this.canvasWidth,
           Math.random() * this.canvasHeight,
-          this
-        )
+          this,
+        ),
       );
     }
   }
@@ -216,7 +224,7 @@ class Juego {
         Math.random() * this.canvasWidth,
         Math.random() * this.canvasHeight,
         velocidad,
-        this
+        this,
       ); // Pasar la grid a los ovejas
       this.ovejas.push(oveja);
       this.grid.add(oveja);
@@ -294,7 +302,7 @@ class Juego {
   calcularLuzDelDia() {
     this.sol = -Math.cos(
       (2 * Math.PI * (this.contadorDeFrames % this.cantFramesPorDia)) /
-        this.cantFramesPorDia
+        this.cantFramesPorDia,
     );
   }
   calcularHoraDelDia() {
@@ -330,23 +338,23 @@ class Juego {
     // Aplicar el límite de 0,0 y canvasWidth, canvasHeight
     const clampedX = Math.min(
       Math.max(targetX, -(this.canvasWidth - this.app.screen.width)),
-      0
+      0,
     );
     const clampedY = Math.min(
       Math.max(targetY, -(this.canvasHeight - this.app.screen.height)),
-      0
+      0,
     );
 
     // Aplicar Lerp para suavizar el movimiento de la cámara
     this.app.stage.position.x = lerp(
       this.app.stage.position.x,
       clampedX,
-      lerpFactor
+      lerpFactor,
     );
     this.app.stage.position.y = lerp(
       this.app.stage.position.y,
       clampedY,
-      lerpFactor
+      lerpFactor,
     );
   }
 }

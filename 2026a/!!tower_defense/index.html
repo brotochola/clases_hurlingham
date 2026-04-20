@@ -1,0 +1,67 @@
+<html>
+
+<head>
+
+    <style>
+        body {
+            margin: 0px
+        }
+    </style>
+
+
+
+
+    <script src="utils.js"></script>
+    <script src="pixi.js"></script>
+
+    <script src="clases/gameObject.js"></script>
+    <script src="clases/casita.js"></script>
+    <script src="clases/torre.js"></script>
+    <script src="clases/centroUrbano.js"></script>
+    <script src="clases/persona.js"></script>
+    <script src="clases/enemigo.js"></script>
+    <script src="clases/ui.js"></script>
+    <script src="clases/juego.js"></script>
+
+
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+    <script>
+        async function arrancar() {
+            const juego = new Juego()
+
+            window.juego = juego
+
+            await juego.init()
+
+            const cx = MUNDO_ANCHO / 2
+            const cy = MUNDO_ALTO / 2
+
+
+
+            // await juego.spawnTorre(cx - 220, cy + 80, 1)
+            // await juego.spawnTorre(cx + 220, cy + 80, 2)
+            for (let i = 0; i < 100; i++) {
+                juego.spawnEnemigo(Math.random() * MUNDO_ANCHO, Math.random() * MUNDO_ALTO)
+            }
+
+        }
+
+        arrancar().catch((error) => {
+            console.error("No se pudo arrancar el juego", error)
+        })
+    </script>
+
+</body>
+
+</html>

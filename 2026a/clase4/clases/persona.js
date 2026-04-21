@@ -3,12 +3,23 @@ class Persona extends GameObject {
     super(x, y, textures, i, juego);
 
     this.dataJson = textures;
-    this.distanciaParaLlegar = 100;
+    this.distanciaParaLlegar = 60;
+    this.distanciaParaEscaparmeDeLaPersonaQueMeAsusta = 140;
 
-    this.velocidadMaxima = 10;
+    this.velocidadMaxima = 3;
     this.direccion = "abajo";
 
+    this.target = null;
+
     this.cargarSpritesAnimados(this.dataJson);
+
+    if (!(this instanceof Protagonista)) {
+      this.asignarTarget(this.juego.gameObjects[this.id - 1]);
+    }
+
+    this.asignarPersonaQueMeAsusta(this.juego.prota);
+
+    // this.asignarTarget(this.juego.prota);
   }
 
   // chequearSiEstoyCercaDelTargetYFrenar() {
@@ -22,6 +33,7 @@ class Persona extends GameObject {
 
   render() {
     this.cambiarDeSpriteDeDireccion();
+    if (!this.spriteAnimadoActual) return;
     this.cambiarVelDeReproduccionDeLaAnimacionSegunVelocidadLineal();
     super.render();
   }
@@ -65,28 +77,64 @@ class Persona extends GameObject {
 
   update() {
     this.perseguirTarget();
+    this.escaparmeDeQuienMeAsusta();
     super.update();
   }
 
-  perseguirTarget() {
-    const cuanto = 0.1;
-    if (this.targetX == undefined || this.targetX == null) {
+  escaparmeDeQuienMeAsusta() {
+    if (!this.personaQueMeAsusta) {
       return;
     }
-    let dx = this.targetX - this.posicion.x;
-    let dy = this.targetY - this.posicion.y;
+
+    let dx = this.personaQueMeAsusta.posicion.x - this.posicion.x;
+    let dy = this.personaQueMeAsusta.posicion.y - this.posicion.y;
     const dist = Math.hypot(dx, dy);
 
-    if (dist > this.distanciaParaLlegar) {
-      const vx = dx / dist; // dirección normalizada X
-      const vy = dy / dist; // dirección normalizada Y
-      // velocidad con magnitud 1 (cambiar multiplicador si se quiere otra rapidez)
-      this.sumarAceleracion(vx * cuanto, vy * cuanto);
+    if (dist < this.distanciaParaEscaparmeDeLaPersonaQueMeAsusta) {
+      const ratioDistanciaACtualConDistParaLlegar =
+        dist / this.distanciaParaEscaparmeDeLaPersonaQueMeAsusta;
+
+      const vx = dx / dist;
+      const vy = dy / dist;
+
+      this.sumarAceleracion(
+        -vx * ratioDistanciaACtualConDistParaLlegar,
+        -vy * ratioDistanciaACtualConDistParaLlegar,
+      );
     }
   }
 
-  asignarTarget(targetX, targetY) {
-    this.targetX = targetX;
-    this.targetY = targetY;
+  perseguirTarget() {
+    if (!this.target) {
+      return;
+    }
+
+    const cuanto = 0.1;
+
+    let dx = this.target.posicion.x - this.posicion.x;
+    let dy = this.target.posicion.y - this.posicion.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > this.distanciaParaLlegar) {
+      const ratioDistanciaACtualConDistParaLlegar =
+        dist / this.distanciaParaLlegar;
+
+      const vx = dx / dist; // dirección normalizada X
+      const vy = dy / dist; // dirección normalizada Y
+
+      this.sumarAceleracion(
+        vx * ratioDistanciaACtualConDistParaLlegar,
+        vy * ratioDistanciaACtualConDistParaLlegar,
+      );
+    }
+  }
+
+  asignarPersonaQueMeAsusta(gameObj) {
+    this.personaQueMeAsusta = gameObj;
+  }
+
+  asignarTarget(gameObj) {
+    console.log("asignar", gameObj, this);
+    this.target = gameObj;
   }
 }

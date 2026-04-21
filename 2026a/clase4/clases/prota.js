@@ -1,6 +1,7 @@
 class Protagonista extends Persona {
   constructor(x, y, textures, juego) {
     super(x, y, textures, juego);
+    this.velocidadMaxima = 7;
   }
 
   update() {

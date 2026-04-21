@@ -55,9 +55,14 @@ class Juego {
   }
 
   crearNivel() {
-    for (let i = 0; i < 10; i++) {
-      // const spriteDeConejitoTemporal = new PIXI.Sprite(texture);
+    this.prota = new Protagonista(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      this.ssChica,
+      this,
+    );
 
+    for (let i = 0; i < 25; i++) {
       //definimos coord x
       const coordenadaXDeEsteConejito = Math.random() * window.innerWidth;
       //definimos y
@@ -71,30 +76,24 @@ class Juego {
       );
     }
 
-    this.prota = new Protagonista(
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      this.ssChica,
-      this,
-    );
-
     this.gameLoop();
   }
 
   gameLoop() {
     const nuevoAhora = performance.now();
-    // console.log("gameloop", nuevoAhora, this);
-    const duracionFrame = nuevoAhora - this.ahora;
-    const fps = 1000 / duracionFrame;
-
-    // console.log(fps)
-
-    this.ahora = nuevoAhora;
 
     for (let i = 0; i < this.gameObjects.length; i++) {
       const conejito = this.gameObjects[i];
       conejito.update();
     }
+
+    // console.log("gameloop", nuevoAhora, this);
+    const duracionFrame = nuevoAhora - this.ahora;
+    this.fps = 1000 / duracionFrame;
+
+    // console.log(fps)
+
+    this.ahora = nuevoAhora;
 
     requestAnimationFrame(() => {
       this.gameLoop();

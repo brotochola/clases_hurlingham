@@ -94,8 +94,8 @@
                 for (const obstacle of obstacles) {
                     // Calcula la distancia al obstáculo considerando la posición futura del boid
                     // (4 unidades adelante en la dirección de su velocidad actual)
-                    const distX = obstacle.x - (this.position.x + this.velocity.x * 4);
-                    const distY = obstacle.y - (this.position.y + this.velocity.y * 4);
+                    const distX = obstacle.x - (this.position.x + this.velocity.x * 12);
+                    const distY = obstacle.y - (this.position.y + this.velocity.y * 12);
                     const distance = Math.sqrt(distX ** 2 + distY ** 2);
 
                     // Si el boid está demasiado cerca del obstáculo (110% de la suma de radios)

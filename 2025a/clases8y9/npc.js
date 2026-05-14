@@ -1,7 +1,7 @@
 import { FSM } from "./fsm.js";
 import { BaseEntity } from "./baseEntity.js";
 import { AnimatedCharacter } from "./pixijs-animated-character-class/animated-character.js";
-import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
+import * as PIXI from "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.mjs";
 
 export class NPC extends BaseEntity {
   static STATES = {
@@ -92,7 +92,7 @@ export class NPC extends BaseEntity {
     const result = await AnimatedCharacter.CreateCharacterFromMegaSpritesheet(
       "./pixijs-animated-character-class/chabon" + this.team + ".png",
       64,
-      64
+      64,
     );
     this.animatedCharacter = result.character;
     this.container.addChild(result.character);
@@ -458,7 +458,7 @@ export class NPC extends BaseEntity {
     if (!this.game.homes.length) return;
 
     this.homeBase = this.game.homes.filter(
-      (home) => home.team === this.team
+      (home) => home.team === this.team,
     )[0];
   }
 
@@ -469,7 +469,7 @@ export class NPC extends BaseEntity {
 
     this.distanceToHome = this.calculateDistance(
       this.homeBase.x,
-      this.homeBase.y
+      this.homeBase.y,
     );
   }
 

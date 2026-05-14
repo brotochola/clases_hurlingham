@@ -1,4 +1,4 @@
-import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
+import * as PIXI from "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.mjs";
 export class UI {
   constructor(game) {
     this.game = game;

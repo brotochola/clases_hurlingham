@@ -1,4 +1,4 @@
-import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
+import * as PIXI from "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.mjs";
 import { NPC } from "./npc.js";
 import { GoldMine } from "./goldMine.js";
 import { Tree } from "./tree.js";
@@ -133,7 +133,7 @@ export class Game {
         Math.random() * this.width,
         Math.random() * this.height,
         this,
-        team
+        team,
       );
       window.npc = npc;
     }
@@ -144,7 +144,7 @@ export class Game {
       const goldMine = new GoldMine(
         Math.random() * this.width,
         Math.random() * this.height,
-        this
+        this,
       );
     }
   }
@@ -154,7 +154,7 @@ export class Game {
       const tree = new Tree(
         Math.random() * this.width,
         Math.random() * this.height,
-        this
+        this,
       );
     }
   }

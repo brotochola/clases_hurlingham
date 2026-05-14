@@ -1,4 +1,4 @@
-import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
+import * as PIXI from "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.mjs";
 import Victor from "https://cdn.skypack.dev/victor";
 import { generateName } from "./utils.js";
 
@@ -118,7 +118,7 @@ export class BaseEntity {
 
     // Apply acceleration to velocity
     this.velocity.add(
-      Victor.fromObject(this.acceleration).multiplyScalar(deltaTime)
+      Victor.fromObject(this.acceleration).multiplyScalar(deltaTime),
     );
 
     // Apply friction to velocity
@@ -135,7 +135,7 @@ export class BaseEntity {
 
     // Apply velocity to position
     this.position.add(
-      Victor.fromObject(this.velocity).multiplyScalar(deltaTime)
+      Victor.fromObject(this.velocity).multiplyScalar(deltaTime),
     );
 
     // Update x, y for backward compatibility

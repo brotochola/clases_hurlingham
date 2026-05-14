@@ -1,5 +1,5 @@
 import { BaseEntity } from "./baseEntity.js";
-import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
+import * as PIXI from "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.mjs";
 
 export class Tree extends BaseEntity {
   constructor(x, y, game) {
@@ -70,7 +70,7 @@ export class Tree extends BaseEntity {
 
     return this.game.npcs.filter(
       (npc) =>
-        this.calculateDistance(npc.x, npc.y) < this.size * 2 && npc.health > 0
+        this.calculateDistance(npc.x, npc.y) < this.size * 2 && npc.health > 0,
     ).length;
   }
 
@@ -171,7 +171,7 @@ export class Tree extends BaseEntity {
         -barWidth / 2,
         yOffset,
         barWidth * this.getWoodPercentage(),
-        barHeight
+        barHeight,
       );
       graphics.endFill();
     }

@@ -1,5 +1,5 @@
 import { BaseEntity } from "./baseEntity.js";
-import * as PIXI from "https://cdn.skypack.dev/pixi.js@8.0.0";
+import * as PIXI from "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.mjs";
 
 export class Home extends BaseEntity {
   constructor(x, y, game, team = 1) {
@@ -88,7 +88,7 @@ export class Home extends BaseEntity {
       -this.width / 2,
       -this.height / 2,
       this.width,
-      this.height
+      this.height,
     );
     graphics.endFill();
 
@@ -110,7 +110,7 @@ export class Home extends BaseEntity {
         -this.width / 2 - 2,
         -this.height / 2 - 2,
         this.width + 4,
-        this.height + 4
+        this.height + 4,
       );
     }
   }
